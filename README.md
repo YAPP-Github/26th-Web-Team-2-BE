@@ -1,1 +1,1 @@
-# @yapp-github/26th-web-team-2-be
+# @yapp-github/26th-web-team-2-BE
