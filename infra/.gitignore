@@ -38,6 +38,3 @@ out/
 
 ### env ###
 .env
-
-### spr ###
-.spr.yml
