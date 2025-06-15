@@ -1,0 +1,24 @@
+spring:
+  security:
+    base-url: ${BASE_URL}
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID} # REST API key
+            client-secret: ${KAKAO_CLIENT_SECRET} # Admin key
+            authorization-grant-type: authorization_code
+            redirect-uri: "${BASE_URL}/login/oauth2/code/kakao"
+            client-authentication-method: client_secret_post
+            scope: profile_nickname, profile_image
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+    jwt:
+      access-secret-key: ${JWT_ACCESS_SECRET_KEY}
+      refresh-secret-key: ${JWT_REFRESH_SECRET_KEY}
+      access-token-validity-in-ms: 3600000           # 1시간
+      refresh-token-validity-in-ms: 1209600000       # 7일
