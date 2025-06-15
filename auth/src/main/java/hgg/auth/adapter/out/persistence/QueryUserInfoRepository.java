@@ -18,4 +18,11 @@ public class QueryUserInfoRepository implements QueryUserPort {
         return jpaUserRepository.findByProviderAndSocialId(provider, socialId)
                 .map(UserEntity::toModel);
     }
+
+    @Override
+    public User getUserById(Long userId) {
+        return jpaUserRepository.findById(userId)
+                .orElseThrow(RuntimeException::new)
+                .toModel();
+    }
 }

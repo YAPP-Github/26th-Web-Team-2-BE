@@ -5,4 +5,5 @@ import java.util.Optional;
 
 public interface QueryUserPort {
     Optional<User> getUser(String provider, String socialId);
+    User getUserById(Long aLong);
 }
