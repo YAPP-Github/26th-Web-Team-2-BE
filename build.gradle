@@ -1,14 +1,13 @@
 plugins {
-	id 'java'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'io.spring.dependency-management' version '1.1.7' apply(false)
 }
 
-group = 'com.yapp'
-version = '1.0.0'
+allprojects {
+	group = 'com.yapp'
+	version = '1.0.0'
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+	repositories {
+		mavenCentral()
 	}
 }
 
@@ -16,25 +15,21 @@ subprojects {
 	apply plugin: 'java'
 	apply plugin: 'io.spring.dependency-management'
 
-	repositories {
-		mavenCentral()
-	}
-
-	dependencies {
-		implementation 'org.springframework.boot:spring-boot-starter'
-		compileOnly 'org.projectlombok:lombok'
-		annotationProcessor 'org.projectlombok:lombok'
-		testImplementation 'org.springframework.boot:spring-boot-starter-test'
-		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	}
-
-	configurations {
-		compileOnly {
-			extendsFrom annotationProcessor
+	dependencyManagement {
+		imports {
+			mavenBom 'org.springframework.boot:spring-boot-dependencies:3.5.0'
 		}
 	}
 
-	tasks.named('test') {
-		useJUnitPlatform()
+	// 공통 테스트 설정 (java/ java-library 플러그인 적용 모듈에만 동작)
+	plugins.withType(JavaPlugin).configureEach {
+		dependencies {
+			testImplementation 'org.junit.jupiter:junit-jupiter-api'
+			testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+		}
+		tasks.named('test') { useJUnitPlatform() }
+		configurations {
+			compileOnly { extendsFrom annotationProcessor }
+		}
 	}
 }

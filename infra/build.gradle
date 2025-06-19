@@ -1,0 +1,20 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+dependencies {
+//    api 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    api 'org.springframework.boot:spring-boot-starter-data-redis'
+//    api 'com.mysql:mysql-connector-j'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    enabled = false
+}

@@ -1,1 +1,11 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
 rootProject.name = '26th-WEB-TEAM-2-BE'
+include ":auth"
+include ":domain"
+include ":infra"
