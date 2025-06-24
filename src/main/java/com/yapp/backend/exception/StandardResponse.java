@@ -1,7 +1,5 @@
 package com.yapp.backend.exception;
 
-import org.springframework.http.ProblemDetail;
-
 import lombok.Getter;
 
 @Getter
