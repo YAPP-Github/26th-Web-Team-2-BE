@@ -8,5 +8,5 @@ sentry:
   traces-sample-rate: 1.0
   profiles-sample-rate: 1.0
   environment: development
-  debug: true
+  debug: false
   exception-resolver-order: 2147483647
