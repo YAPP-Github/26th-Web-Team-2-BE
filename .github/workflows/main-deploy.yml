@@ -69,6 +69,11 @@ jobs:
           printf "%s\n" "${{ secrets.SERVER_SSH_KEY }}" > ./deploy_key
           chmod 600 ./deploy_key
 
+      - name: Inspect key file
+        run: |
+          ls -l ./deploy_key
+          head -n 5 ./deploy_key
+
       - name: Copy docker-compose.yml to server
         uses: appleboy/scp-action@v0.1.2
         with:
