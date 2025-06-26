@@ -70,7 +70,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          fingerprint: ${{ secrets.SERVER_SSH_FINGERPRINT }}
           source: "docker-compose.yml"
           target: "/home/ubuntu/app/docker-compose.yml"
 
@@ -80,7 +80,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          fingerprint: ${{ secrets.SERVER_SSH_FINGERPRINT }}
           script: |
             cd /home/ubuntu/app
             docker-compose pull
