@@ -74,8 +74,13 @@ jobs:
           ls -l ./deploy_key
           head -n 5 ./deploy_key
 
+      - name: Test SSH auth
+        run: |
+          ssh -vvv -i deploy_key -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.SERVER_HOST }} echo ok
+
       - name: Copy docker-compose.yml to server
-        uses: appleboy/scp-action@v0.1.2
+        uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
