@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.yapp.common.response.StandardResponse;
+import com.yapp.common.response.ResponseType;
+
 @Order(1)
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,21 +34,19 @@ public class GlobalExceptionHandler {
 			message
 		);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-			.body(new StandardResponse<>("error", problemDetail));
+			.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 
 	@ExceptionHandler(CustomException.class)
 	public ResponseEntity<StandardResponse<ProblemDetail>> handleCustomException(CustomException e) {
 		Sentry.captureException(e);
-		String message = (e.getMessage() != null && !e.getMessage().isEmpty())
-			? e.getMessage()
-			: "커스텀 오류가 발생했습니다.";
+		ErrorCode errorCode = e.getErrorCode();
 		ProblemDetail problemDetail = createProblemDetail(
-			HttpStatus.BAD_REQUEST,
-			e.getTitle(),
-			message
+			errorCode.getHttpStatus(),
+			errorCode.getTitle(),
+			errorCode.getMessage()
 		);
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(new StandardResponse<>("error", problemDetail));
+		return ResponseEntity.status(errorCode.getHttpStatus())
+			.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 } 
