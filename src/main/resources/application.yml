@@ -1,3 +1,10 @@
 spring:
   application:
     name: backend
+  config:
+    import:
+      - optional:file:./.env[.properties]
+      - classpath:config/bootstrap.yml
+
+env:
+  test: ${TEST_VALUE}
