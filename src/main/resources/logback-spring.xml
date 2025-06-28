@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Console appender -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <!-- logtime -->
+                <timestamp>
+                    <fieldName>logtime</fieldName>
+                    <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSZ</pattern>
+                </timestamp>
+                <!-- level -->
+                <patternLayout>
+                    <pattern>%level</pattern>
+                    <fieldName>level</fieldName>
+                </patternLayout>
+                <!-- thread -->
+                <threadName>
+                    <fieldName>thread</fieldName>
+                </threadName>
+                <!-- class -->
+                <loggerName>
+                    <fieldName>class</fieldName>
+                </loggerName>
+                <!-- message -->
+                <message>
+                    <fieldName>message</fieldName>
+                </message>
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Sentry appender -->
+    <appender name="Sentry" class="io.sentry.logback.SentryAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- Root logger -->
+    <root level="INFO">
+        <appender-ref ref="Console" />
+        <appender-ref ref="Sentry" />
+    </root>
+
+    <!-- Application logger -->
+    <logger name="com.yapp" level="INFO" additivity="false">
+        <appender-ref ref="Console" />
+        <appender-ref ref="Sentry" />
+    </logger>
+</configuration> 
