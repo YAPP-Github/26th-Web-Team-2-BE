@@ -1,3 +1,8 @@
 spring:
   application:
     name: backend
+
+springdoc:
+  swagger-ui:
+    with-credentials: true
+    path: /swagger
