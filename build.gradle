@@ -1,7 +1,14 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id "io.sentry.jvm.gradle" version "5.7.0"
 }
 
 group = 'com.yapp'
@@ -25,6 +32,10 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'io.sentry:sentry-spring-boot-starter:8.12.0'
+	implementation 'io.sentry:sentry-logback:8.12.0'
+	implementation 'io.sentry:sentry-spring:8.12.0'
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -33,4 +44,18 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+sentry {
+	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+	// This enables source context, allowing you to see your source
+	// code as part of your stack traces in Sentry.
+	includeSourceContext = true
+
+	org = "yapp-26th-web-2nd"
+	projectName = "26th-web-team-2-be-web"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+	
+	// 명시적으로 Sentry 버전을 8.12.0으로 통일
+	autoInstallation.sentryVersion.set("8.12.0")
 }
