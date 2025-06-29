@@ -1,3 +1,16 @@
+spring:
+  application:
+    name: backend
+  config:
+    import:
+      - optional:sm://
+      - optional:gcp-secretmanager:/
+  cloud:
+    gcp:
+      project-id: continual-lodge-462511-g8
+      secretmanager:
+        enabled: true
+
 sentry:
   dsn: ${SENTRY_DSN}
   send-default-pii: true
@@ -5,4 +18,4 @@ sentry:
   profiles-sample-rate: 1.0
   environment: production
   debug: false
-  exception-resolver-order: 2147483647 
+  exception-resolver-order: 2147483647

@@ -1,15 +1,18 @@
 spring:
   application:
     name: backend
+  cloud:
+    gcp:
+      secretmanager:
+        enabled: false
   config:
     import:
       - optional:file:./.env[.properties]
-      - classpath:config/bootstrap.yml
-
-env:
-  test: ${TEST_VALUE}
 
 springdoc:
   swagger-ui:
     with-credentials: true
     path: /swagger
+
+env:
+  test: "${TEST_VALUE:${sm://TEST_VALUE}}"
