@@ -5,8 +5,6 @@ import com.yapp.backend.exception.ErrorCode;
 import com.yapp.common.response.StandardResponse;
 import com.yapp.common.response.ResponseType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +23,7 @@ public class MockApiController {
 	@GetMapping("/success")
 	public ResponseEntity<StandardResponse<String>> success() {
 		log.info("정상 응답 API 호출");
-		return ResponseEntity.ok(new StandardResponse<>("정상 응답입니다."));
+		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, "정상 응답입니다."));
 	}
 
 	// CustomException 발생
