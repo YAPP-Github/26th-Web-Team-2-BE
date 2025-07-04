@@ -28,18 +28,27 @@ configurations {
 
 repositories {
 	mavenCentral()
+	google()
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:5.10.0"
+	}
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'com.google.cloud:spring-cloud-gcp-starter-secretmanager'
+  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+    
 	implementation 'io.sentry:sentry-spring-boot-starter:8.12.0'
-	implementation 'io.sentry:sentry-logback:8.12.0'
-	implementation 'io.sentry:sentry-spring:8.12.0'
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -56,7 +65,7 @@ sentry {
 
 	org = "yapp-26th-web-2nd"
 	projectName = "26th-web-team-2-be-web"
-	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+	authToken = System.getenv("SENTRY_AUTH_TOKEN") ?: ""
 	
 	// 명시적으로 Sentry 버전을 8.12.0으로 통일
 	autoInstallation.sentryVersion.set("8.12.0")
