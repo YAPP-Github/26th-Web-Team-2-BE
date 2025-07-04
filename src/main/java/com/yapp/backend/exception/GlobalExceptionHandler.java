@@ -39,6 +39,7 @@ public class GlobalExceptionHandler {
 		String message = (e.getMessage() != null && !e.getMessage().isEmpty())
 			? e.getMessage()
 			: DEFAULT_ERROR_MESSAGE;
+
 		ProblemDetail problemDetail = createProblemDetail(
 			HttpStatus.INTERNAL_SERVER_ERROR,
 			"Internal Server Error",
