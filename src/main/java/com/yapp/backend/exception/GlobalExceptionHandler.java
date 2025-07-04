@@ -21,6 +21,12 @@ public class GlobalExceptionHandler {
 		problemDetail.setDetail(detail);
 		return problemDetail;
 	}
+	private ProblemDetail createProblemDetail(ErrorCode errorCode) {
+		ProblemDetail problemDetail = ProblemDetail.forStatus(errorCode.getHttpStatus());
+		problemDetail.setTitle(errorCode.getTitle());
+		problemDetail.setDetail(errorCode.getMessage());
+		return problemDetail;
+	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<StandardResponse<ProblemDetail>> handleAllExceptions(Exception e) {
@@ -41,11 +47,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<StandardResponse<ProblemDetail>> handleCustomException(CustomException e) {
 		Sentry.captureException(e);
 		ErrorCode errorCode = e.getErrorCode();
-		ProblemDetail problemDetail = createProblemDetail(
-			errorCode.getHttpStatus(),
-			errorCode.getTitle(),
-			errorCode.getMessage()
-		);
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
 		return ResponseEntity.status(errorCode.getHttpStatus())
 			.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
