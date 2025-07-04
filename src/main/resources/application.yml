@@ -13,6 +13,3 @@ springdoc:
   swagger-ui:
     with-credentials: true
     path: /swagger
-
-env:
-  test: "${TEST_VALUE:${sm://TEST_VALUE}}"
