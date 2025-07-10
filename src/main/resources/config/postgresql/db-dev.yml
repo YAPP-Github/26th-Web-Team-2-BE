@@ -1,0 +1,16 @@
+# 개발 및 QA 서버 환경(dev)에서 사용
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_BASTION_IP}:5432/${TEST_DB_NAME}
+    username: ${TEST_DB_USER}
+    password: ${TEST_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  cloud:
+    gcp:
+      sql:
+        enabled: false
