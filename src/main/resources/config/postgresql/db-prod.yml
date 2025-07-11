@@ -1,7 +1,7 @@
 # 운영 환경(prod)에서 사용
 spring:
   datasource:
-    url: jdbc:postgresql://host.docker.internal:5432/${sm://PROD_DB_NAME}
+    url: jdbc:postgresql://${sm://DB_BASTION_IP}:5432/${sm://PROD_DB_NAME}
     username: "${sm://PROD_DB_USER}"
     password: "${sm://PROD_DB_PASSWORD}"
     driver-class-name: org.postgresql.Driver
