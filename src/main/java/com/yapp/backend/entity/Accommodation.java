@@ -40,7 +40,7 @@ public class Accommodation {
     private String accommodationName;
 
     @Type(JsonType.class)
-    @Column(name = "images", columnDefinition = "text[]")
+    @Column(name = "images", columnDefinition = "jsonb")
     private List<String> images;
 
     @Column(name = "address")
