@@ -5,6 +5,7 @@ spring:
     import:
       - optional:sm://
       - optional:gcp-secretmanager:/
+      - optional:classpath:config/postgresql/db-prod.yml
   cloud:
     gcp:
       project-id: continual-lodge-462511-g8
