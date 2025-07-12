@@ -14,6 +14,7 @@ public class Transportation {
     private String type;
     private Double latitude;
     private Double longitude;
+    private String distance;
     private DistanceInfo byFoot;
     private DistanceInfo byCar;
 }
