@@ -20,50 +20,68 @@ public class Accommodation {
     private Long id;
 
     // 메타데이터
+    @Column(name = "url_test")
     private String urlTest;
+    @Column(name = "site_name")
     private String siteName;
+    @Column(name = "memo")
     private String memo;
+    @Column(name = "created_at")
     private LocalDate createdAt;
+    @Column(name = "updated_at")
     private LocalDate updatedAt;
+    @Column(name = "created_by")
     private Long createdBy;
+    @Column(name = "table_id")
     private Long tableId;
 
     // 숙소 정보
+    @Column(name = "accommodation_name")
     private String accommodationName;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "text[]")
+    @Column(name = "images", columnDefinition = "text[]")
     private List<String> images;
 
+    @Column(name = "address")
     private String address;
+
+    @Column(name = "latitude")
     private Double latitude;
+    @Column(name = "longitude")
     private Double longitude;
+    @Column(name = "lowest_price")
     private Integer lowestPrice;
+    @Column(name = "highest_price")
     private Integer highestPrice;
+    @Column(name = "currency")
     private String currency;
+    @Column(name = "review_score")
     private Double reviewScore;
+    @Column(name = "cleanliness_score")
     private Double cleanlinessScore;
+    @Column(name = "review_summary")
     private String reviewSummary;
+    @Column(name = "hotel_id")
     private Long hotelId;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private String nearbyAttractions;
+    @Column(name = "nearby_attractions", columnDefinition = "jsonb")
+    private List<Attraction> nearbyAttractions;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private String nearbyTransportation;
+    @Column(name = "nearby_transportation", columnDefinition = "jsonb")
+    private List<Transportation> nearbyTransportation;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private String amenities;
+    @Column(name = "amenities", columnDefinition = "jsonb")
+    private List<Amenity> amenities;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private String checkInTime;
+    @Column(name = "check_in_time", columnDefinition = "jsonb")
+    private CheckTime checkInTime;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private String checkOutTime;
-
+    @Column(name = "check_out_time", columnDefinition = "jsonb")
+    private CheckTime checkOutTime;
 }
