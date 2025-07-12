@@ -1,7 +1,7 @@
 # 개발 및 QA 서버 환경(dev)에서 사용
 spring:
   datasource:
-    url: jdbc:postgresql://${sm://DB_BASTION_IP}:5432/${TEST_DB_NAME}
+    url: jdbc:postgresql://${sm://DB_PRIVATE_IP}:5432/${TEST_DB_NAME}
     username: ${TEST_DB_USER}
     password: ${TEST_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
