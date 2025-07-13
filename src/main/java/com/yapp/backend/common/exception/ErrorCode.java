@@ -1,4 +1,4 @@
-package com.yapp.backend.exception;
+package com.yapp.backend.common.exception;
 
 import org.springframework.http.HttpStatus;
 import lombok.Getter;

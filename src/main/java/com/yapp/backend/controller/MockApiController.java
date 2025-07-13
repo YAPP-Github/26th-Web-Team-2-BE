@@ -1,14 +1,14 @@
 package com.yapp.backend.controller;
 
-import com.yapp.backend.exception.CustomException;
-import com.yapp.backend.exception.ErrorCode;
-import com.yapp.common.response.StandardResponse;
-import com.yapp.common.response.ResponseType;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.yapp.backend.common.exception.CustomException;
+import com.yapp.backend.common.exception.ErrorCode;
+import com.yapp.backend.common.response.ResponseType;
+import com.yapp.backend.common.response.StandardResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
