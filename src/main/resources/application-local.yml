@@ -7,4 +7,9 @@
 #   profiles-sample-rate: 1.0
 #   environment: local
 #   debug: false
-#   exception-resolver-order: 2147483647 
+#   exception-resolver-order: 2147483647
+
+spring:
+  config:
+    import:
+      - optional:classpath:config/postgresql/db-local.yml

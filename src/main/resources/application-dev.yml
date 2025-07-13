@@ -1,3 +1,8 @@
+spring:
+  config:
+    import:
+      - optional:classpath:config/postgresql/db-dev.yml
+
 sentry:
   dsn: ${SENTRY_DSN}
   send-default-pii: true
@@ -5,4 +10,4 @@ sentry:
   profiles-sample-rate: 1.0
   environment: development
   debug: false
-  exception-resolver-order: 2147483647 
+  exception-resolver-order: 2147483647
