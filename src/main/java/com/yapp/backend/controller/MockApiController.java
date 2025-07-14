@@ -2,6 +2,7 @@ package com.yapp.backend.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,13 +11,18 @@ import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 
-import lombok.extern.slf4j.Slf4j;
+import com.yapp.backend.domain.dto.UserDto;
+import com.yapp.backend.service.UserService;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/mock")
+@RequiredArgsConstructor
 public class MockApiController {
+	private final UserService userService;
 	// todo 응답, 예외, 에러 처리 테스트용 & 애플리케이션 로깅 Mock API로 제거 필요
 
 	// 정상 응답
@@ -38,5 +44,11 @@ public class MockApiController {
 	public ResponseEntity<StandardResponse<String>> exceptionError() {
 		log.error("일반 예외 발생");
 		throw new RuntimeException("이것은 일반 예외입니다.");
+	}
+
+	@GetMapping("/user/{id}")
+	public ResponseEntity<StandardResponse<UserDto>> getUser(@PathVariable Long id) {
+		UserDto userDto = userService.getUserById(id);
+		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, userDto));
 	}
 } 
