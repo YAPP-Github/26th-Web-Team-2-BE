@@ -1,6 +1,6 @@
-package com.yapp.backend.service.dto;
+package com.yapp.backend.domain;
 
-import com.yapp.backend.domain.entity.UserEntity;
+import com.yapp.backend.repository.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

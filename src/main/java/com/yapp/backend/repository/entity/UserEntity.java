@@ -1,4 +1,4 @@
-package com.yapp.backend.domain.entity;
+package com.yapp.backend.repository.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

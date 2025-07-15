@@ -10,9 +10,8 @@ import com.yapp.backend.common.exception.CustomException;
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
-import com.yapp.backend.controller.dto.UserResponse;
+import com.yapp.backend.controller.dto.response.UserResponse;
 import com.yapp.backend.service.UserService;
-import com.yapp.backend.service.dto.User;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,8 +47,7 @@ public class MockApiController {
 
 	@GetMapping("/user/{id}")
 	public ResponseEntity<StandardResponse<UserResponse>> getUser(@PathVariable Long id) {
-		User user = userService.getUserById(id);
-        UserResponse response = UserResponse.from(user);
+		UserResponse response = userService.getUserById(id);
 		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
 	}
 } 
