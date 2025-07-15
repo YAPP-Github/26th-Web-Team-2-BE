@@ -1,50 +1,50 @@
 buildscript {
-    repositories {
-        mavenCentral()
-    }
+	repositories {
+		mavenCentral()
+	}
 }
 
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.5.3'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id "io.sentry.jvm.gradle" version "5.7.0"
+	id 'java'
+	id 'org.springframework.boot' version '3.5.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id "io.sentry.jvm.gradle" version "5.7.0"
 }
 
 group = 'com.yapp'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
 }
 
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
 
 repositories {
-    mavenCentral()
-    google()
+	mavenCentral()
+	google()
 }
 
 dependencyManagement {
-    imports {
-        mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:5.10.0"
-    }
+	imports {
+		mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:5.10.0"
+	}
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'com.google.cloud:spring-cloud-gcp-starter-secretmanager'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
-
-    implementation 'io.sentry:sentry-spring-boot-starter:8.12.0'
-    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'com.google.cloud:spring-cloud-gcp-starter-secretmanager'
+  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+    
+	implementation 'io.sentry:sentry-spring-boot-starter:8.12.0'
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 	// Micrometer for Metrics
 	implementation 'io.micrometer:micrometer-registry-prometheus'
@@ -56,31 +56,27 @@ dependencies {
 	// Loki for Logs
 	implementation 'com.github.loki4j:loki-logback-appender:1.5.1'
 
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.postgresql:postgresql:42.7.7'
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.10.1'
-
-    compileOnly 'org.projectlombok:lombok:1.18.38'
-    annotationProcessor 'org.projectlombok:lombok:1.18.38'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+	useJUnitPlatform()
 }
 
 sentry {
-    // Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
-    // This enables source context, allowing you to see your source
-    // code as part of your stack traces in Sentry.
-    includeSourceContext = true
+	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+	// This enables source context, allowing you to see your source
+	// code as part of your stack traces in Sentry.
+	includeSourceContext = true
 
-    org = "yapp-26th-web-2nd"
-    projectName = "26th-web-team-2-be-web"
-    authToken = System.getenv("SENTRY_AUTH_TOKEN") ?: ""
-
-    // 명시적으로 Sentry 버전을 8.12.0으로 통일
-    autoInstallation.sentryVersion.set("8.12.0")
+	org = "yapp-26th-web-2nd"
+	projectName = "26th-web-team-2-be-web"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN") ?: ""
+	
+	// 명시적으로 Sentry 버전을 8.12.0으로 통일
+	autoInstallation.sentryVersion.set("8.12.0")
 }
