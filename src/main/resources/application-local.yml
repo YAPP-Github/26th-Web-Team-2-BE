@@ -1,30 +1,30 @@
-sentry:
-  dsn: ${SENTRY_DSN}
-  send-default-pii: true
-  traces-sample-rate: 1.0
-  profiles-sample-rate: 1.0
-  environment: development
-  debug: false
-  exception-resolver-order: 2147483647
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: prometheus
-  otlp:
-    tracing:
-      endpoint: https://tempo-prod-20-prod-ap-northeast-0.grafana.net/otlp/v1/traces
-      headers:
-        Authorization: ${GRAFANA_TEMPO_AUTHORIZATION}
-  prometheus:
-    metrics:
-      export:
-        url: ${GRAFANA_PROMETHEUS_URL}
-        headers:
-          Authorization: ${GRAFANA_PROMETHEUS_AUTHORIZATION}
-
-loki:
-  url: ${LOKI_URL}
-  username: ${LOKI_USERNAME}
-  password: ${LOKI_PASSWORD}
+#sentry:
+#  dsn: ${SENTRY_DSN}
+#  send-default-pii: true
+#  traces-sample-rate: 1.0
+#  profiles-sample-rate: 1.0
+#  environment: development
+#  debug: false
+#  exception-resolver-order: 2147483647
+#
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: prometheus
+#  otlp:
+#    tracing:
+#      endpoint: https://tempo-prod-20-prod-ap-northeast-0.grafana.net/otlp/v1/traces
+#      headers:
+#        Authorization: ${GRAFANA_TEMPO_AUTHORIZATION}
+#  prometheus:
+#    metrics:
+#      export:
+#        url: ${GRAFANA_PROMETHEUS_URL}
+#        headers:
+#          Authorization: ${GRAFANA_PROMETHEUS_AUTHORIZATION}
+#
+#loki:
+#  url: ${LOKI_URL}
+#  username: ${LOKI_USERNAME}
+#  password: ${LOKI_PASSWORD}
