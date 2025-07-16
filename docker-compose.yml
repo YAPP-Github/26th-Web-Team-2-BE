@@ -1,6 +1,6 @@
 services:
   backend:
-    image: yapp26web2/hzz:latest
+    image: yapp26web2/ssok-prod:latest
     restart: unless-stopped
     ports:
       - "8080:8080"
