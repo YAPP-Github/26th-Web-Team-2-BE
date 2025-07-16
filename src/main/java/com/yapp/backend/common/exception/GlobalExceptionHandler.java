@@ -1,4 +1,4 @@
-package com.yapp.backend.exception;
+package com.yapp.backend.common.exception;
 
 import io.sentry.Sentry;
 
@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.yapp.common.response.StandardResponse;
-import com.yapp.common.response.ResponseType;
+import com.yapp.backend.common.response.ResponseType;
+import com.yapp.backend.common.response.StandardResponse;
 
 @Slf4j
 @Order(1)
