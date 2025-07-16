@@ -18,5 +18,5 @@ gcloud run deploy "${IMAGE_NAME}" \
   --platform managed \
   --memory 1Gi \
   --cpu 2 \
-  --update-secrets DB_PRIVATE_IP=projects/${PROJECT_ID}/secrets/DB_PRIVATE_IP/versions/latest
-#  "${UPDATE_SECRETS[@]}"
+  --verbosity debug \
+  "${UPDATE_SECRETS[@]}"
