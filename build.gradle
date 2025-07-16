@@ -53,6 +53,11 @@ dependencies {
 	implementation 'io.micrometer:micrometer-tracing-bridge-otel'
 	implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 
+	// DB
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.postgresql:postgresql:42.7.7'
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.10.1'
+
 	// Loki for Logs
 	implementation 'com.github.loki4j:loki-logback-appender:1.5.1'
 
