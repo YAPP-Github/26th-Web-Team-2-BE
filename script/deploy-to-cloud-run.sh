@@ -4,7 +4,7 @@ REPO_NAME=$3
 IMAGE_NAME=$4
 IMAGE_SHA=$5
 
-IFS=$'\n' read -rd '' -a SECRETS <<<"$(gcloud secrets list --project=$PROJECT_ID --format='value(name)')"
+mapfile -t SECRETS < <(gcloud secrets list --project=$PROJECT_ID --format='value(name)')
 
 UPDATE_SECRETS=()
 for SECRET in "${SECRETS[@]}"; do
