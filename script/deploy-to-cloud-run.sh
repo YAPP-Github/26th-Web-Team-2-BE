@@ -12,6 +12,8 @@ do
     UPDATE_SECRETS+="--update-secrets ${SECRET}=projects/${PROJECT_ID}/secrets/${SECRET}/versions/latest "
 done
 
+echo "UPDATE_SECRETS: $UPDATE_SECRETS"
+
 gcloud run deploy ${IMAGE_NAME} \
   --image ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:${IMAGE_SHA} \
   --region ${REGION} \
