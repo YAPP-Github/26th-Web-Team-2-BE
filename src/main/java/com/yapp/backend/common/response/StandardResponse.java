@@ -1,4 +1,4 @@
-package com.yapp.common.response;
+package com.yapp.backend.common.response;
 
 import lombok.Getter;
 
