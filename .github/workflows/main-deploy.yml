@@ -37,7 +37,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker compose -f docker-compose.yml build
+          docker build \
+          --build-arg SPRING_PROFILES_ACTIVE=prod \
+          -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:$GITHUB_SHA \
+          -f Dockerfile \
+          .
 
       - name: Tag Docker image
         run: |
