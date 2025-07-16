@@ -3,97 +3,56 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - feature/Y26W2-23
 
 env:
-  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-  DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-  DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
-  DOCKER_TAG: ${{ github.sha }}
-  SERVER_HOST: ${{ secrets.SERVER_HOST }}
-  SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+  SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION:     ${{ secrets.GCP_REGION }}
+  REPO_NAME:  ${{ secrets.GCP_ARTIFACT_REGISTRY_REPO_NAME }}
+  IMAGE_NAME: ssok-prod
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
         with:
-          fetch-depth: 1
+          credentials_json: ${{ env.SA_KEY }}
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          project_id: ${{ env.PROJECT_ID }}
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ env.DOCKER_HUB_USERNAME }}
-          password: ${{ env.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ env.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-            ${{ env.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_TAG }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: compose-files
-          path: |
-            docker-compose.yml
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build-and-push
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: compose-files
-          path: ./deploy-files
-
-      - uses: webfactory/ssh-agent@v0.9.1
-        with:
-          ssh-private-key: ${{ env.SERVER_SSH_KEY }}
-
-      - name: Copy docker-compose.yml via scp
+      - name: Configure Docker auth
         run: |
-          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
-          scp -o StrictHostKeyChecking=no \
-            deploy-files/docker-compose.yml \
-            ubuntu@${{ env.SERVER_HOST }}:/home/ubuntu/app/docker-compose.yml
+          gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
 
-      - name: Deploy on server
+      - name: Build Docker image
         run: |
-          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ env.SERVER_HOST }} << 'EOF'
-            cd /home/ubuntu/app
-            docker compose pull
-            docker compose up -d
-          EOF
+          docker build \
+            -f docker/Dockerfile \
+            -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:$GITHUB_SHA \
+            .
+
+      - name: Push to Artifact Registry
+        run: |
+          docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:$GITHUB_SHA
+
+      - name: Make deploy script executable
+        run: chmod +x script/deploy-to-cloud-run.sh
+
+      - name: Deploy to Cloud Run
+        run: |
+          ./script/deploy-to-cloud-run.sh \
+            ${{ env.PROJECT_ID }} \
+            ${{ env.REGION }} \
+            ${{ env.REPO_NAME }} \
+            ${{ env.IMAGE_NAME }} \
+            $GITHUB_SHA
