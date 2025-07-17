@@ -1,4 +1,4 @@
-package com.yapp.backend.entity;
+package com.yapp.backend.repository.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Amenity {
-    private String type;
-    private boolean available;
-    private String description;
+public class CheckTime {
+    private String checkInTimeFrom;
+    private String checkInTimeTo;
 }

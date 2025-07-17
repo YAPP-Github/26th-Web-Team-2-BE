@@ -1,4 +1,4 @@
-package com.yapp.backend.entity;
+package com.yapp.backend.repository.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Attraction {
+public class Transportation {
     private String name;
     private String type;
     private Double latitude;
