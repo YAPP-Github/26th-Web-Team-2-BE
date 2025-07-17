@@ -8,7 +8,7 @@ spring:
   config:
     import:
       - optional:file:./.env[.properties]
-
+      - classpath:config/oauth/security.yml
 springdoc:
   swagger-ui:
     with-credentials: true
