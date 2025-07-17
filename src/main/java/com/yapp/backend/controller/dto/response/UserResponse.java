@@ -11,6 +11,6 @@ public class UserResponse {
     private String name;
 
     public static UserResponse from(User user) {
-        return new UserResponse(user.getId(), user.getName());
+        return new UserResponse(user.getId(), user.getNickname());
     }
 }
