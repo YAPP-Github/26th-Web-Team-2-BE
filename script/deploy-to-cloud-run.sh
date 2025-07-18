@@ -23,7 +23,7 @@ for SECRET in "${SECRETS[@]}"; do
     SECRET=$(echo "$SECRET" | xargs)  # 공백 제거 (trim)
     if [ -n "$SECRET" ]; then
         echo "Adding secret: $SECRET"
-        UPDATE_SECRETS+=(--update-secrets "${SECRET}=projects/${PROJECT_ID}/secrets/${SECRET}:latest")
+        UPDATE_SECRETS+=(--update-secrets "${SECRET}=${SECRET}:latest")
     fi
 done
 
