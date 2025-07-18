@@ -1,10 +1,9 @@
+server:
+  forward-headers-strategy: framework
+
 spring:
   application:
     name: backend
-  cloud:
-    gcp:
-      secretmanager:
-        enabled: false
   config:
     import:
       - optional:file:./.env[.properties]
