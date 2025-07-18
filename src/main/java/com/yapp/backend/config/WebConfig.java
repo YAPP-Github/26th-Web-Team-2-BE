@@ -10,11 +10,10 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
                 .allowedHeaders("*")
-                .allowedOrigins(
-                        "https://ssok.info",
-                        "https://dev.ssok.info",
-                        "https://prod.ssok.info",
-                        "http://ssok-prod-100906159553.asia-northeast3.run.app"
+                .allowedOriginPatterns(
+                        "https://*.ssok.info",
+                        "https://*.run.app",
+                        "http://*.run.app"
                 )
                 .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
                 .allowCredentials(true);
