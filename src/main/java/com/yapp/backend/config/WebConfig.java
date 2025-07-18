@@ -14,7 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "https://ssok.info",
                         "https://dev.ssok.info",
                         "https://prod.ssok.info",
-                        "https://ssok-prod-100906159553.asia-northeast3.run.app"
+                        "http://ssok-prod-100906159553.asia-northeast3.run.app"
                 )
                 .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
                 .allowCredentials(true);
