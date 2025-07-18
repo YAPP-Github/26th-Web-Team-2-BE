@@ -10,7 +10,7 @@ public class TestController {
     @Value("${test.value}")
     private String value;
 
-    @GetMapping("/")
+    @GetMapping("/api/test")
     public String test() {
         return value;
     }
