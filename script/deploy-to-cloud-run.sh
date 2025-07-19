@@ -44,7 +44,14 @@ gcloud run deploy "${IMAGE_NAME}" \
   --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:${IMAGE_SHA}" \
   --region "${REGION}" \
   --platform managed \
+  --port 8080 \
   --memory 1Gi \
   --cpu 2 \
   --verbosity debug \
   "${UPDATE_SECRETS[@]}"
+
+gcloud logs read \
+  --project=$PROJECT_ID \
+  --limit=50 \
+  --resource="cloud_run_revision" \
+  --log-filter='resource.labels.service_name="ssok-prod" AND severity>=ERROR'
