@@ -55,3 +55,7 @@ gcloud logs read \
   --limit=50 \
   --resource="cloud_run_revision" \
   --log-filter='resource.labels.service_name="ssok-prod" AND severity>=ERROR'
+
+echo "🔍 LOKI_URL=$LOKI_URL"
+echo "🔍 LOKI_USERNAME=$LOKI_USERNAME"
+echo "🔍 LOKI_PASSWORD=${LOKI_PASSWORD:0:4}****"  # (보안상 일부만)
