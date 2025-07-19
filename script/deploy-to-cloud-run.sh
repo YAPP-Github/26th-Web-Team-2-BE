@@ -50,11 +50,11 @@ gcloud run deploy "${IMAGE_NAME}" \
   --verbosity debug \
   "${UPDATE_SECRETS[@]}" || true
 
-gcloud logs read \
+gcloud run services logs read ssok-prod \
   --project=$PROJECT_ID \
+  --region=$REGION \
   --limit=50 \
-  --resource="cloud_run_revision" \
-  --log-filter='resource.labels.service_name="ssok-prod" AND severity>=ERROR'
+  --severity=ERROR
 
 echo "🔍 LOKI_URL=$LOKI_URL"
 echo "🔍 LOKI_USERNAME=$LOKI_USERNAME"
