@@ -1,6 +1,7 @@
 package com.yapp.backend.repository.entity;
 
 import com.yapp.backend.domain.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Getter
@@ -19,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(
         name = "users",
         uniqueConstraints = @UniqueConstraint(
-                columnNames = { "provider", "social_id" }
+                columnNames = { "provider", "socialId" }
         ))
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,14 +31,31 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "provider")
     private String provider;
+
+    @Column(name = "social_id")
     private String socialId;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "nickname")
     private String nickname;
+
+    @Column(name = "profile_image")
     private String profileImage;
 
+    @CreationTimestamp
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     public static UserEntity from(User user) {
@@ -47,6 +67,8 @@ public class UserEntity {
                 .nickname(user.getNickname())
                 .profileImage(user.getProfileImage())
                 .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .deletedAt(user.getDeletedAt())
                 .build();
     }
 
@@ -58,6 +80,10 @@ public class UserEntity {
                 .email(email)
                 .nickname(nickname)
                 .profileImage(profileImage)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .deletedAt(deletedAt)
                 .build();
     }
+
 }

@@ -22,7 +22,7 @@ public class SocialUserInfo {
                 .email(email)
                 .nickname(nickname)
                 .profileImage(profileImage)
-                .createdAt(LocalDateTime.now())
+                .createdAt(null)
                 .build();
     }
 }
