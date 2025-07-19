@@ -24,11 +24,11 @@ public class AccommodationController implements AccommodationDocs {
 	@Override
 	@GetMapping("/search")
 	public ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationsByTitle(
-		@RequestParam String title,
+		@RequestParam Integer tableId,
 		@RequestParam Integer page,
 		@RequestParam Integer size
 	) {
-		AccommodationPageResponse response = accommodationService.findAccommodationsByTitle(title, page, size);
+		AccommodationPageResponse response = accommodationService.findAccommodationsByTableId(tableId, page, size);
 		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
 	}
 }

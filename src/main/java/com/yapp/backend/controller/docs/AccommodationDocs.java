@@ -18,7 +18,7 @@ public interface AccommodationDocs {
 	@Operation(summary = "숙소 목록 조회", description = "제목에 포함된 키워드를 통해 숙소 목록을 검색합니다.")
 	@ApiResponse(responseCode = "200", description = "숙소 목록 조회 성공", content = @Content(schema = @Schema(implementation = StandardResponse.class)))
 	ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationsByTitle(
-		@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "string", description = "검색할 숙소 제목 키워드")) String title,
+		@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer", description = "숙소가 포함된 테이블의 ID")) Integer tableId,
 		@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer", description = "페이지 번호")) Integer page,
 		@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer", description = "페이지 크기")) Integer size
 	);

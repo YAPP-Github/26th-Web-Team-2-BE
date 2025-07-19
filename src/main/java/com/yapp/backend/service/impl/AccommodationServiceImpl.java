@@ -26,7 +26,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 	private final AccommodationRepository accommodationRepository;
 
 	@Override
-	public AccommodationPageResponse findAccommodationsByTitle(String title, int page, int size) {
+	public AccommodationPageResponse findAccommodationsByTableId(Integer tableId, int page, int size) {
 		// Base coordinates for Seoul
 		double baseLatitude = 37.5665;
 		double baseLongitude = 126.9780;
