@@ -1,6 +1,5 @@
 package com.yapp.backend.controller.dto.response;
 
-import com.yapp.backend.domain.Accommodation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

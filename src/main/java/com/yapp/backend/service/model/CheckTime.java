@@ -1,4 +1,4 @@
-package com.yapp.backend.repository.entity;
+package com.yapp.backend.service.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
