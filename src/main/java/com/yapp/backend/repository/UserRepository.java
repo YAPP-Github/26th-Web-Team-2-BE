@@ -1,6 +1,6 @@
 package com.yapp.backend.repository;
 
-import com.yapp.backend.domain.User;
+import com.yapp.backend.service.model.User;
 
 public interface UserRepository {
     User findById(Long id);

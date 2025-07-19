@@ -1,6 +1,6 @@
 package com.yapp.backend.controller.dto.response;
 
-import com.yapp.backend.domain.User;
+import com.yapp.backend.service.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

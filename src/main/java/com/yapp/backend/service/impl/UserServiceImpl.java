@@ -1,6 +1,6 @@
 package com.yapp.backend.service.impl;
 
-import com.yapp.backend.domain.User;
+import com.yapp.backend.service.model.User;
 import com.yapp.backend.repository.UserRepository;
 import com.yapp.backend.service.UserService;
 import lombok.RequiredArgsConstructor;

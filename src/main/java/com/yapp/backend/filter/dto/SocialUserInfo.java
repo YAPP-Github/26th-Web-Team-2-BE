@@ -1,7 +1,7 @@
 package com.yapp.backend.filter.dto;
 
-import com.yapp.backend.domain.User;
-import java.time.LocalDateTime;
+import com.yapp.backend.service.model.User;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

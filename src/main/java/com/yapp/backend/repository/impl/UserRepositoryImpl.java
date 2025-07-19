@@ -3,7 +3,7 @@ package com.yapp.backend.repository.impl;
 import static com.yapp.backend.common.exception.ErrorCode.*;
 
 import com.yapp.backend.common.exception.UserNotFoundException;
-import com.yapp.backend.domain.User;
+import com.yapp.backend.service.model.User;
 import com.yapp.backend.repository.JpaUserRepository;
 import com.yapp.backend.repository.entity.UserEntity;
 import com.yapp.backend.repository.UserRepository;
