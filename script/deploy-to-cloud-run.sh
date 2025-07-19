@@ -48,7 +48,7 @@ gcloud run deploy "${IMAGE_NAME}" \
   --memory 1Gi \
   --cpu 2 \
   --verbosity debug \
-  "${UPDATE_SECRETS[@]}"
+  "${UPDATE_SECRETS[@]}" || true
 
 gcloud logs read \
   --project=$PROJECT_ID \
@@ -58,4 +58,4 @@ gcloud logs read \
 
 echo "🔍 LOKI_URL=$LOKI_URL"
 echo "🔍 LOKI_USERNAME=$LOKI_USERNAME"
-echo "🔍 LOKI_PASSWORD=${LOKI_PASSWORD:0:4}****"  # (보안상 일부만)
+echo "🔍 LOKI_PASSWORD=${LOKI_PASSWORD:0:4}****"
