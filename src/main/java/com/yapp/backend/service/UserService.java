@@ -1,7 +1,7 @@
 package com.yapp.backend.service;
 
-import com.yapp.backend.controller.dto.response.UserResponse;
+import com.yapp.backend.domain.User;
 
 public interface UserService {
-    UserResponse getUserById(Long id);
+    User getUserById(Long id);
 }

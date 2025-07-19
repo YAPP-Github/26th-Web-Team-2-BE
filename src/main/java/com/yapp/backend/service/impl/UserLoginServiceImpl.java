@@ -14,15 +14,14 @@ public class UserLoginServiceImpl implements UserLoginService {
     private final UserRepository userRepository;
 
     /**
-     * provider와 socialId로 user 정보를 조회하고,
+     * userSocialInfo로 user 정보를 조회하고,
      * 기존에 존재하지 않을 경우 새롭게 생성해 반환합니다.
-     * @param userInfo
+     * @param userSocialInfo
      * @return
      */
     @Override
     @Transactional
-    public User handleOAuthLogin(User userInfo) {
-        return userRepository.getUser(userInfo.getProvider(), userInfo.getSocialId())
-                .orElseGet(() -> userRepository.save(userInfo));
+    public User handleOAuthLogin(User userSocialInfo) {
+        return userRepository.getUserBySocialUserInfo(userSocialInfo);
     }
 }
