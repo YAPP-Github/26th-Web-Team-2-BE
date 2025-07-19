@@ -9,7 +9,7 @@ import com.yapp.backend.controller.docs.HealthCheckDocs;
 @RestController
 public class HealthCheckController implements HealthCheckDocs {
 
-    @GetMapping("/health")
+    @GetMapping("/api/health")
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("success");
     }
