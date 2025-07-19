@@ -47,7 +47,7 @@ public class MockApiController {
 
 	@GetMapping("/user/{id}")
 	public ResponseEntity<StandardResponse<UserResponse>> getUser(@PathVariable Long id) {
-		UserResponse response = userService.getUserById(id);
+		UserResponse response = UserResponse.from(userService.getUserById(id));
 		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
 	}
 } 
