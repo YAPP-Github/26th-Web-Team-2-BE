@@ -25,6 +25,11 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger/**"          // 만약 path: /swagger 로 설정했다면
+                        ).permitAll()
+                        .requestMatchers(
                                 "/oauth2/authorization/**",
                                 "/oauth/authorize",              // OAuth2 Authorization Endpoint
                                 "/login/oauth2/**"               // OAuth2 code Redirect URI
