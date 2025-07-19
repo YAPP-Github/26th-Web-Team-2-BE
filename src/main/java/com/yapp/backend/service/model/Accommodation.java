@@ -1,9 +1,5 @@
-package com.yapp.backend.domain;
+package com.yapp.backend.service.model;
 
-import com.yapp.backend.repository.entity.Amenity;
-import com.yapp.backend.repository.entity.Attraction;
-import com.yapp.backend.repository.entity.CheckTime;
-import com.yapp.backend.repository.entity.Transportation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

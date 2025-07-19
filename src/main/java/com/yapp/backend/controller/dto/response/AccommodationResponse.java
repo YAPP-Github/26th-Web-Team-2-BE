@@ -1,10 +1,10 @@
 package com.yapp.backend.controller.dto.response;
 
-import com.yapp.backend.domain.Accommodation;
-import com.yapp.backend.repository.entity.Amenity;
-import com.yapp.backend.repository.entity.Attraction;
-import com.yapp.backend.repository.entity.CheckTime;
-import com.yapp.backend.repository.entity.Transportation;
+import com.yapp.backend.service.model.Accommodation;
+import com.yapp.backend.service.model.Amenity;
+import com.yapp.backend.service.model.Attraction;
+import com.yapp.backend.service.model.CheckTime;
+import com.yapp.backend.service.model.Transportation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

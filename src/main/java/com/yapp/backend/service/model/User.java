@@ -1,4 +1,4 @@
-package com.yapp.backend.domain;
+package com.yapp.backend.service.model;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/oauth2/authorization/**",
+                                "/api/**",
                                 "/oauth/authorize",              // OAuth2 Authorization Endpoint
                                 "/login/oauth2/**"               // OAuth2 code Redirect URI
                         ).permitAll()
