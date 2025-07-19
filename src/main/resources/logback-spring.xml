@@ -10,10 +10,9 @@
                     <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSZ</pattern>
                 </timestamp>
                 <!-- level -->
-                <patternLayout>
-                    <pattern>%level</pattern>
+                <level>
                     <fieldName>level</fieldName>
-                </patternLayout>
+                </level>
                 <!-- thread -->
                 <threadName>
                     <fieldName>thread</fieldName>
@@ -25,6 +24,7 @@
                 <!-- message -->
                 <message>
                     <fieldName>message</fieldName>
+                    <pattern>%-5level %msg</pattern>
                 </message>
             </providers>
         </encoder>
@@ -37,15 +37,42 @@
         </filter>
     </appender>
 
+    <!-- Loki appender -->
+    <appender name="Loki" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <url>${LOKI_URL}</url>
+            <auth>
+                <username>${LOKI_USERNAME}</username>
+                <password>${LOKI_PASSWORD}</password>
+            </auth>
+        </http>
+        <format>
+            <label>
+                <pattern>application=${spring.application.name}</pattern>
+            </label>
+            <label>
+                <pattern>host=${HOSTNAME}</pattern>
+            </label>
+            <label>
+                <pattern>level=%level</pattern>
+            </label>
+            <message>
+                <pattern>%msg</pattern>
+            </message>
+        </format>
+    </appender>
+
     <!-- Root logger -->
     <root level="INFO">
         <appender-ref ref="Console" />
         <appender-ref ref="Sentry" />
+        <appender-ref ref="Loki" />
     </root>
 
     <!-- Application logger -->
     <logger name="com.yapp" level="INFO" additivity="false">
         <appender-ref ref="Console" />
         <appender-ref ref="Sentry" />
+        <appender-ref ref="Loki" />
     </logger>
-</configuration> 
+</configuration>

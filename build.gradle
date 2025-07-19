@@ -39,16 +39,35 @@ dependencyManagement {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-  implementation 'com.google.cloud:spring-cloud-gcp-starter-secretmanager'
-  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
-    
+    implementation 'com.google.cloud:spring-cloud-gcp-starter-secretmanager'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+
 	implementation 'io.sentry:sentry-spring-boot-starter:8.12.0'
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+	// Micrometer for Metrics
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+
+	// OpenTelemetry for Traces
+	implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+	implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+
+	// DB
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.postgresql:postgresql:42.7.7'
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.10.1'
+
+	// Loki for Logs
+	implementation 'com.github.loki4j:loki-logback-appender:1.5.1'
+
+	// security
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -66,7 +85,7 @@ sentry {
 	org = "yapp-26th-web-2nd"
 	projectName = "26th-web-team-2-be-web"
 	authToken = System.getenv("SENTRY_AUTH_TOKEN") ?: ""
-	
+
 	// 명시적으로 Sentry 버전을 8.12.0으로 통일
 	autoInstallation.sentryVersion.set("8.12.0")
 }

@@ -1,4 +1,4 @@
-package com.yapp.backend.exception;
+package com.yapp.backend.common.exception;
 
 import lombok.Getter;
 
