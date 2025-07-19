@@ -1,4 +1,4 @@
-package com.yapp.backend.entity;
+package com.yapp.backend.repository.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;

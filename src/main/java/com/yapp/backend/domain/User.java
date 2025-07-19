@@ -1,16 +1,25 @@
 package com.yapp.backend.domain;
 
-import com.yapp.backend.repository.entity.UserEntity;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class User {
     private Long id;
-    private String name;
+    private String provider;
+    private String socialId;
+    private String email;
+    private String nickname;
+    private String profileImage;
 
-    public static User from(UserEntity userEntity) {
-        return new User(userEntity.getId(), userEntity.getName());
-    }
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
+
 }

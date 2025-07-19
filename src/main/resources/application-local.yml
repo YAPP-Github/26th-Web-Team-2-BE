@@ -1,3 +1,8 @@
+spring:
+  config:
+    import:
+      - optional:classpath:config/postgresql/db-local.yml
+
 #sentry:
 #  dsn: ${SENTRY_DSN}
 #  send-default-pii: true
