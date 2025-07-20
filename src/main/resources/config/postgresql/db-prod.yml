@@ -13,3 +13,4 @@ spring:
       sql:
         enabled: true
         instance-connection-name: ${CLOUD_SQL_INSTANCE}
+        database-name: ${PROD_DB_NAME}
