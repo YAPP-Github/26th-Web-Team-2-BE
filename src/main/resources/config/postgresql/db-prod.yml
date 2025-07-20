@@ -1,10 +1,8 @@
 # 운영 환경(prod)에서 사용
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/${PROD_DB_NAME}
     username: ${PROD_DB_USER}
     password: ${PROD_DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -13,4 +11,5 @@ spring:
   cloud:
     gcp:
       sql:
-        enabled: false
+        enabled: true
+        instance-connection-name: ${CLOUD_SQL_INSTANCE}
