@@ -34,33 +34,19 @@ echo "== Final UPDATE_SECRETS =="
 printf '%s\n' "${UPDATE_SECRETS[@]}"
 
 echo "== Deploy Command =="
-echo gcloud run deploy "${IMAGE_NAME}" \
-  --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:${IMAGE_SHA}" \
-  --region "${REGION}" \
-  --platform managed \
-  --memory 1Gi \
-  --cpu 2 \
-  --verbosity debug \
-  "${UPDATE_SECRETS[@]}"
 
 gcloud run deploy "${IMAGE_NAME}" \
   --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:${IMAGE_SHA}" \
   --region "${REGION}" \
-  --set-env-vars SPRING_PROFILES_ACTIVE=${PROFILE} \
+  --set-env-vars "SPRING_PROFILES_ACTIVE=${PROFILE}" \
   --add-cloudsql-instances="${PROJECT_ID}:${REGION}:${CLOUD_SQL}" \
   --platform managed \
   --port 8080 \
   --memory 1Gi \
   --cpu 2 \
   --verbosity debug \
-  "${UPDATE_SECRETS[@]}" || true
+  "${UPDATE_SECRETS[@]}"
 
-gcloud run services logs read ssok-prod \
-  --project=$PROJECT_ID \
-  --region=$REGION \
-  --limit=50 \
-  --severity=ERROR
-
-echo "🔍 LOKI_URL=$LOKI_URL"
-echo "🔍 LOKI_USERNAME=$LOKI_USERNAME"
-echo "🔍 LOKI_PASSWORD=${LOKI_PASSWORD:0:4}****"
+gcloud run services describe ${IMAGE_NAME} \
+  --region asia-northeast3 \
+  --format="yaml(spec.template.spec.volumes)"
