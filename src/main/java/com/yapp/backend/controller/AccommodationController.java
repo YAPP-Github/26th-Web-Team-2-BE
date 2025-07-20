@@ -3,7 +3,9 @@ package com.yapp.backend.controller;
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.docs.AccommodationDocs;
+import com.yapp.backend.controller.dto.response.AccommodationCountResponse;
 import com.yapp.backend.controller.dto.response.AccommodationPageResponse;
+import com.yapp.backend.controller.dto.response.AccommodationResponse;
 import com.yapp.backend.service.AccommodationService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,5 +39,15 @@ public class AccommodationController implements AccommodationDocs {
 	) {
 		AccommodationPageResponse response = accommodationService.findAccommodationsByTableId(tableId, page, size, userId);
 		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
+	}
+
+	@Override
+	@GetMapping("/count")
+	public ResponseEntity<StandardResponse<AccommodationCountResponse>> getAccommodationCountByTableId(
+		@RequestParam Long tableId,
+		@RequestParam Long userId
+	) {
+		AccommodationCountResponse accommodationCountResponse = new AccommodationCountResponse(accommodationService.countAccommodationsByTableId(tableId, userId));
+		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, accommodationCountResponse));
 	}
 }

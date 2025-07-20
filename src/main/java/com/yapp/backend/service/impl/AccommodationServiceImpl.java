@@ -64,6 +64,14 @@ public class AccommodationServiceImpl implements AccommodationService {
 	}
 
 	/**
+	 * table에 포함된 숙소 카드의 개수를 반환합니다.
+	 */
+	@Override
+	public Long countAccommodationsByTableId(Long tableId, Long userId) {
+		return 6L;
+	}
+
+	/**
 	 * Mock Method
 	 * @sehwan 실제 API로 변경되면 제거해야 합니다.
 	 */
