@@ -11,6 +11,7 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION:     ${{ secrets.GCP_REGION }}
   REPO_NAME:  ${{ secrets.GCP_ARTIFACT_REGISTRY_REPO_NAME }}
+  PROFILE: prod
   IMAGE_NAME: ssok-prod
 
 jobs:
@@ -38,7 +39,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build \
-          --build-arg SPRING_PROFILES_ACTIVE=prod \
+          --build-arg SPRING_PROFILES_ACTIVE=${PROFILE} \
           -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:$GITHUB_SHA \
           -f Dockerfile \
           .
@@ -57,4 +58,5 @@ jobs:
             ${{ env.REGION }} \
             ${{ env.REPO_NAME }} \
             ${{ env.IMAGE_NAME }} \
+            ${{ env.PROFILE }}
             $GITHUB_SHA

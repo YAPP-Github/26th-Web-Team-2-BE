@@ -5,12 +5,14 @@ PROJECT_ID=$1
 REGION=$2
 REPO_NAME=$3
 IMAGE_NAME=$4
-IMAGE_SHA=$5
+PROFILE=$5
+IMAGE_SHA=$6
 
 echo "Project ID: $PROJECT_ID"
 echo "Region: $REGION"
 echo "Repo Name: $REPO_NAME"
 echo "Image Name: $IMAGE_NAME"
+echo "PROFILE: $PROFILE"
 echo "Image SHA: $IMAGE_SHA"
 
 mapfile -t SECRETS < <(gcloud secrets list --project=$PROJECT_ID --format='value(name)')
@@ -43,6 +45,7 @@ echo gcloud run deploy "${IMAGE_NAME}" \
 gcloud run deploy "${IMAGE_NAME}" \
   --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:${IMAGE_SHA}" \
   --region "${REGION}" \
+  --set-env-vars SPRING_PROFILES_ACTIVE=${PROFILE} \
   --platform managed \
   --port 8080 \
   --memory 1Gi \
