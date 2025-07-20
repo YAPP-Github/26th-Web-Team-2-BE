@@ -1,6 +1,6 @@
 package com.yapp.backend.repository.entity;
 
-import com.yapp.backend.domain.User;
+import com.yapp.backend.service.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

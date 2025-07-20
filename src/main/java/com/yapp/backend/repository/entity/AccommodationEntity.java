@@ -16,13 +16,18 @@ import org.hibernate.annotations.Type;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.yapp.backend.service.model.Amenity;
+import com.yapp.backend.service.model.Attraction;
+import com.yapp.backend.service.model.CheckTime;
+import com.yapp.backend.service.model.Transportation;
+
 @Getter
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "accommodation")
-public class Accommodation {
+public class AccommodationEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -31,6 +31,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 "/oauth2/authorization/**",
+                                "/api/**",
                                 "/oauth/authorize",              // OAuth2 Authorization Endpoint
                                 "/login/oauth2/**"               // OAuth2 code Redirect URI
                         ).permitAll()

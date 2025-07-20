@@ -1,6 +1,6 @@
 package com.yapp.backend.filter.handler;
 
-import com.yapp.backend.domain.User;
+import com.yapp.backend.service.model.User;
 import com.yapp.backend.filter.dto.SocialUserInfo;
 import com.yapp.backend.filter.oauth.OAuthUserInfoProvider;
 import com.yapp.backend.service.UserLoginService;
