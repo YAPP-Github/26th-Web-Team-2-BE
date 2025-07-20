@@ -11,6 +11,7 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION:     ${{ secrets.GCP_REGION }}
   REPO_NAME:  ${{ secrets.GCP_ARTIFACT_REGISTRY_REPO_NAME }}
+  CLOUD_SQL_INSTANCE: ${{ secrets.CLOUD_SQL_INSTANCE_PROD }}
   PROFILE: prod
   IMAGE_NAME: ssok-prod
 
@@ -58,5 +59,6 @@ jobs:
             ${{ env.REGION }} \
             ${{ env.REPO_NAME }} \
             ${{ env.IMAGE_NAME }} \
+            ${{ env.CLOUD_SQL_INSTANCE }} \
             ${{ env.PROFILE }} \
             $GITHUB_SHA

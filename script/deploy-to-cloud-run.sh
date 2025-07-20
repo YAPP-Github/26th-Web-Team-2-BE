@@ -5,8 +5,9 @@ PROJECT_ID=$1
 REGION=$2
 REPO_NAME=$3
 IMAGE_NAME=$4
-PROFILE=$5
-IMAGE_SHA=$6
+CLOUD_SQL=$5
+PROFILE=$6
+IMAGE_SHA=$7
 
 echo "Project ID: $PROJECT_ID"
 echo "Region: $REGION"
@@ -46,6 +47,7 @@ gcloud run deploy "${IMAGE_NAME}" \
   --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:${IMAGE_SHA}" \
   --region "${REGION}" \
   --set-env-vars SPRING_PROFILES_ACTIVE=${PROFILE} \
+  --add-cloudsql-instances="${PROJECT_ID}:${REGION}:${CLOUD_SQL}" \
   --platform managed \
   --port 8080 \
   --memory 1Gi \
