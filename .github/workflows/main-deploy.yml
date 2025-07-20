@@ -58,5 +58,5 @@ jobs:
             ${{ env.REGION }} \
             ${{ env.REPO_NAME }} \
             ${{ env.IMAGE_NAME }} \
-            ${{ env.PROFILE }}
+            ${{ env.PROFILE }} \
             $GITHUB_SHA
