@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 숙소 도메인 Controller
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/accommodations")
@@ -21,14 +24,18 @@ public class AccommodationController implements AccommodationDocs {
 
 	private final AccommodationService accommodationService;
 
+	/**
+	 * 숙소 목록 조회 API
+	 */
 	@Override
 	@GetMapping("/search")
-	public ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationsByTitle(
+	public ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationByTableIdAndUserId(
 		@RequestParam Integer tableId,
 		@RequestParam Integer page,
-		@RequestParam Integer size
+		@RequestParam Integer size,
+		@RequestParam (required = false) Long userId
 	) {
-		AccommodationPageResponse response = accommodationService.findAccommodationsByTableId(tableId, page, size);
+		AccommodationPageResponse response = accommodationService.findAccommodationsByTableId(tableId, page, size, userId);
 		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
 	}
 }

@@ -5,7 +5,7 @@ import com.yapp.backend.repository.AccommodationRepository;
 import com.yapp.backend.service.model.Amenity;
 import com.yapp.backend.service.model.Attraction;
 import com.yapp.backend.service.model.CheckTime;
-import com.yapp.backend.repository.entity.DistanceInfo;
+import com.yapp.backend.service.model.DistanceInfo;
 import com.yapp.backend.service.model.Transportation;
 import com.yapp.backend.service.AccommodationService;
 
@@ -19,14 +19,22 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 숙소 도메인 서비스
+ */
 @Service
 @RequiredArgsConstructor
 public class AccommodationServiceImpl implements AccommodationService {
 
 	private final AccommodationRepository accommodationRepository;
 
+	/**
+	 * 숙소 목록 조회
+	 * 특정 유저가 생성한 숙소 목록을 조회
+	 * userId 가 null인 경우, 그룹에 속한 모든 숙소를 조회
+	 */
 	@Override
-	public AccommodationPageResponse findAccommodationsByTableId(Integer tableId, int page, int size) {
+	public AccommodationPageResponse findAccommodationsByTableId(Integer tableId, int page, int size, Long userId) {
 		// Base coordinates for Seoul
 		double baseLatitude = 37.5665;
 		double baseLongitude = 126.9780;
@@ -55,6 +63,10 @@ public class AccommodationServiceImpl implements AccommodationService {
 			.build();
 	}
 
+	/**
+	 * Mock Method
+	 * @sehwan 실제 API로 변경되면 제거해야 합니다.
+	 */
 	private Accommodation createMockAccommodation(Long id, String name, String address, double latitude, double longitude) {
 		return Accommodation.builder()
 			.id(id)
@@ -86,6 +98,10 @@ public class AccommodationServiceImpl implements AccommodationService {
 			.build();
 	}
 
+	/**
+	 * Mock Method
+	 * @sehwan 실제 API로 변경되면 제거해야 합니다.
+	 */
 	private List<Attraction> createRandomAttractions() {
 		return List.of(
 			Attraction.builder().name("Namsan Tower").type("Landmark").latitude(37.5512).longitude(126.9882).distance("5km").byFoot(new DistanceInfo("60min", "5km")).byCar(new DistanceInfo("15min", "5km")).build(),
@@ -93,6 +109,10 @@ public class AccommodationServiceImpl implements AccommodationService {
 		);
 	}
 
+	/**
+	 * Mock Method
+	 * @sehwan 실제 API로 변경되면 제거해야 합니다.
+	 */
 	private List<Transportation> createRandomTransportations() {
 		return List.of(
 			Transportation.builder().name("Seoul Station").type("Train Station").latitude(37.5559).longitude(126.9723).distance("2km").byFoot(new DistanceInfo("20min", "2km")).byCar(new DistanceInfo("5min", "2km")).build(),
