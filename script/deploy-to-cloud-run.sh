@@ -3,11 +3,12 @@ set -euo pipefail
 
 PROJECT_ID=$1
 REGION=$2
-REPO_NAME=$3
-IMAGE_NAME=$4
-CLOUD_SQL=$5
-PROFILE=$6
-IMAGE_SHA=$7
+CLOUD_RUN_REGION=$3
+REPO_NAME=$4
+IMAGE_NAME=$5
+CLOUD_SQL=$6
+PROFILE=$7
+IMAGE_SHA=$8
 
 mapfile -t SECRETS < <(gcloud secrets list --project=$PROJECT_ID --format='value(name)')
 
@@ -22,7 +23,7 @@ done
 
 gcloud run deploy "${IMAGE_NAME}" \
   --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:${IMAGE_SHA}" \
-  --region "${REGION}" \
+  --region "${CLOUD_RUN_REGION}" \
   --set-env-vars "SPRING_PROFILES_ACTIVE=${PROFILE}" \
   --add-cloudsql-instances="${PROJECT_ID}:${REGION}:${CLOUD_SQL}" \
   --platform managed \

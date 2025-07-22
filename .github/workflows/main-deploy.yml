@@ -3,13 +3,14 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - hotfix/Y26W2-23
 
 env:
   SA_KEY: ${{ secrets.GCP_SA_KEY }}
   DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION:     ${{ secrets.GCP_REGION }}
+  REGION: ${{ secrets.GCP_REGION }}
+  CLOUD_RUN_REGION: ${{ secrets.CLOUD_RUN_REGION }}
   REPO_NAME:  ${{ secrets.GCP_ARTIFACT_REGISTRY_REPO_NAME }}
   CLOUD_SQL_INSTANCE: ${{ secrets.CLOUD_SQL_INSTANCE_PROD }}
   PROFILE: prod
@@ -57,6 +58,7 @@ jobs:
           ./script/deploy-to-cloud-run.sh \
             ${{ env.PROJECT_ID }} \
             ${{ env.REGION }} \
+            ${{ env.CLOUD_RUN_REGION }} \
             ${{ env.REPO_NAME }} \
             ${{ env.IMAGE_NAME }} \
             ${{ env.CLOUD_SQL_INSTANCE }} \
