@@ -1,7 +1,5 @@
 package com.yapp.backend.service.model;
 
-import com.yapp.backend.repository.entity.DistanceInfo;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

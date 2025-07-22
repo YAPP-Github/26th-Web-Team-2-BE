@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Accommodation {
     private Long id;
+    private Long userId;
     private String urlTest;
     private String siteName;
     private String memo;
