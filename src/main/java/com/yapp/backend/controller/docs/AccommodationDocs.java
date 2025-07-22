@@ -1,8 +1,10 @@
 package com.yapp.backend.controller.docs;
 
 import com.yapp.backend.common.response.StandardResponse;
+import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.response.AccommodationCountResponse;
 import com.yapp.backend.controller.dto.response.AccommodationPageResponse;
+import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,5 +28,10 @@ public interface AccommodationDocs {
 	ResponseEntity<StandardResponse<AccommodationCountResponse>> getAccommodationCountByTableId(
 		@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "숙소가 포함된 테이블의 ID") Long tableId,
 		@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer", format = "int64"), description = "유저 ID, 없는 경우 모든 유저가 생성한 숙소 목록을 반환합니다.") Long userId
+	);
+
+	@Operation(summary = "숙소 카드 등록", description = "링크를 첨부하여 숙소 카드를 등록합니다.", method = "POST")
+	ResponseEntity<StandardResponse<AccommodationRegisterResponse>> registerAccommodationCard(
+		@Parameter(in = ParameterIn.QUERY, schema = @Schema(implementation = AccommodationRegisterRequest.class), description = "호텔 숙소 예약 상세페이지") AccommodationRegisterRequest request
 	);
 }
