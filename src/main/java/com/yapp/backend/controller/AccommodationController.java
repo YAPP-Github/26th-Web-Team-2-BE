@@ -45,7 +45,7 @@ public class AccommodationController implements AccommodationDocs {
 	@GetMapping("/count")
 	public ResponseEntity<StandardResponse<AccommodationCountResponse>> getAccommodationCountByTableId(
 		@RequestParam Long tableId,
-		@RequestParam Long userId
+		@RequestParam(required = false) Long userId
 	) {
 		AccommodationCountResponse accommodationCountResponse = new AccommodationCountResponse(accommodationService.countAccommodationsByTableId(tableId, userId));
 		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, accommodationCountResponse));
