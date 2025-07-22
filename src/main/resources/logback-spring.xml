@@ -47,10 +47,10 @@
     <!-- Loki appender -->
     <appender name="Loki" class="com.github.loki4j.logback.Loki4jAppender">
         <http>
-            <url>${loki.url}</url>
+            <url>${LOKI_URL:-}</url>
             <auth>
-                <username>${loki.username}</username>
-                <password>${loki.password}</password>
+                <username>${LOKI_USERNAME:-}</username>
+                <password>${LOKI_PASSWORD:-}</password>
             </auth>
         </http>
         <format>

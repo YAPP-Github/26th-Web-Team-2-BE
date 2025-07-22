@@ -16,4 +16,4 @@ WORKDIR /app
 EXPOSE 8080
 
 COPY --from=builder /app/build/libs/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh","-c","java -Dlogback.debug=true -Dserver.port=${PORT:-8080} -jar app.jar"]
