@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - hotfix/Y26W2-23
+      - main
 
 env:
   SA_KEY: ${{ secrets.GCP_SA_KEY }}
