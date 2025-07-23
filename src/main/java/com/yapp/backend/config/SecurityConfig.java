@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/v3/api-docs/**",
+                                "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger/**"          // 만약 path: /swagger 로 설정했다면
                         ).permitAll()
