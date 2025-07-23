@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
+                                "/",
                                 "/swagger",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
