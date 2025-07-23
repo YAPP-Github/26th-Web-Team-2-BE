@@ -17,3 +17,8 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+    jwt:
+      access-secret-key: ${JWT_ACCESS_SECRET_KEY}
+      refresh-secret-key: ${JWT_REFRESH_SECRET_KEY}
+      access-token-validity-in-ms: 3600000           # 1시간
+      refresh-token-validity-in-ms: 1209600000       # 7일
