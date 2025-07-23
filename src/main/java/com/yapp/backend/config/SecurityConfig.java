@@ -25,10 +25,12 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/swagger/**"          // 만약 path: /swagger 로 설정했다면
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/swagger/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/oauth2/authorization/**",
