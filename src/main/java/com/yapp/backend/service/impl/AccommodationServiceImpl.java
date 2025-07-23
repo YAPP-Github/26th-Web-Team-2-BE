@@ -1,5 +1,7 @@
 package com.yapp.backend.service.impl;
 
+import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
+import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 import com.yapp.backend.service.model.Accommodation;
 import com.yapp.backend.repository.AccommodationRepository;
 import com.yapp.backend.service.model.Amenity;
@@ -126,5 +128,11 @@ public class AccommodationServiceImpl implements AccommodationService {
 			Transportation.builder().name("Seoul Station").type("Train Station").latitude(37.5559).longitude(126.9723).distance("2km").byFoot(new DistanceInfo("20min", "2km")).byCar(new DistanceInfo("5min", "2km")).build(),
 			Transportation.builder().name("Gangnam Station").type("Subway Station").latitude(37.4981).longitude(127.0276).distance("10km").byFoot(new DistanceInfo("120min", "10km")).byCar(new DistanceInfo("30min", "10km")).build()
 		);
+	}
+
+	@Override
+	public AccommodationRegisterResponse registerAccommodationCard(AccommodationRegisterRequest request) {
+		// todo @sehwan 스크래핑 서버와 연결 로직 구현 필요
+		return new AccommodationRegisterResponse();
 	}
 }
