@@ -4,6 +4,8 @@ spring:
   config:
     import:
       - optional:classpath:config/postgresql/db-prod.yml
+      - optional:classpath:config/redis/redis-prod.yml
+
 
 sentry:
   dsn: ${SENTRY_DSN}
