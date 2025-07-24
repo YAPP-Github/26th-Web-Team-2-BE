@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.oauth2.jwt.JwtException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -37,7 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
         return uri.startsWith("/oauth2/authorization")
                 || uri.startsWith("/oauth2/authorize")
                 || uri.startsWith("/login/oauth2/code")
-                || uri.startsWith("/")
+                || uri.equals("/")
                 || uri.startsWith("/error")
                 || uri.startsWith("/swagger")
                 ;
@@ -56,7 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
             jwtTokenProvider.validateAccessTokenOrThrow(accessToken);
             authContextService.createAuthContext(accessToken);
             filterChain.doFilter(request, response);
-        } catch (ExpiredJwtException | JwtException | IllegalArgumentException bad) {
+        } catch (JwtException | IllegalArgumentException bad) {
             // CASE 2: InValid Access Token
             String refreshToken = getCookieValue(request, "REFRESH_TOKEN");
             if (validateRefreshToken(refreshToken)) {
