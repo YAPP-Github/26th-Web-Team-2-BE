@@ -7,7 +7,6 @@ on:
 
 env:
   SA_KEY: ${{ secrets.GCP_SA_KEY }}
-  DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: ${{ secrets.GCP_REGION }}
   CLOUD_RUN_REGION: ${{ secrets.CLOUD_RUN_REGION }}
