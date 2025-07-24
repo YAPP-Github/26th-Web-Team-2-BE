@@ -38,7 +38,6 @@ public class JwtTokenProvider {
             @Value("${spring.security.jwt.refresh-secret-key}") String refreshKey,
             RefreshTokenService refreshTokenService
     ) {
-        log.info(accessKey);
         this.accessSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessKey.replaceAll("\\s+", "")));
         this.refreshSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshKey.replaceAll("\\s+", "")));
         this.refreshTokenService = refreshTokenService;
