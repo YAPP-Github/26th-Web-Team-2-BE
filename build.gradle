@@ -66,7 +66,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.data:spring-data-keyvalue'
 
-
 	// security
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -75,8 +74,6 @@ dependencies {
 	implementation('io.jsonwebtoken:jjwt-api:0.12.6')
 	runtimeOnly    "io.jsonwebtoken:jjwt-impl:0.12.6"
 	runtimeOnly    "io.jsonwebtoken:jjwt-jackson:0.12.6"
-//	implementation('io.jsonwebtoken:jjwt-impl:0.12.6', 'io.jsonwebtoken:jjwt-jackson:0.12.6')
-
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
