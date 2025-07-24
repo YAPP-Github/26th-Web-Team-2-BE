@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Console appender -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <springProfile name="!local">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <!-- logtime -->
+                    <timestamp>
+                        <fieldName>logtime</fieldName>
+                        <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSZ</pattern>
+                    </timestamp>
+                    <!-- level -->
+                    <level>
+                        <fieldName>level</fieldName>
+                    </level>
+                    <!-- thread -->
+                    <threadName>
+                        <fieldName>thread</fieldName>
+                    </threadName>
+                    <!-- class -->
+                    <loggerName>
+                        <fieldName>class</fieldName>
+                    </loggerName>
+                    <!-- message -->
+                    <message>
+                        <fieldName>message</fieldName>
+                        <pattern>%-5level %msg</pattern>
+                    </message>
+                </providers>
+            </encoder>
+        </springProfile>
+        <springProfile name="local">
+            <encoder>
+                <pattern>%green(%d{HH:mm:ss.SSS}) [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n</pattern>
+            </encoder>
+        </springProfile>
+    </appender>
+
+    <!-- Sentry appender -->
+    <appender name="Sentry" class="io.sentry.logback.SentryAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- Loki appender -->
+    <appender name="Loki" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <url>${LOKI_URL:-}</url>
+            <auth>
+                <username>${LOKI_USERNAME:-}</username>
+                <password>${LOKI_PASSWORD:-}</password>
+            </auth>
+        </http>
+        <format>
+            <label>
+                <pattern>application=${SPRING_APPLICATION_NAME:backend}</pattern>
+            </label>
+            <label>
+                <pattern>host=${HOSTNAME}</pattern>
+            </label>
+            <label>
+                <pattern>level=%level</pattern>
+            </label>
+            <message>
+                <pattern>%msg</pattern>
+            </message>
+        </format>
+    </appender>
+
+    <!-- Root logger -->
+    <springProfile name="!local">
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="Sentry"/>
+            <appender-ref ref="Loki"/>
+        </root>
+
+        <logger name="com.yapp" level="INFO" additivity="false">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="Sentry"/>
+            <appender-ref ref="Loki"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="local">
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+        </root>
+
+        <logger name="com.yapp" level="INFO" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
+    </springProfile>
+</configuration>
