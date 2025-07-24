@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    private static final String REFRESH_PREFIX = "Refresh ";
+    private static final String REFRESH_TOKEN_PREFIX = "refresh_token ";
     @Value("${spring.security.jwt.refresh-token-validity-in-ms}")
     private long refreshTtlMs;
     private final StringRedisTemplate redisTemplate;
 
 
     private String keyFor(Long userId) {
-        return REFRESH_PREFIX + userId;
+        return REFRESH_TOKEN_PREFIX + userId;
     }
 
     // 로그인 시, 새 리프레시 토큰 저장
