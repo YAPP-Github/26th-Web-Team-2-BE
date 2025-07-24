@@ -11,6 +11,7 @@ import java.io.IOException;
 public interface OAuthDocs {
 
     @Operation(summary = "KAKAO", description = "KAKAO 소셜 로그인 요청 URI")
-    @ApiResponse(responseCode = "302", description = "카카오 로그인 페이지로 리다이렉트")
+    @ApiResponse(responseCode = "302", description = "카카오 로그인 인가 페이지로 리다이렉트되고, "
+            + "인가 성공시 Cookie에 ACCESS TOKEN과 REFRESH TOKEN이 발급됩니다.")
     void kakaoLoginRedirect(HttpServletResponse response) throws IOException;
 }

@@ -31,25 +31,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/",
-                                "/swagger",
+                                "/swagger/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/webjars/**",
-                                "/swagger/**"
-
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/oauth2/authorization/**",
                                 "/api/**",
                                 "/oauth/authorize",              // OAuth2 Authorization Endpoint
                                 "/login/oauth2/**"               // OAuth2 code Redirect URI
-                                ,
-                                "/error",               // 에러 페이지
-                                "/oauth2/**",           // OAuth2 진입·콜백
-                                "/login/**",            // (필요 시) 커스텀 로그인 페이지
-                                "/css/**", "/js/**", "/images/**" // 정적 리소스
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
