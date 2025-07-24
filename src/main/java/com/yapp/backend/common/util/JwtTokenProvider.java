@@ -6,11 +6,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -24,11 +26,11 @@ public class JwtTokenProvider {
 
     @Value("${spring.security.jwt.access-token-validity-in-ms}")
     private long accessTokenValidityInMs;           // 1 hour
-    private final Key accessSecretKey;
+    private final SecretKey accessSecretKey;
 
     @Value("${spring.security.jwt.refresh-token-validity-in-ms}")
     private long refreshTokenValidityInMs;           // 7 days
-    private final Key refreshSecretKey;
+    private final SecretKey refreshSecretKey;
     private final RefreshTokenService refreshTokenService;
 
     public JwtTokenProvider(
@@ -36,8 +38,9 @@ public class JwtTokenProvider {
             @Value("${spring.security.jwt.refresh-secret-key}") String refreshKey,
             RefreshTokenService refreshTokenService
     ) {
-        this.accessSecretKey = Keys.hmacShaKeyFor(accessKey.getBytes(StandardCharsets.UTF_8));
-        this.refreshSecretKey = Keys.hmacShaKeyFor(refreshKey.getBytes(StandardCharsets.UTF_8));
+        log.info(accessKey);
+        this.accessSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessKey.replaceAll("\\s+", "")));
+        this.refreshSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshKey.replaceAll("\\s+", "")));
         this.refreshTokenService = refreshTokenService;
     }
 
@@ -97,20 +100,23 @@ public class JwtTokenProvider {
 
     // 토큰이 유효한지 검증
     public boolean validateAccessTokenOrThrow(String token) {
+//        if (token == null) {
         if (token == null || getUserIdFromToken(token) == null) {
             return false;
         }
 
         try {
             Claims claims = getAccessClaims(token);
-            if(!isExpired(claims)) return true;
+            if (claims.getSubject() == null) {
+                return false;
+            }
+            return !isExpired(claims);
         } catch (ExpiredJwtException expiredJwtException) {
             throw expiredJwtException;
         } catch (JwtException | IllegalArgumentException e) {
             // any other parsing/signature/format error
             throw new JwtException("Invalid access token", e);
         }
-        return true;
     }
     public Claims parseAndValidateRefreshToken(String token) {
         if (token == null) {
@@ -120,14 +126,14 @@ public class JwtTokenProvider {
             Claims refreshClaims = getRefreshClaims(token);
             if(!isExpired(refreshClaims))
                 return refreshClaims;
+            return null;
         } catch (ExpiredJwtException e) {
-            throw e;
             // 토큰 만료
+            throw e;
         } catch (JwtException e) {
             // 서명 오류 / 토큰 변조 / 포맷 오류 등
             throw e;
         }
-        return null;
     }
 
     // token 내에서 userId(subject)를 꺼내오는 메소드
@@ -148,19 +154,19 @@ public class JwtTokenProvider {
 
 
     private Claims getAccessClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(accessSecretKey)
+        return Jwts.parser()
+                .verifyWith(accessSecretKey)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private Claims getRefreshClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(refreshSecretKey)
+        return Jwts.parser()
+                .verifyWith(refreshSecretKey)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
 }
