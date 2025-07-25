@@ -20,5 +20,3 @@ spring:
     user: ${LOCAL_DB_USER}
     password: ${LOCAL_DB_PASSWORD}
     locations: classpath:flyway/migration
-#    baseline-on-migrate: true
-    baseline-version: 1

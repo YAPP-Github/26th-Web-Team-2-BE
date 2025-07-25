@@ -23,7 +23,6 @@ spring:
     user: ${PROD_DB_USER}
     password: ${PROD_DB_PASSWORD}
     locations: classpath:flyway/migration
-    baseline-version: 1
 
 logging:
   level:
