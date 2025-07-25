@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,9 +41,9 @@ public class AccommodationEntity {
     @Column(name = "memo")
     private String memo;
     @Column(name = "created_at")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     @Column(name = "updated_at")
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
     @Column(name = "created_by")
     private Long createdBy;
     @Column(name = "table_id")
@@ -67,7 +68,7 @@ public class AccommodationEntity {
     private Integer lowestPrice;
     @Column(name = "highest_price")
     private Integer highestPrice;
-    @Column(name = "currency")
+    @Column(name = "currency", length = 3)
     private String currency;
     @Column(name = "review_score")
     private Double reviewScore;
