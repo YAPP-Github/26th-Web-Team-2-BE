@@ -1,0 +1,30 @@
+CREATE TABLE accommodation (
+   id BIGSERIAL PRIMARY KEY,
+
+   url_test TEXT,
+   site_name TEXT,
+   memo TEXT,
+   created_at DATE,
+   updated_at DATE,
+   created_by BIGINT,
+   table_id BIGINT,
+
+   accommodation_name TEXT,
+   images JSONB,
+   address TEXT,
+   latitude DOUBLE PRECISION,
+   longitude DOUBLE PRECISION,
+   lowest_price INTEGER,
+   highest_price INTEGER,
+   currency TEXT,
+   review_score DOUBLE PRECISION,
+   cleanliness_score DOUBLE PRECISION,
+   review_summary TEXT,
+   hotel_id BIGINT,
+
+    nearby_attractions JSONB,
+    nearby_transportation JSONB,
+    amenities JSONB,
+    check_in_time JSONB,
+    check_out_time JSONB
+);
