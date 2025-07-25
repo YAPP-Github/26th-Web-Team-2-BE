@@ -4,8 +4,8 @@ CREATE TABLE accommodation (
    url_test TEXT,
    site_name TEXT,
    memo TEXT,
-   created_at DATE,
-   updated_at DATE,
+   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+   updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
    created_by BIGINT,
    table_id BIGINT,
 
@@ -16,15 +16,15 @@ CREATE TABLE accommodation (
    longitude DOUBLE PRECISION,
    lowest_price INTEGER,
    highest_price INTEGER,
-   currency TEXT,
+   currency CHAR(3),
    review_score DOUBLE PRECISION,
    cleanliness_score DOUBLE PRECISION,
    review_summary TEXT,
    hotel_id BIGINT,
 
-    nearby_attractions JSONB,
-    nearby_transportation JSONB,
-    amenities JSONB,
-    check_in_time JSONB,
-    check_out_time JSONB
+   nearby_attractions JSONB,
+   nearby_transportation JSONB,
+   amenities JSONB,
+   check_in_time JSONB,
+   check_out_time JSONB
 );

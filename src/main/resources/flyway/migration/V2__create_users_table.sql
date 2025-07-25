@@ -7,9 +7,9 @@ CREATE TABLE users (
        nickname TEXT,
        profile_image TEXT,
 
-       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-       deleted_at TIMESTAMP,
+       created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+       updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+       deleted_at TIMESTAMPTZ,
 
        CONSTRAINT uq_provider_social_id UNIQUE (provider, social_id)
 );
