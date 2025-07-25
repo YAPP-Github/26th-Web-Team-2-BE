@@ -48,7 +48,7 @@ public class JwtTokenProvider {
         String accessToken = createAccessToken(userId);
         return ResponseCookie.from("ACCESS_TOKEN", accessToken)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(maxAgeInSeconds)
                 .sameSite("Lax")
@@ -61,7 +61,7 @@ public class JwtTokenProvider {
         refreshTokenService.storeRefresh(userId, refreshToken);
         return ResponseCookie.from("REFRESH_TOKEN", refreshToken)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(maxAgeInSeconds)
                 .sameSite("Lax")
