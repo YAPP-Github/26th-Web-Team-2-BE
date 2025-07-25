@@ -68,7 +68,7 @@ public class AccommodationEntity {
     private Integer lowestPrice;
     @Column(name = "highest_price")
     private Integer highestPrice;
-    @Column(name = "currency", columnDefinition = "CHAR(3)")
+    @Column(name = "currency", length = 3)
     private String currency;
     @Column(name = "review_score")
     private Double reviewScore;

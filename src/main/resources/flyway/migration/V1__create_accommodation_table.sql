@@ -16,7 +16,7 @@ CREATE TABLE accommodation (
    longitude DOUBLE PRECISION,
    lowest_price INTEGER,
    highest_price INTEGER,
-   currency CHAR(3),
+   currency VARCHAR(3),
    review_score DOUBLE PRECISION,
    cleanliness_score DOUBLE PRECISION,
    review_summary TEXT,
