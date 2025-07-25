@@ -14,3 +14,9 @@ spring:
     gcp:
       sql:
         enabled: false
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/${LOCAL_DB_NAME}
+    user: ${LOCAL_DB_USER}
+    password: ${LOCAL_DB_PASSWORD}
+    locations: classpath:flyway/migration
