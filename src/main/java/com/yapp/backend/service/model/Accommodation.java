@@ -15,7 +15,7 @@ import java.util.List;
 public class Accommodation {
     private Long id;
     private Long userId;
-    private String urlTest;
+    private String url;
     private String siteName;
     private String memo;
     private LocalDate createdAt;

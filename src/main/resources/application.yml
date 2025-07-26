@@ -9,6 +9,9 @@ spring:
     import:
       - optional:file:./.env[.properties]
       - classpath:config/oauth/security.yml
+  cloud:
+    compatibility-verifier:
+      enabled: false
 springdoc:
   swagger-ui:
     path: /swagger

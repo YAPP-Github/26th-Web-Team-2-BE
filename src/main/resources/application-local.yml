@@ -4,6 +4,11 @@ spring:
       - optional:classpath:config/postgresql/db-local.yml
       - optional:classpath:config/redis/redis-local.yml
 
+scraping:
+  server:
+    url: ${DATA_URL}
+    client: ${DATA_CLIENT}
+
 sentry:
   dsn: ${SENTRY_DSN}
   send-default-pii: true
