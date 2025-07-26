@@ -7,11 +7,16 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Order(1)
@@ -56,6 +61,44 @@ public class GlobalExceptionHandler {
 		ErrorCode errorCode = e.getErrorCode();
 		ProblemDetail problemDetail = createProblemDetail(errorCode);
 		return ResponseEntity.status(errorCode.getHttpStatus())
+			.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleValidationException(MethodArgumentNotValidException e) {
+		log.warn("Validation exception occurred", e);
+		Sentry.captureException(e);
+		
+		String errorMessage = e.getBindingResult().getFieldErrors().stream()
+			.map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+			.collect(Collectors.joining(", "));
+		
+		ProblemDetail problemDetail = createProblemDetail(
+			HttpStatus.BAD_REQUEST,
+			"Validation Failed",
+			errorMessage
+		);
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+	
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleConstraintViolationException(ConstraintViolationException e) {
+		log.warn("Constraint violation exception occurred", e);
+		Sentry.captureException(e);
+		
+		String errorMessage = e.getConstraintViolations().stream()
+			.map(ConstraintViolation::getMessage)
+			.collect(Collectors.joining(", "));
+		
+		ProblemDetail problemDetail = createProblemDetail(
+			HttpStatus.BAD_REQUEST,
+			"Validation Failed",
+			errorMessage
+		);
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 			.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 } 

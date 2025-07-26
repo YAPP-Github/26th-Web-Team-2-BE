@@ -9,6 +9,15 @@ spring:
     import:
       - optional:file:./.env[.properties]
       - classpath:config/oauth/security.yml
+  cloud:
+    openfeign:
+      client:
+        config:
+            default:
+                connect-timeout: 10000
+                read-timeout: 10000
+    compatibility-verifier:
+      enabled: false
 springdoc:
   swagger-ui:
     path: /swagger

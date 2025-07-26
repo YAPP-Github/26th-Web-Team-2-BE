@@ -7,13 +7,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import com.yapp.backend.service.model.Amenity;
@@ -33,16 +35,18 @@ public class AccommodationEntity {
     private Long id;
 
     // 메타데이터
-    @Column(name = "url_test")
-    private String urlTest;
+    @Column(name = "url")
+    private String url;
     @Column(name = "site_name")
     private String siteName;
     @Column(name = "memo")
     private String memo;
+    @CreationTimestamp
     @Column(name = "created_at")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
+    @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
     @Column(name = "created_by")
     private Long createdBy;
     @Column(name = "table_id")
@@ -67,7 +71,7 @@ public class AccommodationEntity {
     private Integer lowestPrice;
     @Column(name = "highest_price")
     private Integer highestPrice;
-    @Column(name = "currency")
+    @Column(name = "currency", length = 3)
     private String currency;
     @Column(name = "review_score")
     private Double reviewScore;

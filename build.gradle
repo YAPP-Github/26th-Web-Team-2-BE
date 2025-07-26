@@ -34,11 +34,13 @@ repositories {
 dependencyManagement {
 	imports {
 		mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:5.10.0"
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.1"
 	}
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'com.google.cloud:spring-cloud-gcp-starter-secretmanager'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
 
@@ -74,6 +76,13 @@ dependencies {
 	implementation('io.jsonwebtoken:jjwt-api:0.12.6')
 	runtimeOnly    "io.jsonwebtoken:jjwt-impl:0.12.6"
 	runtimeOnly    "io.jsonwebtoken:jjwt-jackson:0.12.6"
+
+  // feign client
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	// flyway
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

@@ -10,7 +10,20 @@ public enum ErrorCode {
     /**
      * 4xx
      */
-    USER_NOT_FOUND("사용자 존재하지 않음", "사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND)
+    USER_NOT_FOUND("사용자 존재하지 않음", "사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    
+    // Accommodation related errors
+    INVALID_TABLE_ID("잘못된 테이블 ID", "존재하지 않거나 유효하지 않은 테이블 ID입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_USER_ID("잘못된 사용자 ID", "존재하지 않거나 유효하지 않은 사용자 ID입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_URL_FORMAT("잘못된 URL 형식", "유효하지 않은 URL 형식입니다.", HttpStatus.BAD_REQUEST),
+    ACCOMMODATION_REGISTRATION_FAILED("숙소 등록 실패", "숙소 등록 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    DATABASE_CONNECTION_ERROR("데이터베이스 연결 오류", "데이터베이스 연결에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    DATABASE_CONSTRAINT_VIOLATION("데이터베이스 제약 조건 위반", "데이터베이스 제약 조건을 위반했습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_PAGINATION_PARAMETERS("잘못된 페이징 파라미터", "페이지 번호나 크기가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+    
+    // Scraping related errors
+    SCRAPING_FAILED("스크래핑 실패", "외부 서버에서 데이터를 가져오는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    SCRAPING_SERVER_ERROR("스크래핑 서버 오류", "스크래핑 서버와의 통신에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE)
     // 필요에 따라 추가
     ;
 

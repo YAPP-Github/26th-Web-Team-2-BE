@@ -1,34 +1,44 @@
 package com.yapp.backend.service.impl;
 
+import com.yapp.backend.common.exception.CustomException;
+import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 import com.yapp.backend.service.model.Accommodation;
 import com.yapp.backend.repository.AccommodationRepository;
-import com.yapp.backend.service.model.Amenity;
-import com.yapp.backend.service.model.Attraction;
-import com.yapp.backend.service.model.CheckTime;
-import com.yapp.backend.service.model.DistanceInfo;
-import com.yapp.backend.service.model.Transportation;
+import com.yapp.backend.repository.entity.AccommodationEntity;
+import com.yapp.backend.repository.mapper.ScrapingDataMapper;
 import com.yapp.backend.service.AccommodationService;
+import com.yapp.backend.service.ScrapingService;
+import com.yapp.backend.service.dto.ScrapingResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yapp.backend.controller.dto.response.AccommodationPageResponse;
 import com.yapp.backend.controller.dto.response.AccommodationResponse;
-import java.time.LocalDate;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * 숙소 도메인 서비스
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccommodationServiceImpl implements AccommodationService {
 
 	private final AccommodationRepository accommodationRepository;
+	private final ScrapingService scrapingService;
+	private final ScrapingDataMapper scrapingDataMapper;
 
 	/**
 	 * 숙소 목록 조회
@@ -36,103 +46,83 @@ public class AccommodationServiceImpl implements AccommodationService {
 	 * userId 가 null인 경우, 그룹에 속한 모든 숙소를 조회
 	 */
 	@Override
-	public AccommodationPageResponse findAccommodationsByTableId(Integer tableId, int page, int size, Long userId) {
-		// Base coordinates for Seoul
-		double baseLatitude = 37.5665;
-		double baseLongitude = 126.9780;
+	@Transactional(readOnly = true)
+	public AccommodationPageResponse findAccommodationsByTableId(Long tableId, int page, int size, Long userId) {
+		try {
+			// size + 1개를 조회하여 다음 페이지 존재 여부를 한 번의 쿼리로 확인
+			List<Accommodation> accommodations = accommodationRepository.findByTableIdWithPagination(
+					tableId.longValue(), page, size + 1, userId);
 
-		List<Accommodation> allAccommodations = List.of(
-			createMockAccommodation(1L, "신라호텔", "서울 중구 동호로 249", baseLatitude + 0.01, baseLongitude - 0.02),
-			createMockAccommodation(2L, "롯데호텔 월드", "서울 송파구 올림픽로 240", baseLatitude - 0.01, baseLongitude + 0.03),
-			createMockAccommodation(3L, "파크 하얏트 부산", "부산 해운대구 마린시티1로 51", baseLatitude + 0.02, baseLongitude - 0.01),
-			createMockAccommodation(4L, "그랜드 조선 제주", "제주 서귀포시 중문관광로72번길 60", baseLatitude - 0.02, baseLongitude + 0.01),
-			createMockAccommodation(5L, "씨마크 호텔", "강원 강릉시 해안로406번길 2", baseLatitude + 0.03, baseLongitude - 0.03),
-			createMockAccommodation(6L, "아난티코브", "부산 기장군 기장읍 기장해안로 268-32", baseLatitude - 0.03, baseLongitude + 0.02)
-		);
+			// 실제 반환할 데이터와 다음 페이지 존재 여부 판단
+			boolean hasNext = accommodations.size() > size;
+			List<Accommodation> actualAccommodations = hasNext
+					? accommodations.subList(0, size)
+					: accommodations;
 
-		int startIndex = page * size;
-		int endIndex = Math.min(startIndex + size, allAccommodations.size());
+			List<AccommodationResponse> accommodationResponses = actualAccommodations.stream()
+					.map(AccommodationResponse::from)
+					.collect(Collectors.toList());
 
-		List<AccommodationResponse> accommodationsOnPage = allAccommodations.subList(startIndex, endIndex).stream()
-			.map(AccommodationResponse::from)
-			.collect(Collectors.toList());
-
-		boolean hasNext = endIndex < allAccommodations.size();
-
-		return AccommodationPageResponse.builder()
-			.accommodations(accommodationsOnPage)
-			.hasNext(hasNext)
-			.build();
+			return AccommodationPageResponse.builder()
+					.accommodations(accommodationResponses)
+					.hasNext(hasNext)
+					.build();
+		} catch (DataAccessException e) {
+			log.error("Database error while finding accommodations for tableId: {}, userId: {}", tableId, userId, e);
+			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+		}
 	}
 
 	/**
-	 * table에 포함된 숙소 카드의 개수를 반환합니다.
+	 * table에 포함된 숙소 카드의 개수 반환
 	 */
 	@Override
 	public Long countAccommodationsByTableId(Long tableId, Long userId) {
-		return 6L;
+		try {
+			return accommodationRepository.countByTableId(tableId, userId);
+		} catch (DataAccessException e) {
+			log.error("Database error while counting accommodations for tableId: {}, userId: {}", tableId, userId, e);
+			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+		}
 	}
 
 	/**
-	 * Mock Method
-	 * @sehwan 실제 API로 변경되면 제거해야 합니다.
+	 * 숙소 카드 등록
+	 * URL을 통해 외부 스크래핑 서버에서 숙소 정보를 가져와 등록합니다.
 	 */
-	private Accommodation createMockAccommodation(Long id, String name, String address, double latitude, double longitude) {
-		return Accommodation.builder()
-			.id(id)
-			.urlTest("https://example.com/hotel/" + id)
-			.siteName("Test Site")
-			.memo("메모 " + id)
-			.createdAt(LocalDate.now())
-			.updatedAt(LocalDate.now())
-			.createdBy(1L)
-			.tableId(id)
-			.accommodationName(name)
-			.images(List.of("https://cache.marriott.com/content/dam/marriott-renditions/SELWI/selwi-exterior-8543-hor-feat.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1920px",
-				"https://cache.marriott.com/content/dam/marriott-renditions/SELWI/selwi-lobby-5013-hor-feat.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1920px"))
-			.address(address)
-			.latitude(latitude)
-			.longitude(longitude)
-			.lowestPrice(200000)
-			.highestPrice(500000)
-			.currency("KRW")
-			.reviewScore(4.5)
-			.cleanlinessScore(4.8)
-			.reviewSummary("최고의 경험!")
-			.hotelId(100L + id)
-			.nearbyAttractions(createRandomAttractions())
-			.nearbyTransportation(createRandomTransportations())
-			.amenities(List.of(new Amenity()))
-			.checkInTime(new CheckTime("15:00", "23:00"))
-			.checkOutTime(new CheckTime("11:00", "12:00"))
-			.build();
-	}
-
-	/**
-	 * Mock Method
-	 * @sehwan 실제 API로 변경되면 제거해야 합니다.
-	 */
-	private List<Attraction> createRandomAttractions() {
-		return List.of(
-			Attraction.builder().name("Namsan Tower").type("Landmark").latitude(37.5512).longitude(126.9882).distance("5km").byFoot(new DistanceInfo("60min", "5km")).byCar(new DistanceInfo("15min", "5km")).build(),
-			Attraction.builder().name("Gyeongbokgung Palace").type("Historic Site").latitude(37.5796).longitude(126.9770).distance("3km").byFoot(new DistanceInfo("30min", "3km")).byCar(new DistanceInfo("10min", "3km")).build()
-		);
-	}
-
-	/**
-	 * Mock Method
-	 * @sehwan 실제 API로 변경되면 제거해야 합니다.
-	 */
-	private List<Transportation> createRandomTransportations() {
-		return List.of(
-			Transportation.builder().name("Seoul Station").type("Train Station").latitude(37.5559).longitude(126.9723).distance("2km").byFoot(new DistanceInfo("20min", "2km")).byCar(new DistanceInfo("5min", "2km")).build(),
-			Transportation.builder().name("Gangnam Station").type("Subway Station").latitude(37.4981).longitude(127.0276).distance("10km").byFoot(new DistanceInfo("120min", "10km")).byCar(new DistanceInfo("30min", "10km")).build()
-		);
-	}
-
 	@Override
 	public AccommodationRegisterResponse registerAccommodationCard(AccommodationRegisterRequest request) {
-		// todo @sehwan 스크래핑 서버와 연결 로직 구현 필요
-		return new AccommodationRegisterResponse();
+		try {
+			// 외부 스크래핑 서버에서 숙소 정보 가져오기
+			ScrapingResponse scrapingResponse = scrapingService.scrapeAccommodationData(request.getUrl());
+
+			// 스크래핑 데이터를 Entity로 매핑
+			AccommodationEntity accommodationEntity = scrapingDataMapper.mapToEntity(
+					scrapingResponse.getData(),
+					request.getUrl(),
+					request.getMemo(),
+					request.getUserId(),
+					request.getTableId());
+
+			// Save new accommodation to database using repository
+			Accommodation savedAccommodation = accommodationRepository.save(accommodationEntity);
+
+			// Return proper registration response
+			return AccommodationRegisterResponse.builder()
+					.accommodationId(savedAccommodation.getId())
+					.build();
+		} catch (CustomException e) {
+			// Re-throw custom exceptions (validation errors) as-is
+			throw e;
+		} catch (DataIntegrityViolationException e) {
+			log.error("Database constraint violation while registering accommodation", e);
+			throw new CustomException(ErrorCode.DATABASE_CONSTRAINT_VIOLATION);
+		} catch (DataAccessException e) {
+			log.error("Database error while registering accommodation", e);
+			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+		} catch (Exception e) {
+			log.error("Unexpected error while registering accommodation", e);
+			throw new CustomException(ErrorCode.ACCOMMODATION_REGISTRATION_FAILED);
+		}
 	}
 }
