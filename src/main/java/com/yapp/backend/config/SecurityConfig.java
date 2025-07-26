@@ -1,5 +1,6 @@
 package com.yapp.backend.config;
 
+import com.yapp.backend.filter.JwtFilter;
 import com.yapp.backend.filter.handler.CustomAuthenticationEntryPoint;
 import com.yapp.backend.filter.handler.OAuth2AuthenticationSuccessHandler;
 import com.yapp.backend.filter.service.CustomOAuth2UserService;
@@ -8,7 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -17,17 +20,21 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+                .addFilterBefore(jwtFilter, OAuth2LoginAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                "/v3/api-docs/**",
+                                "/",
+                                "/swagger/**",
                                 "/swagger-ui/**",
-                                "/swagger/**"          // 만약 path: /swagger 로 설정했다면
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/oauth2/authorization/**",

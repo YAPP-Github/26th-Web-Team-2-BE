@@ -21,9 +21,7 @@ services:
   redis:
     image: redis:8.0.2
     container_name: local-redis-y26w2
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes" ]
     volumes:
       - redis-data:/data
     ports:

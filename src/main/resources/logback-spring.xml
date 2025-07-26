@@ -55,7 +55,7 @@
         </http>
         <format>
             <label>
-                <pattern>application=${spring.application.name}</pattern>
+                <pattern>application=${SPRING_APPLICATION_NAME:backend}</pattern>
             </label>
             <label>
                 <pattern>host=${HOSTNAME}</pattern>
