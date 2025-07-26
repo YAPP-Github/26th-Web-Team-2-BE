@@ -1,7 +1,7 @@
 CREATE TABLE accommodation (
    id BIGSERIAL PRIMARY KEY,
 
-   url_test TEXT,
+   url TEXT,
    site_name TEXT,
    memo TEXT,
    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,

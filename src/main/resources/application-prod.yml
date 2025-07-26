@@ -6,6 +6,10 @@ spring:
       - optional:classpath:config/postgresql/db-prod.yml
       - optional:classpath:config/redis/redis-prod.yml
 
+scraping:
+  server:
+    url: ${DATA_URL}
+    client: ${DATA_CLIENT}
 
 sentry:
   dsn: ${SENTRY_DSN}

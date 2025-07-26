@@ -1,4 +1,4 @@
-package com.yapp.backend.controller.dto.response;
+package com.yapp.backend.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class AccommodationRegisterResponse {
-	private Long accommodationId;
+@NoArgsConstructor
+public class ScrapingRequest {
+    private String url;
 }

@@ -21,7 +21,7 @@ import java.util.List;
 public class AccommodationResponse {
 	private Long id;
 	private Long userId;
-	private String urlTest;
+	private String url;
 	private String siteName;
 	private String memo;
 	private LocalDate createdAt;
@@ -50,7 +50,7 @@ public class AccommodationResponse {
 		return AccommodationResponse.builder()
 			.userId(accommodation.getUserId())
 			.id(accommodation.getId())
-			.urlTest(accommodation.getUrlTest())
+			.url(accommodation.getUrl())
 			.siteName(accommodation.getSiteName())
 			.memo(accommodation.getMemo())
 			.createdAt(accommodation.getCreatedAt())
