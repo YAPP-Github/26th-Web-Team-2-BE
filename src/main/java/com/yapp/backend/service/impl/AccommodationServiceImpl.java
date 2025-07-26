@@ -47,7 +47,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public AccommodationPageResponse findAccommodationsByTableId(Integer tableId, int page, int size, Long userId) {
+	public AccommodationPageResponse findAccommodationsByTableId(Long tableId, int page, int size, Long userId) {
 		try {
 			// size + 1개를 조회하여 다음 페이지 존재 여부를 한 번의 쿼리로 확인
 			List<Accommodation> accommodations = accommodationRepository.findByTableIdWithPagination(

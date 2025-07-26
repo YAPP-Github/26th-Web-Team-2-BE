@@ -12,4 +12,6 @@ import lombok.NoArgsConstructor;
 public class CheckTime {
     private String checkInTimeFrom;
     private String checkInTimeTo;
+    private String checkOutTimeFrom;
+    private String checkOutTimeTo;
 }

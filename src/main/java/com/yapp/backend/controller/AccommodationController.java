@@ -40,7 +40,7 @@ public class AccommodationController implements AccommodationDocs {
 	@Override
 	@GetMapping("/search")
 	public ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationByTableIdAndUserId(
-			@RequestParam Integer tableId,
+			@RequestParam Long tableId,
 			@RequestParam Integer page,
 			@RequestParam Integer size,
 			@RequestParam(required = false) Long userId) {

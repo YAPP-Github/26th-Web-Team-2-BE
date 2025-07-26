@@ -5,7 +5,7 @@ import com.yapp.backend.controller.dto.response.AccommodationPageResponse;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 
 public interface AccommodationService {
-    AccommodationPageResponse findAccommodationsByTableId(Integer tableId, int page, int size, Long userId);
+    AccommodationPageResponse findAccommodationsByTableId(Long tableId, int page, int size, Long userId);
 
     Long countAccommodationsByTableId(Long tableId, Long userId);
 

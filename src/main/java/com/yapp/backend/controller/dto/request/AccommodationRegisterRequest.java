@@ -16,7 +16,7 @@ public class AccommodationRegisterRequest {
 	@NotBlank(message = "URL은 필수 입력값입니다.")
 	private String url;
 	
-	@Size(max = 50, message = "메모는 500자를 초과할 수 없습니다.")
+	@Size(max = 50, message = "메모는 50자를 초과할 수 없습니다.")
 	private String memo;
 	
 	@NotNull(message = "테이블 ID는 필수 입력값입니다.")
