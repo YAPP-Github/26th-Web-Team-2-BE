@@ -45,10 +45,11 @@ public class AccommodationController implements AccommodationDocs {
 			@RequestParam Long tableId,
 			@RequestParam Integer page,
 			@RequestParam Integer size,
-			@RequestParam(required = false) Long userId) {
+			@RequestParam(required = false) Long userId,
+			@RequestParam(defaultValue = "recent") String sort) {
 
 		AccommodationPageResponse response = accommodationService.findAccommodationsByTableId(tableId, page, size,
-				userId);
+				userId, sort);
 		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
 	}
 

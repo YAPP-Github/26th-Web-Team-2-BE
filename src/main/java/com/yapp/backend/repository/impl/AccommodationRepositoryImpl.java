@@ -25,17 +25,32 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	/**
 	 * 테이블 ID로 숙소 목록을 페이징하여 조회하는 쿼리
 	 * userId가 null이 아닌 경우 해당 사용자가 생성한 숙소만 조회
+	 * sort 파라미터에 따라 정렬 방식 결정 (recent: 최근 등록순, price_asc: 가격 낮은 순)
 	 */
 	@Override
-	public List<Accommodation> findByTableIdWithPagination(Long tableId, int page, int size, Long userId) {
+	public List<Accommodation> findByTableIdWithPagination(Long tableId, int page, int size, Long userId, String sort) {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<AccommodationEntity> entityPage;
 
+		// 정렬 방식에 따른 쿼리 선택
+		boolean isPriceSort = "price_asc".equals(sort);
+
 		if (userId != null) {
-			entityPage = jpaAccommodationRepository.findByTableIdAndCreatedByOrderByCreatedAtDesc(tableId, userId,
-					pageable);
+			if (isPriceSort) {
+				entityPage = jpaAccommodationRepository.findByTableIdAndCreatedByOrderByLowestPriceAsc(tableId, userId,
+						pageable);
+			} else {
+				// recent 또는 기본값은 최근 등록순
+				entityPage = jpaAccommodationRepository.findByTableIdAndCreatedByOrderByCreatedAtDesc(tableId, userId,
+						pageable);
+			}
 		} else {
-			entityPage = jpaAccommodationRepository.findByTableIdOrderByCreatedAtDesc(tableId, pageable);
+			if (isPriceSort) {
+				entityPage = jpaAccommodationRepository.findByTableIdOrderByLowestPriceAsc(tableId, pageable);
+			} else {
+				// recent 또는 기본값은 최근 등록순
+				entityPage = jpaAccommodationRepository.findByTableIdOrderByCreatedAtDesc(tableId, pageable);
+			}
 		}
 
 		return entityPage.getContent().stream()
