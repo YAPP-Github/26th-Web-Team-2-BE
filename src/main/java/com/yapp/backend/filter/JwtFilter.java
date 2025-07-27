@@ -40,6 +40,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 || uri.equals("/")
                 || uri.startsWith("/error")
                 || uri.startsWith("/swagger")
+                || uri.startsWith("/v3/api-docs")
+                || uri.startsWith("/api/oauth")
                 ;
     }
 
