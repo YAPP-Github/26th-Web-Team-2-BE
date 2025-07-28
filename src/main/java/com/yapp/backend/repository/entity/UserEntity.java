@@ -58,6 +58,10 @@ public class UserEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    public UserEntity(Long id) {
+        this.id = id;
+    }
+
     public static UserEntity from(User user) {
         return UserEntity.builder()
                 .id(null)

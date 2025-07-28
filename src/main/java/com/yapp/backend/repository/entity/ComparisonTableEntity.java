@@ -1,0 +1,101 @@
+package com.yapp.backend.repository.entity;
+
+
+import static jakarta.persistence.CascadeType.ALL;
+
+import com.yapp.backend.service.model.Accommodation;
+import com.yapp.backend.service.model.ComparisonTable;
+import com.yapp.backend.service.model.enums.ComparisonFactor;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+
+@Getter
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "comparison_table")
+public class ComparisonTableEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long tableId;
+
+    @Column(name = "table_name")
+    private String tableName;
+
+    @ManyToOne
+    @JoinColumn(name = "trip_group")
+    private TripGroupEntity tripGroupEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private UserEntity createdByEntity;
+
+    @Type(JsonType.class)
+    @Column(name = "factors", columnDefinition = "jsonb")
+    private List<ComparisonFactor> factors;
+
+    @OneToMany(
+            mappedBy = "comparisonTableEntity",
+            cascade = ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("position")
+    private List<ComparisonAccommodationEntity> items = new ArrayList<>();
+
+
+    public static ComparisonTableEntity from(ComparisonTable comparisonTable) {
+        ComparisonTableEntity tableEntity = ComparisonTableEntity.builder()
+                .tableName(comparisonTable.getTableName())
+                .tripGroupEntity(new TripGroupEntity(comparisonTable.getTripGroupId()))
+                .createdByEntity(new UserEntity(comparisonTable.getCreatedById()))
+                .items(new ArrayList<>())
+                .factors(comparisonTable.getFactors())
+                .build();
+
+        for (Accommodation accommodation : comparisonTable.getAccommodationList()) {
+            ComparisonAccommodationEntity itemEntity = new ComparisonAccommodationEntity(AccommodationEntity.from(accommodation));
+            itemEntity.setComparisonTable(tableEntity);
+            tableEntity.addItems(itemEntity);
+        }
+
+        return tableEntity;
+    }
+
+    private void addItems(ComparisonAccommodationEntity itemEntity) {
+        this.items.add(itemEntity);
+    }
+
+    public ComparisonTable toDomain() {
+        return ComparisonTable.builder()
+                .tableId(this.tableId)
+                .tableName(this.tableName)
+                .tripGroupId(this.tripGroupEntity.getId())
+                .createdById(this.createdByEntity.getId())
+                .accommodationList(
+                        this.items.stream()
+                                .map(item -> item.getAccommodationEntity().toDomain()).collect(
+                        Collectors.toList()))
+                .factors(this.factors)
+                .build();
+    }
+
+}
