@@ -33,14 +33,14 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 
 		if (userId != null) {
 			entityPage = jpaAccommodationRepository.findByTableIdAndCreatedByOrderByCreatedAtDesc(tableId, userId,
-				pageable);
+					pageable);
 		} else {
 			entityPage = jpaAccommodationRepository.findByTableIdOrderByCreatedAtDesc(tableId, pageable);
 		}
 
 		return entityPage.getContent().stream()
-			.map(this::convertToAccommodation)
-			.collect(Collectors.toList());
+				.map(this::convertToAccommodation)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -63,6 +63,15 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	public Accommodation save(AccommodationEntity accommodationEntity) {
 		AccommodationEntity savedEntity = jpaAccommodationRepository.save(accommodationEntity);
 		return convertToAccommodation(savedEntity);
+	}
+
+	/**
+	 * 숙소 ID로 단건 조회합니다.
+	 */
+	@Override
+	public Accommodation findById(Long accommodationId) {
+		AccommodationEntity entity = jpaAccommodationRepository.findByAccommodationId(accommodationId);
+		return entity != null ? convertToAccommodation(entity) : null;
 	}
 
 	/**

@@ -5,6 +5,7 @@ import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.response.AccommodationCountResponse;
 import com.yapp.backend.controller.dto.response.AccommodationPageResponse;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
+import com.yapp.backend.controller.dto.response.AccommodationResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,4 +36,8 @@ public interface AccommodationDocs {
 	@Operation(summary = "숙소 카드 등록", description = "링크를 첨부하여 숙소 카드를 등록합니다.", method = "POST")
 	ResponseEntity<StandardResponse<AccommodationRegisterResponse>> registerAccommodationCard(
 			@RequestBody(description = "숙소 등록 요청 데이터", content = @Content(schema = @Schema(implementation = AccommodationRegisterRequest.class))) AccommodationRegisterRequest request);
+
+	@Operation(summary = "숙소 단건 조회", description = "특정 숙소 ID로 숙소 정보를 조회합니다.")
+	ResponseEntity<StandardResponse<AccommodationResponse>> getAccommodationById(
+			@Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer", format = "int64"), description = "조회할 숙소의 ID") @NotNull(message = "숙소 ID는 필수입니다.") @Min(value = 1, message = "숙소 ID는 1 이상이어야 합니다.") Long accommodationId);
 }
