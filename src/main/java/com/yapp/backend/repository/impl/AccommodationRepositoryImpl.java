@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.yapp.backend.repository.AccommodationRepository;
 import com.yapp.backend.repository.JpaAccommodationRepository;
 import com.yapp.backend.repository.entity.AccommodationEntity;
+import com.yapp.backend.repository.enums.SortType;
 import com.yapp.backend.repository.mapper.AccommodationMapper;
 import com.yapp.backend.service.model.Accommodation;
 
@@ -33,25 +34,12 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 		Page<AccommodationEntity> entityPage;
 
 		// 정렬 방식에 따른 쿼리 선택
-		boolean isPriceSort = "price_asc".equals(sort);
+		SortType sortType = SortType.fromString(sort);
+		boolean isPriceSort = sortType == SortType.PRICE_ASC;
 
-		if (userId != null) {
-			if (isPriceSort) {
-				entityPage = jpaAccommodationRepository.findByTableIdAndCreatedByOrderByLowestPriceAsc(tableId, userId,
-						pageable);
-			} else {
-				// recent 또는 기본값은 최근 등록순
-				entityPage = jpaAccommodationRepository.findByTableIdAndCreatedByOrderByCreatedAtDesc(tableId, userId,
-						pageable);
-			}
-		} else {
-			if (isPriceSort) {
-				entityPage = jpaAccommodationRepository.findByTableIdOrderByLowestPriceAsc(tableId, pageable);
-			} else {
-				// recent 또는 기본값은 최근 등록순
-				entityPage = jpaAccommodationRepository.findByTableIdOrderByCreatedAtDesc(tableId, pageable);
-			}
-		}
+		entityPage = userId != null
+				? getEntityPageWithUserId(tableId, userId, pageable, isPriceSort)
+				: getEntityPageWithoutUserId(tableId, pageable, isPriceSort);
 
 		return entityPage.getContent().stream()
 				.map(this::convertToAccommodation)
@@ -87,6 +75,27 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	public Accommodation findById(Long accommodationId) {
 		AccommodationEntity entity = jpaAccommodationRepository.findByAccommodationId(accommodationId);
 		return entity != null ? convertToAccommodation(entity) : null;
+	}
+
+	/**
+	 * userId가 있는 경우의 엔티티 페이지 조회
+	 */
+	private Page<AccommodationEntity> getEntityPageWithUserId(Long tableId, Long userId, Pageable pageable,
+			boolean isPriceSort) {
+		return isPriceSort
+				? jpaAccommodationRepository.findByTableIdAndCreatedByOrderByLowestPriceAsc(tableId, userId, pageable)
+				: jpaAccommodationRepository.findByTableIdAndCreatedByOrderByCreatedAtDesc(tableId, userId, pageable);
+	}
+
+	/**
+	 * userId가 없는 경우의 엔티티 페이지 조회
+	 */
+	private Page<AccommodationEntity> getEntityPageWithoutUserId(Long tableId, Pageable pageable, boolean isPriceSort) {
+		return isPriceSort
+				? jpaAccommodationRepository.findByTableIdOrderByLowestPriceAsc(tableId, pageable)
+				: jpaAccommodationRepository.findByTableIdOrderByCreatedAtDesc(tableId, pageable);
+	}
+
 	}
 
 	/**
