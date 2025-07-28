@@ -16,15 +16,14 @@ public class UserRepositoryImpl implements UserRepository {
     private final JpaUserRepository jpaUserRepository;
 
     @Override
-    public User findById(Long id) {
-        // Mock data
+    public User findByIdOrThrow(Long id) {
         return jpaUserRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND))
                 .toModel();
     }
 
     @Override
-    public User getUserBySocialUserInfo(User socialUserInfo) {
+    public User getUserBySocialUserInfoOrCreateUser(User socialUserInfo) {
         return jpaUserRepository
                 .findByProviderAndSocialId(socialUserInfo.getProvider(), socialUserInfo.getSocialId())
                 .orElseGet(() ->
