@@ -62,6 +62,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @PathVariable("tableId") Long tableId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
+        // TODO: 인증 로직 리팩토링
         Long userId = userDetails == null ? 1L : userDetails.getUserId();
         ComparisonTableResponse comparisonTableResponse = comparisonTableService.getComparisonTable(tableId, userId);
         return ResponseEntity.ok(
@@ -69,6 +70,7 @@ public class ComparisonTableController implements ComparisonDocs {
         );
     }
 
+    // TODO: 비교표 수정 API
     @Override
     @PutMapping("/{tableId}")
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> updateComparisonTable(
@@ -76,9 +78,9 @@ public class ComparisonTableController implements ComparisonDocs {
         return null;
     }
 
+    // TODO: 비교표 숙소 추가 API
     @Override
     @PatchMapping("/{tableId}")
-
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> addAccommodationToComparisonTable(
             Long tableId, Long accommodationId, CustomUserDetails userDetails) {
         return null;
