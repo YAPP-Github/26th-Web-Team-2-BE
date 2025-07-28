@@ -6,7 +6,6 @@ import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.filter.service.AuthContextService;
 import com.yapp.backend.filter.service.RefreshTokenService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 || uri.startsWith("/error")
                 || uri.startsWith("/swagger")
                 || uri.startsWith("/v3/api-docs")
-                || uri.startsWith("/api/oauth")
+                || uri.startsWith("/api")
                 ;
     }
 
