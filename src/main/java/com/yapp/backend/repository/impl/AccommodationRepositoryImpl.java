@@ -1,5 +1,7 @@
 package com.yapp.backend.repository.impl;
 
+import com.yapp.backend.common.exception.AccommodationNotFoundException;
+import com.yapp.backend.common.exception.ErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -66,6 +68,13 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	public Accommodation save(AccommodationEntity accommodationEntity) {
 		AccommodationEntity savedEntity = jpaAccommodationRepository.save(accommodationEntity);
 		return convertToAccommodation(savedEntity);
+	}
+
+	@Override
+	public Accommodation findByIdOrThrow(Long accommodationId) {
+		return jpaAccommodationRepository.findById(accommodationId)
+				.orElseThrow(() -> new AccommodationNotFoundException(ErrorCode.ACCOMMODATION_NOT_FOUND))
+				.toDomain();
 	}
 
 	/**

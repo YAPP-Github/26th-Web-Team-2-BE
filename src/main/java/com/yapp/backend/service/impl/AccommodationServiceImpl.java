@@ -1,13 +1,9 @@
 package com.yapp.backend.service.impl;
 
-import com.yapp.backend.common.exception.CustomException;
-import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 import com.yapp.backend.service.model.Accommodation;
 import com.yapp.backend.repository.AccommodationRepository;
-import com.yapp.backend.repository.entity.AccommodationEntity;
-import com.yapp.backend.repository.mapper.ScrapingDataMapper;
 import com.yapp.backend.service.AccommodationService;
 import com.yapp.backend.service.ScrapingService;
 import com.yapp.backend.service.dto.ScrapingResponse;
