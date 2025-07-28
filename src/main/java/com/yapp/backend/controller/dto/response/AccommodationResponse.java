@@ -6,6 +6,7 @@ import com.yapp.backend.service.model.Attraction;
 import com.yapp.backend.service.model.CheckTime;
 import com.yapp.backend.service.model.Transportation;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,12 +21,11 @@ import java.util.List;
 @AllArgsConstructor
 public class AccommodationResponse {
 	private Long id;
-	private Long userId;
 	private String url;
 	private String siteName;
 	private String memo;
-	private LocalDate createdAt;
-	private LocalDate updatedAt;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
 	private Long createdBy;
 	private Long tableId;
 	private String accommodationName;
@@ -48,7 +48,6 @@ public class AccommodationResponse {
 
 	public static AccommodationResponse from(Accommodation accommodation) {
 		return AccommodationResponse.builder()
-			.userId(accommodation.getUserId())
 			.id(accommodation.getId())
 			.url(accommodation.getUrl())
 			.siteName(accommodation.getSiteName())
