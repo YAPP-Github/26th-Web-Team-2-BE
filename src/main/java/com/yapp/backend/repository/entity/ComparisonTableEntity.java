@@ -86,14 +86,10 @@ public class ComparisonTableEntity {
                     .accommodationEntity(AccommodationEntity.from(accommodation))
                     .position(i).build();
             itemEntity.setComparisonTable(tableEntity);
-            tableEntity.addItems(itemEntity);
+            tableEntity.items.add(itemEntity);
         }
 
         return tableEntity;
-    }
-
-    private void addItems(ComparisonAccommodationEntity itemEntity) {
-        this.items.add(itemEntity);
     }
 
     public ComparisonTable toDomain() {
