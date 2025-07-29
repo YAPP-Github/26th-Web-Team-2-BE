@@ -72,9 +72,9 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 
 	@Override
 	public Accommodation findByIdOrThrow(Long accommodationId) {
-		return jpaAccommodationRepository.findById(accommodationId)
-				.orElseThrow(() -> new AccommodationNotFoundException(ErrorCode.ACCOMMODATION_NOT_FOUND))
-				.toDomain();
+		AccommodationEntity accommodationEntity = jpaAccommodationRepository.findById(accommodationId)
+				.orElseThrow(() -> new AccommodationNotFoundException(ErrorCode.ACCOMMODATION_NOT_FOUND));
+		return accommodationMapper.entityToDomain(accommodationEntity);
 	}
 
 	/**

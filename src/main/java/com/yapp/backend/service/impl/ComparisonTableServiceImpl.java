@@ -9,7 +9,7 @@ import com.yapp.backend.repository.UserRepository;
 import com.yapp.backend.service.ComparisonTableService;
 import com.yapp.backend.service.model.Accommodation;
 import com.yapp.backend.service.model.ComparisonTable;
-import com.yapp.backend.service.model.TripGroup;
+import com.yapp.backend.service.model.TripBoard;
 import com.yapp.backend.service.model.User;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
 import java.util.stream.Collectors;
@@ -38,9 +38,9 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         List<ComparisonFactor> factors = ComparisonFactor.convertToComparisonFactorList(request.getFactorList());
 
         // TODO : request groupId로 DB에서 실제 group data 가져오기
-        TripGroup tripGroup = TripGroup.builder()
-                .groupId(request.getGroupId())
-                .groupName("테스트 여행 그룹 " + request.getGroupId())
+        TripBoard tripGroup = TripBoard.builder()
+                .id(request.getGroupId())
+                .name("테스트 여행 그룹 " + request.getGroupId())
                 .createdBy(User.builder()
                         .id(userId)
                         .nickname("그룹생성자" + userId)
@@ -68,7 +68,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     public ComparisonTableResponse getComparisonTable(Long tableId, Long userId) {
         ComparisonTable comparisonTable = comparisonTableRepository.findByIdOrThrow(tableId);
         return new ComparisonTableResponse(
-                comparisonTable.getTableId(),
+                comparisonTable.getId(),
                 comparisonTable.getTableName(),
                 comparisonTable.getAccommodationList().stream().map(AccommodationResponse::from).collect(
                         Collectors.toList()),

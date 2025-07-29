@@ -57,7 +57,4 @@ public class TripBoardEntity {
     )
     private List<ComparisonTableEntity> comparisonTables = new ArrayList<>();
 
-    public TripBoardEntity(Long groupId) {
-       this.id = groupId;
-    }
 }

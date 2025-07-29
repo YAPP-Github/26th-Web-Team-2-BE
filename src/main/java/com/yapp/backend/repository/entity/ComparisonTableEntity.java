@@ -72,38 +72,4 @@ public class ComparisonTableEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public static ComparisonTableEntity from(ComparisonTable comparisonTable) {
-        ComparisonTableEntity tableEntity = ComparisonTableEntity.builder()
-                .tableName(comparisonTable.getTableName())
-                .tripBoardEntity(new TripBoardEntity(comparisonTable.getId()))
-                .createdByEntity(new UserEntity(comparisonTable.getCreatedById()))
-                .items(new ArrayList<>())
-                .factors(comparisonTable.getFactors())
-                .build();
-        for (int i = 0; i < comparisonTable.getAccommodationList().size(); i++) {
-            Accommodation accommodation = comparisonTable.getAccommodationList().get(i);
-            ComparisonAccommodationEntity itemEntity = ComparisonAccommodationEntity.builder()
-                    .accommodationEntity(AccommodationEntity.from(accommodation))
-                    .position(i).build();
-            itemEntity.setComparisonTable(tableEntity);
-            tableEntity.items.add(itemEntity);
-        }
-
-        return tableEntity;
-    }
-
-    public ComparisonTable toDomain() {
-        return ComparisonTable.builder()
-                .id(this.id)
-                .tableName(this.tableName)
-                .tripBoardId(this.tripBoardEntity.getId())
-                .createdById(this.createdByEntity.getId())
-                .accommodationList(
-                        this.items.stream()
-                                .map(item -> item.getAccommodationEntity().toDomain()).collect(
-                        Collectors.toList()))
-                .factors(this.factors)
-                .build();
-    }
-
 }
