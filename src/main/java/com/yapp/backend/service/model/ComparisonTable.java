@@ -15,10 +15,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ComparisonTable {
-    private Long tableId;
+    private Long id;
     private String tableName;
     private Long createdById;
-    private Long tripGroupId;
+    private Long tripBoardId;
     private List<Accommodation> accommodationList;
     private List<ComparisonFactor> factors;
     private LocalDateTime createdAt;
@@ -27,14 +27,14 @@ public class ComparisonTable {
     public static ComparisonTable from(
             @NotBlank String tableName,
             User user,
-            TripGroup tripGroup,
+            TripBoard tripBoard,
             List<Accommodation> accommodationList,
             List<ComparisonFactor> factors
     ) {
         return ComparisonTable.builder()
                 .tableName(tableName)
                 .createdById(user.getId())
-                .tripGroupId(tripGroup.getGroupId())
+                .tripBoardId(tripBoard.getId())
                 .accommodationList(accommodationList)
                 .factors(factors)
                 .build();

@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
         name = "comparison_accommodation",
         uniqueConstraints = @UniqueConstraint(
                 name = "uq_cmp_accom",
-                columnNames = {"comparison_id", "accommodation_id"}
+                columnNames = {"comparison_table_id", "accommodation_id"}
         )
 )
 public class ComparisonAccommodationEntity {

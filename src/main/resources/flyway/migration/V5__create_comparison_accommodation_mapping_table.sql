@@ -8,10 +8,10 @@ CREATE TABLE comparison_accommodation
 );
 
 ALTER TABLE comparison_accommodation
-    ADD CONSTRAINT uq_cmp_accom UNIQUE (accommodation_id);
+    ADD CONSTRAINT uq_cmp_accom UNIQUE (comparison_table_id, accommodation_id);
 
 ALTER TABLE comparison_accommodation
     ADD CONSTRAINT FK_COMPARISON_ACCOMMODATION_ON_ACCOMMODATION FOREIGN KEY (accommodation_id) REFERENCES accommodation (id);
 
 ALTER TABLE comparison_accommodation
-    ADD CONSTRAINT FK_COMPARISON_ACCOMMODATION_ON_COMPARISON_TABLE FOREIGN KEY (comparison_table_id) REFERENCES comparison_table (table_id);
+    ADD CONSTRAINT FK_COMPARISON_ACCOMMODATION_ON_COMPARISON_TABLE FOREIGN KEY (comparison_table_id) REFERENCES comparison_table (id);

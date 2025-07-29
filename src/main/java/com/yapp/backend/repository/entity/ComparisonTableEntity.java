@@ -39,14 +39,14 @@ public class ComparisonTableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tableId;
+    private Long id;
 
     @Column(name = "table_name")
     private String tableName;
 
     @ManyToOne
-    @JoinColumn(name = "trip_group")
-    private TripGroupEntity tripGroupEntity;
+    @JoinColumn(name = "trip_board")
+    private TripBoardEntity tripBoardEntity;
 
     @ManyToOne
     @JoinColumn(name = "created_by")
@@ -76,7 +76,7 @@ public class ComparisonTableEntity {
     public static ComparisonTableEntity from(ComparisonTable comparisonTable) {
         ComparisonTableEntity tableEntity = ComparisonTableEntity.builder()
                 .tableName(comparisonTable.getTableName())
-                .tripGroupEntity(new TripGroupEntity(comparisonTable.getTripGroupId()))
+                .tripBoardEntity(new TripBoardEntity(comparisonTable.getId()))
                 .createdByEntity(new UserEntity(comparisonTable.getCreatedById()))
                 .items(new ArrayList<>())
                 .factors(comparisonTable.getFactors())
@@ -99,9 +99,9 @@ public class ComparisonTableEntity {
 
     public ComparisonTable toDomain() {
         return ComparisonTable.builder()
-                .tableId(this.tableId)
+                .id(this.id)
                 .tableName(this.tableName)
-                .tripGroupId(this.tripGroupEntity.getId())
+                .tripBoardId(this.tripBoardEntity.getId())
                 .createdById(this.createdByEntity.getId())
                 .accommodationList(
                         this.items.stream()

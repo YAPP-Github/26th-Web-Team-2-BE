@@ -25,8 +25,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "trip_group")
-public class TripGroupEntity {
+@Table(name = "trip_board")
+public class TripBoardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -51,13 +51,13 @@ public class TripGroupEntity {
     private LocalDateTime updatedAt;
 
     @OneToMany(
-            mappedBy = "tripGroupEntity"
+            mappedBy = "tripBoardEntity"
 //            cascade = CascadeType.ALL,
 //            orphanRemoval = true
     )
     private List<ComparisonTableEntity> comparisonTables = new ArrayList<>();
 
-    public TripGroupEntity(Long groupId) {
+    public TripBoardEntity(Long groupId) {
        this.id = groupId;
     }
 }

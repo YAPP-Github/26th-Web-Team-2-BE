@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TripGroup {
-    private Long groupId;
-    private String groupName;
+public class TripBoard {
+    private Long id;
+    private String name;
     private User createdBy;
     private User updatedBy;
     private LocalDateTime createdAt;
