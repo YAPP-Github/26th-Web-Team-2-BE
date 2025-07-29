@@ -1,5 +1,6 @@
 package com.yapp.backend.service.model;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,4 +15,6 @@ public class TripGroup {
     private String groupName;
     private User createdBy;
     private User updatedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

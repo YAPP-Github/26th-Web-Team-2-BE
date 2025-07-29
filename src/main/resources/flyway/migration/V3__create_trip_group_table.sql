@@ -4,6 +4,8 @@ CREATE TABLE trip_group
     group_name VARCHAR(255),
     created_by BIGINT,
     updated_by BIGINT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_trip_group PRIMARY KEY (id)
 );
 
