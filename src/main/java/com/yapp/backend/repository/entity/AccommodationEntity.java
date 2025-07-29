@@ -135,7 +135,6 @@ public class AccommodationEntity {
                 .lowestPrice(accommodation.getLowestPrice())
                 .highestPrice(accommodation.getHighestPrice())
                 .currency(accommodation.getCurrency())
-                .reviewScore(accommodation.getReviewScore())
                 .cleanlinessScore(accommodation.getCleanlinessScore())
                 .reviewScore(accommodation.getReviewScore())
                 .hotelId(accommodation.getHotelId())
