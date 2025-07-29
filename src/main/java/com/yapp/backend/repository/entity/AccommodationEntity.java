@@ -166,7 +166,6 @@ public class AccommodationEntity {
                 .currency(this.getCurrency())
                 .reviewScore(this.getReviewScore())
                 .cleanlinessScore(this.getCleanlinessScore())
-                .reviewScore(this.getReviewScore())
                 .hotelId(this.getHotelId())
                 .nearbyAttractions(this.getNearbyAttractions())
                 .nearbyTransportation(this.getNearbyTransportation())
