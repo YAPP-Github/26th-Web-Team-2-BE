@@ -125,4 +125,28 @@ public class AccommodationServiceImpl implements AccommodationService {
 			throw new CustomException(ErrorCode.ACCOMMODATION_REGISTRATION_FAILED);
 		}
 	}
+
+	/**
+	 * 숙소 단건 조회
+	 * 특정 숙소 ID로 숙소 정보를 조회합니다.
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public AccommodationResponse findAccommodationById(Long accommodationId) {
+		try {
+			Accommodation accommodation = accommodationRepository.findById(accommodationId);
+
+			if (accommodation == null) {
+				throw new CustomException(ErrorCode.ACCOMMODATION_NOT_FOUND);
+			}
+
+			return AccommodationResponse.from(accommodation);
+		} catch (CustomException e) {
+			// Re-throw custom exceptions as-is
+			throw e;
+		} catch (DataAccessException e) {
+			log.error("Database error while finding accommodation by id: {}", accommodationId, e);
+			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+		}
+	}
 }
