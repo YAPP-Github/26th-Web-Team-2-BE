@@ -46,7 +46,7 @@ public class AccommodationController implements AccommodationDocs {
 			@RequestParam Integer page,
 			@RequestParam Integer size,
 			@RequestParam(required = false) Long userId,
-			@RequestParam(defaultValue = "recent") String sort) {
+			@RequestParam(defaultValue = "saved_at_desc") String sort) {
 
 		AccommodationPageResponse response = accommodationService.findAccommodationsByTableId(tableId, page, size,
 				userId, sort);

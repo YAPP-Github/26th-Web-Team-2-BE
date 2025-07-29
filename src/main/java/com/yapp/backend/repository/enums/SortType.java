@@ -7,7 +7,7 @@ import lombok.Getter;
  */
 @Getter
 public enum SortType {
-    RECENT("recent"),
+    SAVED_AT_DESC("saved_at_desc"),
     PRICE_ASC("price_asc");
 
     private final String value;
@@ -18,11 +18,11 @@ public enum SortType {
 
     /**
      * 문자열 값으로부터 SortType을 찾아 반환
-     * 매칭되는 값이 없으면 기본값(RECENT) 반환
+     * 매칭되는 값이 없으면 기본값(saved_at_desc) 반환
      */
     public static SortType fromString(String value) {
         if (value == null) {
-            return RECENT;
+            return SAVED_AT_DESC;
         }
 
         for (SortType type : values()) {
@@ -30,6 +30,6 @@ public enum SortType {
                 return type;
             }
         }
-        return RECENT; // 기본값
+        return SAVED_AT_DESC; // 기본값
     }
 }

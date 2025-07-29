@@ -10,7 +10,7 @@ public interface AccommodationRepository {
     /**
      * 테이블 ID로 숙소 목록을 페이징하여 조회하는 쿼리
      * userId가 null이 아닌 경우 해당 사용자가 생성한 숙소만 조회
-     * sort 파라미터에 따라 정렬 방식 결정 (recent: 최근 등록순, price_asc: 가격 낮은 순)
+     * sort 파라미터에 따라 정렬 방식 결정 (saved_at_desc: 최근 등록순, price_asc: 가격 낮은 순)
      */
     List<Accommodation> findByTableIdWithPagination(Long tableId, int page, int size, Long userId, String sort);
 

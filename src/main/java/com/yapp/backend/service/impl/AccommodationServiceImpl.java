@@ -50,7 +50,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 		try {
 			// size + 1개를 조회하여 다음 페이지 존재 여부를 한 번의 쿼리로 확인
 			List<Accommodation> accommodations = accommodationRepository.findByTableIdWithPagination(
-					tableId.longValue(), page, size + 1, userId, sort);
+				tableId, page, size + 1, userId, sort);
 
 			// 실제 반환할 데이터와 다음 페이지 존재 여부 판단
 			boolean hasNext = accommodations.size() > size;
