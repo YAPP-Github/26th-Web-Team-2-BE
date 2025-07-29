@@ -70,9 +70,11 @@ public class ComparisonTableEntity {
                 .items(new ArrayList<>())
                 .factors(comparisonTable.getFactors())
                 .build();
-
-        for (Accommodation accommodation : comparisonTable.getAccommodationList()) {
-            ComparisonAccommodationEntity itemEntity = new ComparisonAccommodationEntity(AccommodationEntity.from(accommodation));
+        for (int i = 0; i < comparisonTable.getAccommodationList().size(); i++) {
+            Accommodation accommodation = comparisonTable.getAccommodationList().get(i);
+            ComparisonAccommodationEntity itemEntity = ComparisonAccommodationEntity.builder()
+                    .accommodationEntity(AccommodationEntity.from(accommodation))
+                    .position(i).build();
             itemEntity.setComparisonTable(tableEntity);
             tableEntity.addItems(itemEntity);
         }

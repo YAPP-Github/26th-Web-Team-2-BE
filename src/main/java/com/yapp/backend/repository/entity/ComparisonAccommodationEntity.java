@@ -45,7 +45,7 @@ public class ComparisonAccommodationEntity {
     private AccommodationEntity accommodationEntity;
 
     // 숙소 정렬 순서
-    @Column(name = "position")
+    @Column(name = "position", nullable = false)
     private Integer position;
 
     public ComparisonAccommodationEntity(AccommodationEntity accommodationEntity) {
