@@ -75,7 +75,7 @@ public class ComparisonTableController implements ComparisonDocs {
     @PutMapping("/{tableId}")
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> updateComparisonTable(
             Long tableId, CreateComparisonTableRequest request, CustomUserDetails userDetails) {
-        return null;
+        throw new UnsupportedOperationException("아직 구현되지 않은 기능입니다.");
     }
 
     // TODO: 비교표 숙소 추가 API
@@ -83,7 +83,7 @@ public class ComparisonTableController implements ComparisonDocs {
     @PatchMapping("/{tableId}")
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> addAccommodationToComparisonTable(
             Long tableId, Long accommodationId, CustomUserDetails userDetails) {
-        return null;
+        throw new UnsupportedOperationException("아직 구현되지 않은 기능입니다.");
     }
 
 }
