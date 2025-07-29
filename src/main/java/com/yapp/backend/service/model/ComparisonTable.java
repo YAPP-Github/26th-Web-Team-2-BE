@@ -2,6 +2,7 @@ package com.yapp.backend.service.model;
 
 import com.yapp.backend.service.model.enums.ComparisonFactor;
 import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,8 @@ public class ComparisonTable {
     private Long tripGroupId;
     private List<Accommodation> accommodationList;
     private List<ComparisonFactor> factors;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public static ComparisonTable from(
             @NotBlank String tableName,
