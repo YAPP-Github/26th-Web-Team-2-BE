@@ -17,4 +17,6 @@ public class TripBoard {
     private User updatedBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
+
 }
