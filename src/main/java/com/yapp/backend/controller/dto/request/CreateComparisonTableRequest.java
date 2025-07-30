@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 public class CreateComparisonTableRequest {
     @NotNull
-    private Long groupId;
+    private Long boardId;
 
     @NotBlank
     private String tableName;

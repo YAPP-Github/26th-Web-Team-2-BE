@@ -37,10 +37,10 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         // 문자열 리스트를 ComparisonFactor enum으로 변환
         List<ComparisonFactor> factors = ComparisonFactor.convertToComparisonFactorList(request.getFactorList());
 
-        // TODO : request groupId로 DB에서 실제 group data 가져오기
+        // TODO : request boardId에서 DB에서 실제 trip board data 가져오기
         TripBoard tripGroup = TripBoard.builder()
-                .id(request.getGroupId())
-                .name("테스트 여행 그룹 " + request.getGroupId())
+                .id(request.getBoardId())
+                .name("테스트 여행 그룹 " + request.getBoardId())
                 .createdBy(User.builder()
                         .id(userId)
                         .nickname("그룹생성자" + userId)
