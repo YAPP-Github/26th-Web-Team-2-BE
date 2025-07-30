@@ -3,6 +3,7 @@ package com.yapp.backend.repository.mapper;
 import com.yapp.backend.common.exception.CustomException;
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.repository.entity.AccommodationEntity;
+import com.yapp.backend.repository.entity.UserEntity;
 import com.yapp.backend.service.dto.ScrapingData;
 import com.yapp.backend.service.dto.ScrapingAmenity;
 import com.yapp.backend.service.dto.ScrapingAttraction;
@@ -38,8 +39,7 @@ public class ScrapingDataMapper {
 			.url(originalUrl)
 			.siteName(scrapingData.getSiteName())
 			.memo(memo)
-			.createdBy(createdBy)
-			.tableId(tableId)
+			.createdBy(new UserEntity(createdBy))
 			.accommodationName(scrapingData.getAccommodationName())
 			.images(scrapingData.getImage())
 			.address(scrapingData.getAddress())
@@ -67,7 +67,7 @@ public class ScrapingDataMapper {
 		return AccommodationEntity.builder()
 			.url(url)
 			.memo(memo)
-			.createdBy(createdBy)
+			.createdBy(new UserEntity(createdBy))
 			.tableId(tableId)
 			.accommodationName("정보 없음")
 			.siteName(extractSiteNameFromUrl(url))

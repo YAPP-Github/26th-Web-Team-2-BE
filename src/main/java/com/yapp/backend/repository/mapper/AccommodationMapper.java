@@ -1,6 +1,7 @@
 package com.yapp.backend.repository.mapper;
 
 import com.yapp.backend.repository.entity.AccommodationEntity;
+import com.yapp.backend.repository.entity.UserEntity;
 import com.yapp.backend.service.model.Accommodation;
 import org.springframework.stereotype.Component;
 
@@ -23,13 +24,12 @@ public class AccommodationMapper {
 
         return Accommodation.builder()
                 .id(entity.getId())
-                .userId(entity.getCreatedBy()) // Map createdBy to userId for domain model
                 .url(entity.getUrl())
                 .siteName(entity.getSiteName())
                 .memo(entity.getMemo())
-                .createdAt(convertToLocalDate(entity.getCreatedAt()))
-                .updatedAt(convertToLocalDate(entity.getUpdatedAt()))
-                .createdBy(entity.getCreatedBy())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .createdBy(entity.getCreatedBy().getId())
                 .tableId(entity.getTableId())
                 .accommodationName(entity.getAccommodationName())
                 .images(entity.getImages())
@@ -64,8 +64,7 @@ public class AccommodationMapper {
                 .url(accommodation.getUrl())
                 .siteName(accommodation.getSiteName())
                 .memo(accommodation.getMemo())
-                .createdBy(accommodation.getCreatedBy())
-                .tableId(accommodation.getTableId())
+                .createdBy(new UserEntity(accommodation.getCreatedBy()))
                 .accommodationName(accommodation.getAccommodationName())
                 .images(accommodation.getImages())
                 .address(accommodation.getAddress())
@@ -93,8 +92,7 @@ public class AccommodationMapper {
         return AccommodationEntity.builder()
                 .url(url)
                 .memo(memo)
-                .createdBy(createdBy)
-                .tableId(tableId)
+                .createdBy(new UserEntity(createdBy))
                 .build();
     }
 

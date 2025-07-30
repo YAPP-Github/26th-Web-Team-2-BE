@@ -1,5 +1,6 @@
 package com.yapp.backend.service.model;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,12 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 public class Accommodation {
     private Long id;
-    private Long userId;
     private String url;
     private String siteName;
     private String memo;
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private Long createdBy;
     private Long tableId;
     private String accommodationName;
