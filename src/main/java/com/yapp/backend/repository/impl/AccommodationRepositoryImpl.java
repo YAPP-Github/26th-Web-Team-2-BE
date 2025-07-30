@@ -26,12 +26,12 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	private final AccommodationMapper accommodationMapper;
 
 	/**
-	 * 테이블 ID로 숙소 목록을 페이징하여 조회하는 쿼리
+	 * 여행보드 ID로 숙소 목록을 페이징하여 조회하는 쿼리
 	 * userId가 null이 아닌 경우 해당 사용자가 생성한 숙소만 조회
 	 * sort 파라미터에 따라 정렬 방식 결정 (saved_at_desc: 최근 등록순, price_asc: 가격 낮은 순)
 	 */
 	@Override
-	public List<Accommodation> findByTableIdWithPagination(Long tableId, int page, int size, Long userId, String sort) {
+	public List<Accommodation> findByBoardIdWithPagination(Long boardId, int page, int size, Long userId, String sort) {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<AccommodationEntity> entityPage;
 
@@ -40,8 +40,8 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 		boolean isPriceSort = sortType == SortType.PRICE_ASC;
 
 		entityPage = userId != null
-			? getEntityPageWithUserId(tableId, userId, pageable, isPriceSort)
-			: getEntityPageWithoutUserId(tableId, pageable, isPriceSort);
+			? getEntityPageWithUserId(boardId, userId, pageable, isPriceSort)
+			: getEntityPageWithoutUserId(boardId, pageable, isPriceSort);
 
 		return entityPage.getContent().stream()
 			.map(this::convertToAccommodation)
@@ -53,11 +53,11 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	 * userId가 null이 아닌 경우 해당 사용자가 생성한 숙소 개수만 조회
 	 */
 	@Override
-	public Long countByTableId(Long tableId, Long userId) {
+	public Long countByBoardId(Long boardId, Long userId) {
 		if (userId != null) {
-			return jpaAccommodationRepository.countByTableIdAndCreatedBy(tableId, userId);
+			return jpaAccommodationRepository.countByBoardIdAndCreatedBy(boardId, userId);
 		} else {
-			return jpaAccommodationRepository.countByTableId(tableId);
+			return jpaAccommodationRepository.countByBoardId(boardId);
 		}
 	}
 
@@ -89,20 +89,20 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	/**
 	 * userId가 있는 경우의 엔티티 페이지 조회
 	 */
-	private Page<AccommodationEntity> getEntityPageWithUserId(Long tableId, Long userId, Pageable pageable,
+	private Page<AccommodationEntity> getEntityPageWithUserId(Long boardId, Long userId, Pageable pageable,
 		boolean isPriceSort) {
 		return isPriceSort
-			? jpaAccommodationRepository.findByTableIdAndCreatedByOrderByLowestPriceAsc(tableId, userId, pageable)
-			: jpaAccommodationRepository.findByTableIdAndCreatedByOrderByCreatedAtDesc(tableId, userId, pageable);
+			? jpaAccommodationRepository.findByBoardIdAndCreatedByOrderByLowestPriceAsc(boardId, userId, pageable)
+			: jpaAccommodationRepository.findByBoardIdAndCreatedByOrderByCreatedAtDesc(boardId, userId, pageable);
 	}
 
 	/**
 	 * userId가 없는 경우의 엔티티 페이지 조회
 	 */
-	private Page<AccommodationEntity> getEntityPageWithoutUserId(Long tableId, Pageable pageable, boolean isPriceSort) {
+	private Page<AccommodationEntity> getEntityPageWithoutUserId(Long boardId, Pageable pageable, boolean isPriceSort) {
 		return isPriceSort
-			? jpaAccommodationRepository.findByTableIdOrderByLowestPriceAsc(tableId, pageable)
-			: jpaAccommodationRepository.findByTableIdOrderByCreatedAtDesc(tableId, pageable);
+			? jpaAccommodationRepository.findByBoardIdOrderByLowestPriceAsc(boardId, pageable)
+			: jpaAccommodationRepository.findByBoardIdOrderByCreatedAtDesc(boardId, pageable);
 	}
 
 	/**

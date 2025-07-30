@@ -57,8 +57,8 @@ public class AccommodationEntity {
     @JoinColumn(name = "created_by")
     private UserEntity createdBy;
 
-    @Column(name = "table_id")
-    private Long tableId;
+    @Column(name = "board_id")
+    private Long boardId;
 
     // 숙소 정보
     @Column(name = "accommodation_name")

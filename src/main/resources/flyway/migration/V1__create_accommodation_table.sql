@@ -7,7 +7,7 @@ CREATE TABLE accommodation (
    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
    created_by BIGINT,
-   table_id BIGINT,
+   board_id BIGINT,
 
    accommodation_name TEXT,
    images JSONB,

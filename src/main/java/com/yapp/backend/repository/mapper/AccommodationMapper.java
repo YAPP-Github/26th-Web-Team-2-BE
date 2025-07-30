@@ -34,7 +34,7 @@ public class AccommodationMapper {
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .createdBy(entity.getCreatedBy().getId())
-                .tableId(entity.getTableId())
+                .boardId(entity.getBoardId())
                 .accommodationName(entity.getAccommodationName())
                 .images(entity.getImages())
                 .address(entity.getAddress())
@@ -94,7 +94,7 @@ public class AccommodationMapper {
     /**
      * 숙소 데이터 모델 생성
      */
-    public AccommodationEntity createEntityForRegistration(String url, String memo, Long createdBy, Long tableId) {
+    public AccommodationEntity createEntityForRegistration(String url, String memo, Long createdBy) {
         return AccommodationEntity.builder()
                 .url(url)
                 .memo(memo)

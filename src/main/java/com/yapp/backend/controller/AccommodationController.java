@@ -1,7 +1,5 @@
 package com.yapp.backend.controller;
 
-import com.yapp.backend.common.exception.CustomException;
-import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.docs.AccommodationDocs;
@@ -41,14 +39,14 @@ public class AccommodationController implements AccommodationDocs {
 	 */
 	@Override
 	@GetMapping("/search")
-	public ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationByTableIdAndUserId(
-			@RequestParam Long tableId,
+	public ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationByBoardIdAndUserId(
+			@RequestParam Long boardId,
 			@RequestParam Integer page,
 			@RequestParam Integer size,
 			@RequestParam(required = false) Long userId,
 			@RequestParam(defaultValue = "saved_at_desc") String sort) {
 
-		AccommodationPageResponse response = accommodationService.findAccommodationsByTableId(tableId, page, size,
+		AccommodationPageResponse response = accommodationService.findAccommodationsByBoardId(boardId, page, size,
 				userId, sort);
 		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
 	}
@@ -59,11 +57,11 @@ public class AccommodationController implements AccommodationDocs {
 	 */
 	@Override
 	@GetMapping("/count")
-	public ResponseEntity<StandardResponse<AccommodationCountResponse>> getAccommodationCountByTableId(
-			@RequestParam Long tableId,
+	public ResponseEntity<StandardResponse<AccommodationCountResponse>> getAccommodationCountByBoardId(
+			@RequestParam Long boardId,
 			@RequestParam(required = false) Long userId) {
 		AccommodationCountResponse accommodationCountResponse = new AccommodationCountResponse(
-				accommodationService.countAccommodationsByTableId(tableId, userId));
+				accommodationService.countAccommodationsByBoardId(boardId, userId));
 		return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, accommodationCountResponse));
 	}
 
