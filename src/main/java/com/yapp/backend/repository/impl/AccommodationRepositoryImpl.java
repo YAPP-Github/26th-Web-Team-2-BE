@@ -38,12 +38,12 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 		boolean isPriceSort = sortType == SortType.PRICE_ASC;
 
 		entityPage = userId != null
-				? getEntityPageWithUserId(tableId, userId, pageable, isPriceSort)
-				: getEntityPageWithoutUserId(tableId, pageable, isPriceSort);
+			? getEntityPageWithUserId(tableId, userId, pageable, isPriceSort)
+			: getEntityPageWithoutUserId(tableId, pageable, isPriceSort);
 
 		return entityPage.getContent().stream()
-				.map(this::convertToAccommodation)
-				.collect(Collectors.toList());
+			.map(this::convertToAccommodation)
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -81,10 +81,10 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	 * userId가 있는 경우의 엔티티 페이지 조회
 	 */
 	private Page<AccommodationEntity> getEntityPageWithUserId(Long tableId, Long userId, Pageable pageable,
-			boolean isPriceSort) {
+		boolean isPriceSort) {
 		return isPriceSort
-				? jpaAccommodationRepository.findByTableIdAndCreatedByOrderByLowestPriceAsc(tableId, userId, pageable)
-				: jpaAccommodationRepository.findByTableIdAndCreatedByOrderByCreatedAtDesc(tableId, userId, pageable);
+			? jpaAccommodationRepository.findByTableIdAndCreatedByOrderByLowestPriceAsc(tableId, userId, pageable)
+			: jpaAccommodationRepository.findByTableIdAndCreatedByOrderByCreatedAtDesc(tableId, userId, pageable);
 	}
 
 	/**
@@ -92,10 +92,8 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	 */
 	private Page<AccommodationEntity> getEntityPageWithoutUserId(Long tableId, Pageable pageable, boolean isPriceSort) {
 		return isPriceSort
-				? jpaAccommodationRepository.findByTableIdOrderByLowestPriceAsc(tableId, pageable)
-				: jpaAccommodationRepository.findByTableIdOrderByCreatedAtDesc(tableId, pageable);
-	}
-
+			? jpaAccommodationRepository.findByTableIdOrderByLowestPriceAsc(tableId, pageable)
+			: jpaAccommodationRepository.findByTableIdOrderByCreatedAtDesc(tableId, pageable);
 	}
 
 	/**
@@ -104,4 +102,5 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	private Accommodation convertToAccommodation(AccommodationEntity entity) {
 		return accommodationMapper.entityToDomain(entity);
 	}
+
 }
