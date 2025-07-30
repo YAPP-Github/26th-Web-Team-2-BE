@@ -23,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yapp.backend.controller.dto.response.AccommodationPageResponse;
 import com.yapp.backend.controller.dto.response.AccommodationResponse;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,11 +45,12 @@ public class AccommodationServiceImpl implements AccommodationService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public AccommodationPageResponse findAccommodationsByTableId(Long tableId, int page, int size, Long userId) {
+	public AccommodationPageResponse findAccommodationsByTableId(Long tableId, int page, int size, Long userId,
+			String sort) {
 		try {
 			// size + 1개를 조회하여 다음 페이지 존재 여부를 한 번의 쿼리로 확인
 			List<Accommodation> accommodations = accommodationRepository.findByTableIdWithPagination(
-					tableId.longValue(), page, size + 1, userId);
+				tableId, page, size + 1, userId, sort);
 
 			// 실제 반환할 데이터와 다음 페이지 존재 여부 판단
 			boolean hasNext = accommodations.size() > size;

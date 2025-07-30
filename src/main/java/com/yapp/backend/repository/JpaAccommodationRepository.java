@@ -40,4 +40,19 @@ public interface JpaAccommodationRepository extends JpaRepository<AccommodationE
      */
     @Query("SELECT a FROM AccommodationEntity a WHERE a.id = :id")
     AccommodationEntity findByAccommodationId(@Param("id") Long id);
+
+    /**
+     * Find accommodations by tableId with pagination, sorted by lowest price
+     * ascending
+     */
+    @Query("SELECT a FROM AccommodationEntity a WHERE a.tableId = :tableId ORDER BY a.lowestPrice ASC")
+    Page<AccommodationEntity> findByTableIdOrderByLowestPriceAsc(@Param("tableId") Long tableId, Pageable pageable);
+
+    /**
+     * Find accommodations by tableId and userId with pagination, sorted by lowest
+     * price ascending
+     */
+    @Query("SELECT a FROM AccommodationEntity a WHERE a.tableId = :tableId AND a.createdBy = :userId ORDER BY a.lowestPrice ASC")
+    Page<AccommodationEntity> findByTableIdAndCreatedByOrderByLowestPriceAsc(@Param("tableId") Long tableId,
+            @Param("userId") Long userId, Pageable pageable);
 }
