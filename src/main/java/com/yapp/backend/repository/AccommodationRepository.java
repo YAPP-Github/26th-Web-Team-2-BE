@@ -29,4 +29,12 @@ public interface AccommodationRepository {
      * 숙소 ID로 단건 조회합니다.
      */
     Accommodation findById(Long accommodationId);
+
+    /**
+     * 숙소 ID로 조회, 실패시 에러를 던집니다.
+     * @param accommodationId
+     * @return
+     */
+    Accommodation findByIdOrThrow(Long accommodationId);
+
 }
