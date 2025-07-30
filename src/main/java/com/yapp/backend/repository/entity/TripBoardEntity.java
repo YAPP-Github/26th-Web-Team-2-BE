@@ -51,9 +51,6 @@ public class TripBoardEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
     @OneToMany(
             mappedBy = "tripBoardEntity"
 //            cascade = CascadeType.ALL,

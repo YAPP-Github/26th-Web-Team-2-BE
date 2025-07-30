@@ -23,7 +23,6 @@ public class ComparisonTable {
     private List<ComparisonFactor> factors;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
 
     public static ComparisonTable from(
             @NotBlank String tableName,

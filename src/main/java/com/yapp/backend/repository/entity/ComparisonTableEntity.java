@@ -72,9 +72,6 @@ public class ComparisonTableEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
     public static ComparisonTableEntity from(ComparisonTable comparisonTable) {
         ComparisonTableEntity tableEntity = ComparisonTableEntity.builder()
                 .tableName(comparisonTable.getTableName())

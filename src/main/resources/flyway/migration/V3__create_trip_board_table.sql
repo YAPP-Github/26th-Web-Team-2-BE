@@ -6,7 +6,6 @@ CREATE TABLE trip_board
     updated_by BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_trip_board PRIMARY KEY (id)
 );
 

@@ -7,7 +7,6 @@ CREATE TABLE comparison_table
     factors    JSONB,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_comparison_table PRIMARY KEY (id)
 );
 
