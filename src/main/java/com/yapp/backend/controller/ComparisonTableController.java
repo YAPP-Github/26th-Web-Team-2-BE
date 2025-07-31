@@ -3,7 +3,9 @@ package com.yapp.backend.controller;
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.docs.ComparisonDocs;
+import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
 import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
+import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
 import com.yapp.backend.controller.dto.response.ComparisonFactorList;
 import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import com.yapp.backend.controller.dto.response.CreateComparisonTableResponse;
@@ -49,7 +51,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @RequestBody @Valid CreateComparisonTableRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long userId = userDetails.getUserId();
+        Long userId = userDetails == null ? 1L : userDetails.getUserId();
         Long tableId = comparisonTableService.createComparisonTable(request, userId);
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, new CreateComparisonTableResponse(tableId))
@@ -63,7 +65,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         // TODO: 인증/인가 로직 리팩토링 - 해당 테이블 조회 권한이 있는지 확인 (여행그룹 참여 여부)
-        Long userId = userDetails.getUserId();
+        Long userId = userDetails == null ? 1L : userDetails.getUserId();
         ComparisonTableResponse comparisonTableResponse = comparisonTableService.getComparisonTable(tableId, userId);
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, comparisonTableResponse)
@@ -74,7 +76,11 @@ public class ComparisonTableController implements ComparisonDocs {
     @Override
     @PutMapping("/{tableId}")
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> updateComparisonTable(
-            Long tableId, CreateComparisonTableRequest request, CustomUserDetails userDetails) {
+            @PathVariable("tableId") Long tableId,
+            @RequestBody UpdateComparisonTableRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails == null ? 1L : userDetails.getUserId();
         throw new UnsupportedOperationException("아직 구현되지 않은 기능입니다.");
     }
 
@@ -82,7 +88,10 @@ public class ComparisonTableController implements ComparisonDocs {
     @Override
     @PatchMapping("/{tableId}")
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> addAccommodationToComparisonTable(
-            Long tableId, Long accommodationId, CustomUserDetails userDetails) {
+            @PathVariable("tableId") Long tableId,
+            @RequestBody AddAccommodationRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
         throw new UnsupportedOperationException("아직 구현되지 않은 기능입니다.");
     }
 

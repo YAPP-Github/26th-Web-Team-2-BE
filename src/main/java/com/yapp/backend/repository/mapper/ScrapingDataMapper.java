@@ -213,8 +213,8 @@ public class ScrapingDataMapper {
 		}
 
 		return CheckTime.builder()
-			.checkInTimeFrom(scrapingCheckTime.getCheckInTimeFrom())
-			.checkInTimeTo(scrapingCheckTime.getCheckInTimeTo())
+			.from(scrapingCheckTime.getCheckInTimeFrom())
+			.to(scrapingCheckTime.getCheckInTimeTo())
 			.build();
 	}
 
@@ -227,8 +227,8 @@ public class ScrapingDataMapper {
 		}
 
 		return CheckTime.builder()
-			.checkOutTimeFrom(scrapingCheckTime.getCheckOutTimeFrom())
-			.checkOutTimeTo(scrapingCheckTime.getCheckOutTimeTo())
+			.from(scrapingCheckTime.getCheckOutTimeFrom())
+			.to(scrapingCheckTime.getCheckOutTimeTo())
 			.build();
 	}
 }

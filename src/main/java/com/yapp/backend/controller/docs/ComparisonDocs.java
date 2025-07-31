@@ -2,7 +2,9 @@ package com.yapp.backend.controller.docs;
 
 
 import com.yapp.backend.common.response.StandardResponse;
+import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
 import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
+import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
 import com.yapp.backend.controller.dto.response.ComparisonFactorList;
 import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import com.yapp.backend.controller.dto.response.CreateComparisonTableResponse;
@@ -34,17 +36,17 @@ public interface ComparisonDocs {
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     );
 
-    @Operation(summary = "비교표 수정", description = "비교표 메타 데이터와 비교 기준 항목을 수정합니다.")
+    @Operation(summary = "비교표 수정", description = "비교표 메타 데이터(제목)와 숙소 세부 내용, 비교 기준 정렬 순서, 숙소 정렬 순서를 수정합니다.")
     ResponseEntity<StandardResponse<ComparisonTableResponse>> updateComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "수정할 테이블의 ID") Long tableId,
-            @RequestBody CreateComparisonTableRequest request,
+            @RequestBody UpdateComparisonTableRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     );
 
     @Operation(summary = "비교표 숙소 추가", description = "비교표에 새로운 숙소를 추가합니다.")
     ResponseEntity<StandardResponse<ComparisonTableResponse>> addAccommodationToComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "테이블의 ID") Long tableId,
-            @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "숙소 ID") Long accommodationId,
+            @RequestBody AddAccommodationRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     );
 
