@@ -6,11 +6,13 @@ import com.yapp.backend.controller.docs.ComparisonDocs;
 import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
 import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
 import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
+import com.yapp.backend.controller.dto.response.AmenityFactorList;
 import com.yapp.backend.controller.dto.response.ComparisonFactorList;
 import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import com.yapp.backend.controller.dto.response.CreateComparisonTableResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.service.ComparisonTableService;
+import com.yapp.backend.service.model.enums.AmenityFactor;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -40,6 +42,18 @@ public class ComparisonTableController implements ComparisonDocs {
                 new StandardResponse<>(
                         ResponseType.SUCCESS,
                         new ComparisonFactorList(List.of(ComparisonFactor.values()))
+                )
+        );
+    }
+
+
+    @Override
+    @GetMapping("/amenity")
+    public ResponseEntity<StandardResponse<AmenityFactorList>> getAmenityFactorList() {
+        return ResponseEntity.ok(
+                new StandardResponse<>(
+                        ResponseType.SUCCESS,
+                        new AmenityFactorList(List.of(AmenityFactor.values()))
                 )
         );
     }

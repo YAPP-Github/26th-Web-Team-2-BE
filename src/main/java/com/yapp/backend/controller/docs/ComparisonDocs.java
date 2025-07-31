@@ -5,6 +5,7 @@ import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
 import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
 import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
+import com.yapp.backend.controller.dto.response.AmenityFactorList;
 import com.yapp.backend.controller.dto.response.ComparisonFactorList;
 import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import com.yapp.backend.controller.dto.response.CreateComparisonTableResponse;
@@ -23,6 +24,9 @@ public interface ComparisonDocs {
 
     @Operation(summary = "비교표 기준 항목 Enum 리스트", description = "비교 기준 항목 Enum 리스트를 반환합니다.")
     ResponseEntity<StandardResponse<ComparisonFactorList>> getComparisonFactorList();
+
+    @Operation(summary = "편의 서비스 Enum 리스트", description = "편의 서비스 항목 Enum 리스트를 반환합니다.")
+    ResponseEntity<StandardResponse<AmenityFactorList>> getAmenityFactorList();
 
     @Operation(summary = "비교표 생성", description = "비교표 이름, 숙소 ID 리스트, 비교 기준 항목을 받아서 비교표 메타 데이터를 생성합니다.")
     ResponseEntity<StandardResponse<CreateComparisonTableResponse>> createComparisonTable(
