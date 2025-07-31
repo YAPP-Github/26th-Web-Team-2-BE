@@ -10,7 +10,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -32,7 +34,6 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        String method = request.getMethod();
         return uri.startsWith("/oauth2/authorization")
                 || uri.startsWith("/oauth2/authorize")
                 || uri.startsWith("/login/oauth2/code")
@@ -41,8 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 || uri.startsWith("/swagger")
                 || uri.startsWith("/v3/api-docs")
                 || uri.startsWith("/api/comparison/factors")
-                || uri.startsWith("/api/heath")
-                || uri.startsWith("/api/mock")
+                || uri.startsWith("/api/oauth/kakao")
                 ;
     }
 
@@ -50,8 +50,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+            FilterChain filterChain) throws ServletException, IOException {
 
         String accessToken = getCookieValue(request, "ACCESS_TOKEN");
         try {
@@ -64,7 +63,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String refreshToken = getCookieValue(request, "REFRESH_TOKEN");
             if (validateRefreshToken(refreshToken)) {
                 Long userId = Long.valueOf(jwtTokenProvider.getRefreshUsername(refreshToken));
-                updateAccessAndRefreshToken(request, response, userId);
+                updateAccessAndRefreshToken(response, userId);
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -90,10 +89,8 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private void updateAccessAndRefreshToken(
-            HttpServletRequest request,
             HttpServletResponse response,
-            Long userId
-    ) {
+            Long userId) {
         // 1) 새 토큰 생성
         String newAccess = jwtTokenProvider.createAccessToken(userId);
         String newRefresh = jwtTokenProvider.createRefreshToken(userId);
