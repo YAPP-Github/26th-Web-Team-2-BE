@@ -1,7 +1,5 @@
 package com.yapp.backend.common.util;
 
-import com.yapp.backend.common.exception.DuplicateInvitationUrlException;
-import com.yapp.backend.repository.JpaUserTripBoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
