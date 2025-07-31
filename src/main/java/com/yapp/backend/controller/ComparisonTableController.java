@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -75,13 +74,15 @@ public class ComparisonTableController implements ComparisonDocs {
     // TODO: 비교표 수정 API
     @Override
     @PutMapping("/{tableId}")
-    public ResponseEntity<StandardResponse<ComparisonTableResponse>> updateComparisonTable(
+    public ResponseEntity<StandardResponse<Boolean>> updateComparisonTable(
             @PathVariable("tableId") Long tableId,
             @RequestBody UpdateComparisonTableRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Long userId = userDetails == null ? 1L : userDetails.getUserId();
-        throw new UnsupportedOperationException("아직 구현되지 않은 기능입니다.");
+        Boolean isUpdated = comparisonTableService.updateComparisonTable(tableId, request, userId);
+        return ResponseEntity.ok(
+                new StandardResponse<>(ResponseType.SUCCESS, isUpdated));
     }
 
     // TODO: 비교표 숙소 추가 API

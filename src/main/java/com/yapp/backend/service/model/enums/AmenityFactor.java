@@ -18,7 +18,8 @@ public enum AmenityFactor {
     PET_FRIENDLY,           // 반려동물 동반 가능 여부
     BUSINESS_SERVICES,      // 비즈니스 서비스
     CLEANING_SERVICE,       // 청소 서비스
-    HANDICAP_FACILITIES;    // 장애인 편의시설
+    HANDICAP_FACILITIES     // 장애인 편의시설
+    ;
 
     /**
      * 문자열 리스트를 AmenityFactor 리스트로 변환

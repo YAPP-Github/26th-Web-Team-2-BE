@@ -10,7 +10,7 @@ public enum ComparisonFactor {
     REVIEW_SCORE,               // 리뷰 점수
     ATTRACTION,                 // 인근 관광지
     TRANSPORTATION,             // 인근 교통편
-    CLEANNESS,                  // 청결도
+    CLEANLINESS,                // 청결도
     AMENITY,                    // 편의 서비스
     CHECK_TIME,                 // 체크인, 체크아웃 시간
     REVIEW_SUMMARY,             // 리뷰 요약

@@ -37,4 +37,6 @@ public interface AccommodationRepository {
      */
     Accommodation findByIdOrThrow(Long accommodationId);
 
+    void update(Accommodation updatedAccommodation);
+
 }

@@ -37,7 +37,7 @@ public interface ComparisonDocs {
     );
 
     @Operation(summary = "비교표 수정", description = "비교표 메타 데이터(제목)와 숙소 세부 내용, 비교 기준 정렬 순서, 숙소 정렬 순서를 수정합니다.")
-    ResponseEntity<StandardResponse<ComparisonTableResponse>> updateComparisonTable(
+    ResponseEntity<StandardResponse<Boolean>> updateComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "수정할 테이블의 ID") Long tableId,
             @RequestBody UpdateComparisonTableRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
