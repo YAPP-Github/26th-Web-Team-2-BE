@@ -2,6 +2,8 @@ package com.yapp.backend.repository.impl;
 
 import com.yapp.backend.common.exception.ComparisonTableNotFoundException;
 import com.yapp.backend.common.exception.ErrorCode;
+import com.yapp.backend.common.exception.UserAuthorizationException;
+import com.yapp.backend.repository.AccommodationRepository;
 import com.yapp.backend.repository.ComparisonTableRepository;
 import com.yapp.backend.repository.JpaAccommodationRepository;
 import com.yapp.backend.repository.JpaComparisonTableRepository;
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +29,7 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
     
     private final JpaComparisonTableRepository jpaComparisonTableRepository;
     private final JpaAccommodationRepository jpaAccommodationRepository;
+    private final AccommodationRepository accommodationRepository;
     private final ComparisonTableMapper comparisonTableMapper;
 
     @Override
@@ -112,5 +117,51 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
         // 남은 기존 매핑들은 자동으로 삭제됨 (orphanRemoval = true)
         tableEntity.getItems().clear();
         tableEntity.getItems().addAll(updatedItems);
+    }
+    
+    @Override
+    @Transactional
+    public ComparisonTable addAccommodationsToTable(Long tableId, List<Long> accommodationIds, Long userId) {
+        // 기존 비교표 조회
+        ComparisonTableEntity tableEntity = jpaComparisonTableRepository.findById(tableId)
+                .orElseThrow(() -> new ComparisonTableNotFoundException(ErrorCode.TABLE_NOT_FOUND));
+
+        // 권한 검증
+        if (!tableEntity.getCreatedByEntity().getId().equals(userId)) {
+            throw new UserAuthorizationException(ErrorCode.INVALID_USER_AUTHORIZATION);
+        }
+        
+        // 기존 숙소 ID 목록 추출 (중복 방지용)
+        Set<Long> existingAccommodationIds = tableEntity.getItems().stream()
+                .map(item -> item.getAccommodationEntity().getId())
+                .collect(java.util.stream.Collectors.toSet());
+        
+        // 중복되지 않는 새로운 숙소 ID들만 필터링
+        List<Long> newAccommodationIds = accommodationIds.stream()
+                .filter(id -> !existingAccommodationIds.contains(id))
+                .toList();
+        
+        // 새로운 숙소 ID들이 실제 DB에 존재하는지 검증
+        List<Accommodation> validatedAccommodations = newAccommodationIds.stream()
+                .map(accommodationRepository::findByIdOrThrow) // AccommodationNotFoundException 발생 가능
+                .toList();
+        
+        // 새로운 매핑 엔티티들 생성 및 추가
+        int currentMaxPosition = tableEntity.getItems().size();
+        for (int i = 0; i < validatedAccommodations.size(); i++) {
+            Long accommodationId = validatedAccommodations.get(i).getId();
+            AccommodationEntity accommodationEntity = jpaAccommodationRepository.getReferenceById(accommodationId);
+            
+            ComparisonAccommodationEntity newMapping = ComparisonAccommodationEntity.builder()
+                    .comparisonTableEntity(tableEntity)
+                    .accommodationEntity(accommodationEntity)
+                    .position(currentMaxPosition + i)
+                    .build();
+            
+            tableEntity.getItems().add(newMapping);
+        }
+        
+        jpaComparisonTableRepository.save(tableEntity);
+        return comparisonTableMapper.entityToDomain(tableEntity);
     }
 }

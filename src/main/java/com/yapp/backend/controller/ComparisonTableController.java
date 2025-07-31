@@ -85,7 +85,6 @@ public class ComparisonTableController implements ComparisonDocs {
                 new StandardResponse<>(ResponseType.SUCCESS, isUpdated));
     }
 
-    // TODO: 비교표 숙소 추가 API
     @Override
     @PatchMapping("/{tableId}")
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> addAccommodationToComparisonTable(
@@ -93,7 +92,10 @@ public class ComparisonTableController implements ComparisonDocs {
             @RequestBody AddAccommodationRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        throw new UnsupportedOperationException("아직 구현되지 않은 기능입니다.");
+        Long userId = userDetails == null ? 1L : userDetails.getUserId();
+        ComparisonTableResponse response = comparisonTableService.addAccommodationToComparisonTable(tableId, request, userId);
+        return ResponseEntity.ok(
+                new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 
 }

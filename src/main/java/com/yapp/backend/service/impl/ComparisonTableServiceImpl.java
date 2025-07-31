@@ -2,6 +2,7 @@ package com.yapp.backend.service.impl;
 
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.exception.UserAuthorizationException;
+import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
 import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
 import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
 import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
@@ -17,6 +18,7 @@ import com.yapp.backend.service.model.ComparisonTable;
 import com.yapp.backend.service.model.TripBoard;
 import com.yapp.backend.service.model.User;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -134,6 +136,36 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         }
     }
 
+    @Override
+    @Transactional
+    public ComparisonTableResponse addAccommodationToComparisonTable(
+            Long tableId,
+            AddAccommodationRequest request,
+            Long userId
+    ) {
+        try {
+            ComparisonTable updatedTable = comparisonTableRepository.addAccommodationsToTable(
+                    tableId, 
+                    request.getAccommodationIds(), 
+                    userId
+            );
+            
+            // 업데이트된 비교표 반환
+            return new ComparisonTableResponse(
+                    updatedTable.getId(),
+                    updatedTable.getTableName(),
+                    updatedTable.getAccommodationList().stream()
+                            .map(AccommodationResponse::from)
+                            .collect(Collectors.toList()),
+                    updatedTable.getFactors(),
+                    updatedTable.getCreatedById()
+            );
+            
+        } catch (Exception e) {
+            throw new RuntimeException("비교표에 숙소 추가 중 오류가 발생했습니다.", e);
+        }
+    }
+    
     /**
      * 숙소 세부 내용 업데이트
      */
