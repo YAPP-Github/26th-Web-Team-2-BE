@@ -29,4 +29,11 @@ public enum ComparisonFactor {
                 )
                 .collect(Collectors.toList());
     }
+    
+    /**
+     * 디폴트 ComparisonFactor 리스트를 enum 정의 순서대로 반환
+     */
+    public static List<ComparisonFactor> getDefaultFactors() {
+        return Arrays.asList(ComparisonFactor.values());
+    }
 }

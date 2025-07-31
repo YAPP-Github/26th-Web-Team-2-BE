@@ -43,7 +43,13 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     @Transactional
     public Long createComparisonTable(CreateComparisonTableRequest request, Long userId) {
         // 문자열 리스트를 ComparisonFactor enum으로 변환
-        List<ComparisonFactor> factors = ComparisonFactor.convertToComparisonFactorList(request.getFactorList());
+        // factorList가 비어있거나 null이면 디폴트 순서로 모든 factor 사용
+        List<ComparisonFactor> factors;
+        if (request.getFactorList() == null || request.getFactorList().isEmpty()) {
+            factors = ComparisonFactor.getDefaultFactors();
+        } else {
+            factors = ComparisonFactor.convertToComparisonFactorList(request.getFactorList());
+        }
 
         // TODO : request boardId에서 DB에서 실제 trip board data 가져오기
         TripBoard tripGroup = TripBoard.builder()
