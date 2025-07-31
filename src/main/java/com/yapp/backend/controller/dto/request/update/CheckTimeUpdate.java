@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class CheckTimeUpdate {
-    private String From;
-    private String To;
+    private String from;
+    private String to;
 }
