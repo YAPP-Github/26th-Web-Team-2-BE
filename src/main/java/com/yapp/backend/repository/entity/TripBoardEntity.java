@@ -31,8 +31,8 @@ public class TripBoardEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "group_name")
-    private String groupName;
+    @Column(name = "board_name")
+    private String boardName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
