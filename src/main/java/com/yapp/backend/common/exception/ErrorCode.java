@@ -26,7 +26,11 @@ public enum ErrorCode {
 
     // Scraping related errors
     SCRAPING_FAILED("스크래핑 실패", "외부 서버에서 데이터를 가져오는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    SCRAPING_SERVER_ERROR("스크래핑 서버 오류", "스크래핑 서버와의 통신에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE)
+    SCRAPING_SERVER_ERROR("스크래핑 서버 오류", "스크래핑 서버와의 통신에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE),
+
+    // Trip Board related errors
+    TRIP_BOARD_CREATION_FAILED("여행 보드 생성 실패", "여행 보드 생성에 실패했습니다.", HttpStatus.BAD_REQUEST),
+    TRIP_BOARD_PARTICIPANT_LIMIT_EXCEEDED("참여자 수 한계 초과", "여행 보드 참여자 수가 한계에 도달했습니다.", HttpStatus.BAD_REQUEST)
     // 필요에 따라 추가
     ;
 
