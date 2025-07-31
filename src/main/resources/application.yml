@@ -24,3 +24,8 @@ springdoc:
     config-url: /v3/api-docs/swagger-config
     url: /v3/api-docs
     disable-swagger-default-url: true
+
+swagger:
+  auth:
+    username: ${SWAGGER_AUTH_USERNAME}
+    password: ${SWAGGER_AUTH_PASSWORD}
