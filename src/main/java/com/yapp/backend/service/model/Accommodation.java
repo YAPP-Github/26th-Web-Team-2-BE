@@ -88,8 +88,8 @@ public class Accommodation {
                 .map(update -> Attraction.builder()
                         .name(update.getName())
                         .type(update.getType())
-                        .latitude(update.getLatitude())  // Update DTO에 latitude가 없으므로 null로 설정
-                        .longitude(update.getLongitude()) // Update DTO에 longitude가 없으므로 null로 설정
+                        .latitude(update.getLatitude())
+                        .longitude(update.getLongitude())
                         .distance(update.getDistance())
                         .byFoot(update.getByFoot())
                         .byCar(update.getByCar())
@@ -108,9 +108,9 @@ public class Accommodation {
         return updates.stream()
                 .map(update -> Transportation.builder()
                         .name(update.getName())
-                        .type(update.getType()) // Update DTO에 type이 없으므로 null로 설정
-                        .latitude(update.getLatitude()) // Update DTO에 latitude가 없으므로 null로 설정
-                        .longitude(update.getLongitude()) // Update DTO에 longitude가 없으므로 null로 설정
+                        .type(update.getType())
+                        .latitude(update.getLatitude())
+                        .longitude(update.getLongitude())
                         .distance(update.getDistance())
                         .byFoot(update.getByFoot())
                         .byCar(update.getByCar())
