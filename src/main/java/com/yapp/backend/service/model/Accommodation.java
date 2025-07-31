@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -21,7 +20,7 @@ public class Accommodation {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long createdBy;
-    private Long tableId;
+    private Long boardId;
     private String accommodationName;
     private List<String> images;
     private String address;

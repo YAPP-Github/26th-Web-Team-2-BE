@@ -1,5 +1,8 @@
 package com.yapp.backend.service.model.enums;
 
+import com.yapp.backend.common.exception.ErrorCode;
+import com.yapp.backend.common.exception.InvalidFactorsException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,13 +25,11 @@ public enum ComparisonFactor {
      */
     public static List<ComparisonFactor> convertToComparisonFactorList(List<String> factorNames) {
         return factorNames.stream()
-                .map(factorName -> {
-                    try {
-                        return ComparisonFactor.valueOf(factorName);
-                    } catch (IllegalArgumentException e) {
-                        throw new IllegalArgumentException("잘못된 비교 기준입니다: " + factorName);
-                    }
-                })
+                .map(name -> Arrays.stream(ComparisonFactor.values())
+                        .filter(f -> f.name().equals(name))
+                        .findFirst()
+                        .orElseThrow(() -> new InvalidFactorsException(ErrorCode.INVALID_FACTORS))
+                )
                 .collect(Collectors.toList());
     }
 }

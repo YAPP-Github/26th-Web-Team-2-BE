@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -46,7 +47,14 @@ public class ComparisonAccommodationEntity {
 
     // 숙소 정렬 순서
     @Column(name = "position", nullable = false)
-    private Integer position;
+    private Integer position = 0;
+
+    @PrePersist
+    public void setDefaultPosition() {
+        if (this.position == null) {
+            this.position = 0;
+            }
+    }
 
     public ComparisonAccommodationEntity(AccommodationEntity accommodationEntity) {
         this.accommodationEntity = accommodationEntity;

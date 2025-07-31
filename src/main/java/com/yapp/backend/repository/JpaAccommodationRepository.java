@@ -11,29 +11,29 @@ import com.yapp.backend.repository.entity.AccommodationEntity;
 public interface JpaAccommodationRepository extends JpaRepository<AccommodationEntity, Long> {
 
     /**
-     * Find accommodations by tableId with pagination
+     * Find accommodations by boardId with pagination
      */
-    @Query("SELECT a FROM AccommodationEntity a WHERE a.tableId = :tableId ORDER BY a.createdAt DESC")
-    Page<AccommodationEntity> findByTableIdOrderByCreatedAtDesc(@Param("tableId") Long tableId, Pageable pageable);
+    @Query("SELECT a FROM AccommodationEntity a WHERE a.boardId = :boardId ORDER BY a.createdAt DESC")
+    Page<AccommodationEntity> findByBoardIdOrderByCreatedAtDesc(@Param("boardId") Long boardId, Pageable pageable);
 
     /**
-     * Find accommodations by tableId and userId with pagination
+     * Find accommodations by boardId and userId with pagination
      */
-    @Query("SELECT a FROM AccommodationEntity a WHERE a.tableId = :tableId AND a.createdBy = :userId ORDER BY a.createdAt DESC")
-    Page<AccommodationEntity> findByTableIdAndCreatedByOrderByCreatedAtDesc(@Param("tableId") Long tableId,
+    @Query("SELECT a FROM AccommodationEntity a WHERE a.boardId = :boardId AND a.createdBy = :userId ORDER BY a.createdAt DESC")
+    Page<AccommodationEntity> findByBoardIdAndCreatedByOrderByCreatedAtDesc(@Param("boardId") Long boardId,
             @Param("userId") Long userId, Pageable pageable);
 
     /**
-     * Count accommodations by tableId
+     * Count accommodations by boardId
      */
-    @Query("SELECT COUNT(a) FROM AccommodationEntity a WHERE a.tableId = :tableId")
-    long countByTableId(@Param("tableId") Long tableId);
+    @Query("SELECT COUNT(a) FROM AccommodationEntity a WHERE a.boardId = :boardId")
+    long countByBoardId(@Param("boardId") Long boardId);
 
     /**
-     * Count accommodations by tableId and userId
+     * Count accommodations by boardId and userId
      */
-    @Query("SELECT COUNT(a) FROM AccommodationEntity a WHERE a.tableId = :tableId AND a.createdBy = :userId")
-    long countByTableIdAndCreatedBy(@Param("tableId") Long tableId, @Param("userId") Long userId);
+    @Query("SELECT COUNT(a) FROM AccommodationEntity a WHERE a.boardId = :boardId AND a.createdBy = :userId")
+    long countByBoardIdAndCreatedBy(@Param("boardId") Long boardId, @Param("userId") Long userId);
 
     /**
      * Find accommodation by id
@@ -42,17 +42,17 @@ public interface JpaAccommodationRepository extends JpaRepository<AccommodationE
     AccommodationEntity findByAccommodationId(@Param("id") Long id);
 
     /**
-     * Find accommodations by tableId with pagination, sorted by lowest price
+     * Find accommodations by boardId with pagination, sorted by lowest price
      * ascending
      */
-    @Query("SELECT a FROM AccommodationEntity a WHERE a.tableId = :tableId ORDER BY a.lowestPrice ASC")
-    Page<AccommodationEntity> findByTableIdOrderByLowestPriceAsc(@Param("tableId") Long tableId, Pageable pageable);
+    @Query("SELECT a FROM AccommodationEntity a WHERE a.boardId = :boardId ORDER BY a.lowestPrice ASC")
+    Page<AccommodationEntity> findByBoardIdOrderByLowestPriceAsc(@Param("boardId") Long boardId, Pageable pageable);
 
     /**
-     * Find accommodations by tableId and userId with pagination, sorted by lowest
+     * Find accommodations by boardId and userId with pagination, sorted by lowest
      * price ascending
      */
-    @Query("SELECT a FROM AccommodationEntity a WHERE a.tableId = :tableId AND a.createdBy = :userId ORDER BY a.lowestPrice ASC")
-    Page<AccommodationEntity> findByTableIdAndCreatedByOrderByLowestPriceAsc(@Param("tableId") Long tableId,
+    @Query("SELECT a FROM AccommodationEntity a WHERE a.boardId = :boardId AND a.createdBy = :userId ORDER BY a.lowestPrice ASC")
+    Page<AccommodationEntity> findByBoardIdAndCreatedByOrderByLowestPriceAsc(@Param("boardId") Long boardId,
             @Param("userId") Long userId, Pageable pageable);
 }

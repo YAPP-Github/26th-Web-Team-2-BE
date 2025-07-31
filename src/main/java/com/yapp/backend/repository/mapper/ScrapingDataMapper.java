@@ -29,10 +29,10 @@ public class ScrapingDataMapper {
 	 * 스크래핑 데이터 -> 숙소 데이터 모델 매핑
 	 */
 	public AccommodationEntity mapToEntity(ScrapingData scrapingData, String originalUrl, String memo, Long createdBy,
-		Long tableId) {
+		Long boardId) {
 		if (scrapingData == null) {
 			log.warn("ScrapingData is null, creating entity with minimal data");
-			return createMinimalEntity(originalUrl, memo, createdBy, tableId);
+			return createMinimalEntity(originalUrl, memo, createdBy, boardId);
 		}
 
 		return AccommodationEntity.builder()
@@ -63,12 +63,12 @@ public class ScrapingDataMapper {
 	/**
 	 * 숙소 데이터 모델 생성
 	 */
-	private AccommodationEntity createMinimalEntity(String url, String memo, Long createdBy, Long tableId) {
+	private AccommodationEntity createMinimalEntity(String url, String memo, Long createdBy, Long boardId) {
 		return AccommodationEntity.builder()
 			.url(url)
 			.memo(memo)
 			.createdBy(new UserEntity(createdBy))
-			.tableId(tableId)
+			.boardId(boardId)
 			.accommodationName("정보 없음")
 			.siteName(extractSiteNameFromUrl(url))
 			.currency("KRW")

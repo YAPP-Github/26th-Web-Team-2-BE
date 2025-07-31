@@ -4,10 +4,10 @@ import com.yapp.backend.common.exception.CustomException;
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
-import com.yapp.backend.service.model.Accommodation;
-import com.yapp.backend.repository.AccommodationRepository;
 import com.yapp.backend.repository.entity.AccommodationEntity;
 import com.yapp.backend.repository.mapper.ScrapingDataMapper;
+import com.yapp.backend.service.model.Accommodation;
+import com.yapp.backend.repository.AccommodationRepository;
 import com.yapp.backend.service.AccommodationService;
 import com.yapp.backend.service.ScrapingService;
 import com.yapp.backend.service.dto.ScrapingResponse;
@@ -45,12 +45,12 @@ public class AccommodationServiceImpl implements AccommodationService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public AccommodationPageResponse findAccommodationsByTableId(Long tableId, int page, int size, Long userId,
+	public AccommodationPageResponse findAccommodationsByBoardId(Long boardId, int page, int size, Long userId,
 			String sort) {
 		try {
 			// size + 1개를 조회하여 다음 페이지 존재 여부를 한 번의 쿼리로 확인
-			List<Accommodation> accommodations = accommodationRepository.findByTableIdWithPagination(
-				tableId, page, size + 1, userId, sort);
+			List<Accommodation> accommodations = accommodationRepository.findByBoardIdWithPagination(
+					boardId, page, size + 1, userId, sort);
 
 			// 실제 반환할 데이터와 다음 페이지 존재 여부 판단
 			boolean hasNext = accommodations.size() > size;
@@ -67,7 +67,8 @@ public class AccommodationServiceImpl implements AccommodationService {
 					.hasNext(hasNext)
 					.build();
 		} catch (DataAccessException e) {
-			log.error("Database error while finding accommodations for tableId: {}, userId: {}", tableId, userId, e);
+			log.error("Database error while finding accommodations for boardId: {}, userId: {}",
+					boardId, userId, e);
 			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
 		}
 	}
@@ -76,11 +77,12 @@ public class AccommodationServiceImpl implements AccommodationService {
 	 * table에 포함된 숙소 카드의 개수 반환
 	 */
 	@Override
-	public Long countAccommodationsByTableId(Long tableId, Long userId) {
+	public Long countAccommodationsByBoardId(Long boardId, Long userId) {
 		try {
-			return accommodationRepository.countByTableId(tableId, userId);
+			return accommodationRepository.countByBoardId(boardId, userId);
 		} catch (DataAccessException e) {
-			log.error("Database error while counting accommodations for tableId: {}, userId: {}", tableId, userId, e);
+			log.error("Database error while counting accommodations for boardId: {}, userId: {}",
+					boardId, userId, e);
 			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
 		}
 	}
@@ -101,7 +103,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 					request.getUrl(),
 					request.getMemo(),
 					request.getUserId(),
-					request.getTableId());
+					request.getBoardId());
 
 			// Save new accommodation to database using repository
 			Accommodation savedAccommodation = accommodationRepository.save(accommodationEntity);

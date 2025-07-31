@@ -22,6 +22,6 @@ public class UserLoginServiceImpl implements UserLoginService {
     @Override
     @Transactional
     public User handleOAuthLogin(User userSocialInfo) {
-        return userRepository.getUserBySocialUserInfo(userSocialInfo);
+        return userRepository.getUserBySocialUserInfoOrCreateUser(userSocialInfo);
     }
 }

@@ -1,8 +1,10 @@
 package com.yapp.backend.repository.mapper;
 
+import com.yapp.backend.repository.JpaUserRepository;
 import com.yapp.backend.repository.entity.AccommodationEntity;
 import com.yapp.backend.repository.entity.UserEntity;
 import com.yapp.backend.service.model.Accommodation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -12,8 +14,10 @@ import java.time.LocalDateTime;
  * Mapper utility for converting between AccommodationEntity and Accommodation domain model
  */
 @Component
+@RequiredArgsConstructor
 public class AccommodationMapper {
 
+    private final JpaUserRepository jpaUserRepository;
     /**
      * 숙소 데이터 모델 -> 숙소 도메인 모델
      */
@@ -30,7 +34,7 @@ public class AccommodationMapper {
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .createdBy(entity.getCreatedBy().getId())
-                .tableId(entity.getTableId())
+                .boardId(entity.getBoardId())
                 .accommodationName(entity.getAccommodationName())
                 .images(entity.getImages())
                 .address(entity.getAddress())
@@ -59,12 +63,14 @@ public class AccommodationMapper {
             return null;
         }
 
+        UserEntity userProxy = jpaUserRepository.getReferenceById(accommodation.getCreatedBy());
+
         return AccommodationEntity.builder()
                 .id(accommodation.getId())
                 .url(accommodation.getUrl())
                 .siteName(accommodation.getSiteName())
                 .memo(accommodation.getMemo())
-                .createdBy(new UserEntity(accommodation.getCreatedBy()))
+                .createdBy(userProxy)
                 .accommodationName(accommodation.getAccommodationName())
                 .images(accommodation.getImages())
                 .address(accommodation.getAddress())
@@ -88,7 +94,7 @@ public class AccommodationMapper {
     /**
      * 숙소 데이터 모델 생성
      */
-    public AccommodationEntity createEntityForRegistration(String url, String memo, Long createdBy, Long tableId) {
+    public AccommodationEntity createEntityForRegistration(String url, String memo, Long createdBy) {
         return AccommodationEntity.builder()
                 .url(url)
                 .memo(memo)
