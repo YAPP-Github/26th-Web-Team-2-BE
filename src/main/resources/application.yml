@@ -29,3 +29,6 @@ swagger:
   auth:
     username: ${SWAGGER_AUTH_USERNAME}
     password: ${SWAGGER_AUTH_PASSWORD}
+
+cors:
+    allowed-origins: ""
