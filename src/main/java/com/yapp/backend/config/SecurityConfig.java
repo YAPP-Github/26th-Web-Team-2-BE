@@ -46,6 +46,7 @@ public class SecurityConfig {
                                                 "/swagger-ui.html",
                                                 "/v3/api-docs/**")
                                 .csrf(AbstractHttpConfigurer::disable)
+                                .cors(cors -> cors.configure(http)) // CORS 설정 추가
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .anyRequest().authenticated())
                                 .httpBasic(httpBasic -> {
@@ -59,6 +60,7 @@ public class SecurityConfig {
         public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
                 return http
                                 .csrf(AbstractHttpConfigurer::disable)
+                                .cors(cors -> cors.configure(http)) // CORS 설정 추가
                                 .formLogin(AbstractHttpConfigurer::disable)
                                 .addFilterBefore(jwtFilter, OAuth2LoginAuthenticationFilter.class)
                                 .authorizeHttpRequests(authorize -> authorize
