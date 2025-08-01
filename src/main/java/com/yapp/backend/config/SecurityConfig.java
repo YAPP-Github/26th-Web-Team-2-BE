@@ -63,35 +63,36 @@ public class SecurityConfig {
                                 .build();
         }
 
+        // todo UT 이후 재 반영 필요
         // 일반 API용 JWT 인증 설정
-        @Bean
-        @Order(2)
-        public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-                return http
-                                .csrf(AbstractHttpConfigurer::disable)
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // WebConfig의 CORS 설정
-                                                                                                   // 사용
-                                .formLogin(AbstractHttpConfigurer::disable)
-                                .addFilterBefore(jwtFilter, OAuth2LoginAuthenticationFilter.class)
-                                .authorizeHttpRequests(authorize -> authorize
-                                                .requestMatchers(
-                                                                "/")
-                                                .permitAll()
-                                                .requestMatchers(
-                                                                "/oauth2/authorization/**",
-                                                                "/api/**",
-                                                                "/oauth/authorize", // OAuth2 Authorization Endpoint
-                                                                "/login/oauth2/**" // OAuth2 code Redirect URI
-                                                ).permitAll()
-                                                .anyRequest().authenticated())
-                                .oauth2Login(oauth2 -> oauth2
-                                                .userInfoEndpoint(userInfo -> userInfo
-                                                                .userService(customOAuth2UserService))
-                                                .successHandler(oAuth2AuthenticationSuccessHandler))
-                                .exceptionHandling(exception -> exception
-                                                .authenticationEntryPoint(customAuthenticationEntryPoint))
-                                .build();
-        }
+//        @Bean
+//        @Order(2)
+//        public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+//                return http
+//                                .csrf(AbstractHttpConfigurer::disable)
+//                                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // WebConfig의 CORS 설정
+//                                                                                                   // 사용
+//                                .formLogin(AbstractHttpConfigurer::disable)
+//                                .addFilterBefore(jwtFilter, OAuth2LoginAuthenticationFilter.class)
+//                                .authorizeHttpRequests(authorize -> authorize
+//                                                .requestMatchers(
+//                                                                "/")
+//                                                .permitAll()
+//                                                .requestMatchers(
+//                                                                "/oauth2/authorization/**",
+//                                                                "/api/**",
+//                                                                "/oauth/authorize", // OAuth2 Authorization Endpoint
+//                                                                "/login/oauth2/**" // OAuth2 code Redirect URI
+//                                                ).permitAll()
+//                                                .anyRequest().authenticated())
+//                                .oauth2Login(oauth2 -> oauth2
+//                                                .userInfoEndpoint(userInfo -> userInfo
+//                                                                .userService(customOAuth2UserService))
+//                                                .successHandler(oAuth2AuthenticationSuccessHandler))
+//                                .exceptionHandling(exception -> exception
+//                                                .authenticationEntryPoint(customAuthenticationEntryPoint))
+//                                .build();
+//        }
 
         @Bean
         public UserDetailsService userDetailsService() {
