@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ComparisonTableServiceImpl implements ComparisonTableService {
 
     private final ComparisonTableRepository comparisonTableRepository;
-//    private final TripGroupRepository tripGroupRepository;
+    //    private final TripGroupRepository tripGroupRepository;
     private final UserRepository userRepository;
     private final AccommodationRepository accommodationRepository;
     private final AccommodationService accommodationService;
@@ -84,8 +84,9 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         return new ComparisonTableResponse(
                 comparisonTable.getId(),
                 comparisonTable.getTableName(),
-                comparisonTable.getAccommodationList().stream().map(AccommodationResponse::from).collect(
-                        Collectors.toList()),
+                comparisonTable.getAccommodationList().stream().map(AccommodationResponse::from)
+                        .collect(
+                                Collectors.toList()),
                 comparisonTable.getFactors(),
                 comparisonTable.getCreatedById()
         );
@@ -98,48 +99,41 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
             UpdateComparisonTableRequest request,
             Long userId
     ) {
-        try {
-            // 기존 비교표 조회
-            ComparisonTable existingTable = comparisonTableRepository.findByIdOrThrow(tableId);
-
-            // 권한 검증: 해당 비교표를 생성한 사용자인지 확인
-            if (!existingTable.getCreatedById().equals(userId)) {
-                throw new UserAuthorizationException(ErrorCode.INVALID_USER_AUTHORIZATION);
-            }
-
-            // 1. 숙소 세부 내용 업데이트
-            if (request.getAccommodationRequestList() != null) {
-                updateAccommodationsContent(request.getAccommodationRequestList());
-            }
-            
-            // 2. ComparisonFactor 정렬 순서 업데이트
-            List<ComparisonFactor> updatedFactors = ComparisonFactor.convertToComparisonFactorList(request.getFactorList());
-            
-            // 3. Accommodation 정렬 순서에 따라 숙소 리스트 재구성
-            List<Accommodation> updatedAccommodationList = request.getAccommodationIdList().stream()
-                    .map(accommodationRepository::findByIdOrThrow)
-                    .toList();
-            
-            // 4. 업데이트된 비교표 생성
-            ComparisonTable updatedTable = ComparisonTable.builder()
-                    .id(existingTable.getId())
-                    .tableName(request.getTableName())
-                    .createdById(existingTable.getCreatedById())
-                    .tripBoardId(request.getBoardId())
-                    .accommodationList(updatedAccommodationList)
-                    .factors(updatedFactors)
-                    .createdAt(existingTable.getCreatedAt())
-                    .build();
-            
-            // 5. 비교표 업데이트 저장
-            comparisonTableRepository.update(updatedTable);
-            
-            return true;
-            
-        } catch (Exception e) {
-            // 에러 로깅 및 예외 처리
-            throw new RuntimeException("비교표 업데이트 중 오류가 발생했습니다.", e);
+        ComparisonTable existingTable = comparisonTableRepository.findByIdOrThrow(tableId);
+        if (isAuthorizedToTable(userId, existingTable)) {
+            throw new UserAuthorizationException(ErrorCode.INVALID_USER_AUTHORIZATION);
         }
+
+        // 1. 숙소 세부 내용 업데이트
+        updateAccommodationsContent(request.getAccommodationRequestList());
+
+        // 2. ComparisonFactor 정렬 순서 업데이트
+        List<ComparisonFactor> updatedFactors = ComparisonFactor.convertToComparisonFactorList(request.getFactorList());
+
+        // 3. Accommodation 정렬 순서에 따라 숙소 리스트 재구성
+        List<Accommodation> updatedAccommodationList = request.getAccommodationIdList().stream()
+                .map(accommodationRepository::findByIdOrThrow)
+                .toList();
+
+        // 4. 업데이트된 비교표 생성
+        ComparisonTable updatedTable = ComparisonTable.builder()
+                .id(existingTable.getId())
+                .tableName(request.getTableName())
+                .createdById(existingTable.getCreatedById())
+                .tripBoardId(request.getBoardId())
+                .accommodationList(updatedAccommodationList)
+                .factors(updatedFactors)
+                .createdAt(existingTable.getCreatedAt())
+                .build();
+
+        // 5. 비교표 업데이트 저장
+        comparisonTableRepository.update(updatedTable);
+
+        return true;
+    }
+
+    private static boolean isAuthorizedToTable(Long userId, ComparisonTable existingTable) {
+        return !existingTable.getCreatedById().equals(userId);
     }
 
     @Override
@@ -151,11 +145,11 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     ) {
         try {
             ComparisonTable updatedTable = comparisonTableRepository.addAccommodationsToTable(
-                    tableId, 
-                    request.getAccommodationIds(), 
+                    tableId,
+                    request.getAccommodationIds(),
                     userId
             );
-            
+
             // 업데이트된 비교표 반환
             return new ComparisonTableResponse(
                     updatedTable.getId(),
@@ -166,16 +160,17 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
                     updatedTable.getFactors(),
                     updatedTable.getCreatedById()
             );
-            
+
         } catch (Exception e) {
             throw new RuntimeException("비교표에 숙소 추가 중 오류가 발생했습니다.", e);
         }
     }
-    
+
     /**
      * 숙소 세부 내용 업데이트
      */
-    private void updateAccommodationsContent(List<UpdateAccommodationRequest> accommodationRequestList) {
+    private void updateAccommodationsContent(
+            List<UpdateAccommodationRequest> accommodationRequestList) {
         for (UpdateAccommodationRequest accommodationRequest : accommodationRequestList) {
             if (accommodationRequest.getId() != null) {
                 accommodationService.updateAccommodation(accommodationRequest);

@@ -54,21 +54,10 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
         // 기존 엔티티 조회
         ComparisonTableEntity existingEntity = jpaComparisonTableRepository.findById(comparisonTable.getId())
                 .orElseThrow(() -> new ComparisonTableNotFoundException(ErrorCode.TABLE_NOT_FOUND));
-        
-        // 기본 정보 업데이트
-        existingEntity = ComparisonTableEntity.builder()
-                .id(existingEntity.getId())
-                .tableName(comparisonTable.getTableName())
-                .tripBoardEntity(existingEntity.getTripBoardEntity())
-                .createdByEntity(existingEntity.getCreatedByEntity())
-                .factors(comparisonTable.getFactors())
-                .items(existingEntity.getItems()) // 기존 매핑 유지
-                .createdAt(existingEntity.getCreatedAt())
-                .build();
-        
-        // 숙소 매핑 정보 업데이트
+
+        // 기본 정보, 숙소 매핑 정보 업데이트
+        existingEntity.update(comparisonTable);
         updateAccommodationMappings(existingEntity, comparisonTable.getAccommodationList());
-        
         jpaComparisonTableRepository.save(existingEntity);
     }
     
