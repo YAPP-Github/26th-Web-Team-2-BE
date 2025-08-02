@@ -72,11 +72,16 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-        String origin = request.getHeader(HttpHeaders.ORIGIN);
-        if (origin == null) {
-            origin = request.getHeader(HttpHeaders.REFERER);
-        }
 
-        getRedirectStrategy().sendRedirect(request, response, origin + "/oauth2/callback");
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json; charset=UTF-8");
+        response.getWriter().write("{\"redirect\":\"https://ssok.info/oauth2/callback\"}");
+
+//        String origin = request.getHeader(HttpHeaders.ORIGIN);
+//        if (origin == null) {
+//            origin = request.getHeader(HttpHeaders.REFERER);
+//        }
+//
+//        getRedirectStrategy().sendRedirect(request, response, origin + "/oauth2/callback");
     }
 }
