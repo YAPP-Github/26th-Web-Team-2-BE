@@ -10,7 +10,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -34,6 +36,15 @@ public class TripBoardEntity {
     @Column(name = "board_name")
     private String boardName;
 
+    @Column(name = "destination", length = 20, nullable = false)
+    private String destination;
+
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private UserEntity createdBy;
@@ -50,11 +61,21 @@ public class TripBoardEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(
-            mappedBy = "tripBoardEntity"
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true
+    @OneToMany(mappedBy = "tripBoardEntity"
+    // cascade = CascadeType.ALL,
+    // orphanRemoval = true
     )
+    @Builder.Default
     private List<ComparisonTableEntity> comparisonTables = new ArrayList<>();
 
+    /**
+     * 여행 기간을 "yy.MM.dd~yy.MM.dd" 형식으로 포맷팅하여 반환
+     */
+    public String getFormattedTravelPeriod() {
+        if (startDate == null || endDate == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
+        return startDate.format(formatter) + "~" + endDate.format(formatter);
+    }
 }

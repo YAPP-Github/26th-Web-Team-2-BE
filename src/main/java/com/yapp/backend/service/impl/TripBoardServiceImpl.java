@@ -1,5 +1,7 @@
 package com.yapp.backend.service.impl;
 
+import com.yapp.backend.common.exception.InvalidDestinationException;
+import com.yapp.backend.common.exception.InvalidTravelPeriodException;
 import com.yapp.backend.common.exception.TripBoardCreationException;
 import com.yapp.backend.common.exception.TripBoardParticipantLimitExceededException;
 import com.yapp.backend.common.util.InvitationLinkGenerator;
@@ -15,9 +17,7 @@ import com.yapp.backend.repository.enums.TripBoardRole;
 import com.yapp.backend.repository.mapper.TripBoardMapper;
 import com.yapp.backend.repository.mapper.UserMapper;
 import com.yapp.backend.service.TripBoardService;
-import com.yapp.backend.service.model.TripBoard;
 import com.yapp.backend.service.model.User;
-import com.yapp.backend.service.model.UserTripBoard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -49,29 +49,30 @@ public class TripBoardServiceImpl implements TripBoardService {
     @Transactional
     public TripBoardCreateResponse createTripBoard(TripBoardCreateRequest request, Long userId) {
         try {
-            log.info("여행 보드 생성 시작 - 사용자 ID: {}, 보드명: {}", userId, request.getBoardName());
+            log.info("여행 보드 생성 시작 - 사용자 ID: {}, 보드명: {}, 여행지: {}",
+                    userId, request.getBoardName(), request.getDestination());
 
-            // 1. 사용자 조회
+            // 1. 입력 데이터 유효성 검증
+            validateTravelPeriod(request.getStartDate(), request.getEndDate());
+            validateDestination(request.getDestination());
+
+            // 2. 사용자 조회
             User user = userRepository.findByIdOrThrow(userId);
             UserEntity userEntity = userMapper.domainToEntity(user);
 
-            // 2. 여행 보드 엔티티 생성
+            // 3. 여행 보드 엔티티 생성
             TripBoardEntity tripBoardEntity = TripBoardEntity.builder()
                     .boardName(request.getBoardName())
+                    .destination(request.getDestination())
+                    .startDate(request.getStartDate())
+                    .endDate(request.getEndDate())
                     .createdBy(userEntity)
                     .updatedBy(userEntity)
                     .build();
 
-            // 3. 여행 보드 저장
+            // 4. 여행 보드 저장
             TripBoardEntity savedTripBoard = tripBoardRepository.save(tripBoardEntity);
             log.debug("여행 보드 저장 완료 - ID: {}", savedTripBoard.getId());
-
-            // 4. 참여자 수 제한 검증 (현재는 생성자만 있으므로 1명)
-            long currentParticipantCount = userTripBoardRepository.countByTripBoardId(savedTripBoard.getId());
-            if (currentParticipantCount >= MAX_PARTICIPANTS) {
-                log.warn("참여자 수 한계 초과 - 현재: {}, 최대: {}", currentParticipantCount, MAX_PARTICIPANTS);
-                throw new TripBoardParticipantLimitExceededException();
-            }
 
             // 5. 생성자용 고유 초대 링크 생성
             String invitationUrl = invitationLinkGenerator.generateUniqueInvitationUrl();
@@ -93,6 +94,10 @@ public class TripBoardServiceImpl implements TripBoardService {
             TripBoardCreateResponse response = TripBoardCreateResponse.builder()
                     .boardId(savedTripBoard.getId())
                     .boardName(savedTripBoard.getBoardName())
+                    .destination(savedTripBoard.getDestination())
+                    .travelPeriod(savedTripBoard.getFormattedTravelPeriod())
+                    .startDate(savedTripBoard.getStartDate())
+                    .endDate(savedTripBoard.getEndDate())
                     .invitationUrl(invitationUrl)
                     .invitationActive(true)
                     .creator(TripBoardCreateResponse.UserInfo.builder()
@@ -112,10 +117,32 @@ public class TripBoardServiceImpl implements TripBoardService {
             throw e;
         } catch (DataAccessException e) {
             log.error("여행 보드 생성 중 데이터베이스 오류 발생 - 사용자 ID: {}", userId, e);
-            throw new TripBoardCreationException("데이터베이스 오류로 인해 여행 보드 생성에 실패했습니다.");
+            throw new TripBoardCreationException();
         } catch (Exception e) {
             log.error("여행 보드 생성 중 예상치 못한 오류 발생 - 사용자 ID: {}", userId, e);
-            throw new TripBoardCreationException("여행 보드 생성 중 오류가 발생했습니다.");
+            throw new TripBoardCreationException();
+        }
+    }
+
+    /**
+     * 여행 기간 유효성 검증
+     * 출발일이 도착일보다 늦을 수 없습니다.
+     */
+    private void validateTravelPeriod(java.time.LocalDate startDate, java.time.LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
+            log.warn("유효하지 않은 여행 기간 - 출발일: {}, 도착일: {}", startDate, endDate);
+            throw new InvalidTravelPeriodException();
+        }
+    }
+
+    /**
+     * 여행지 유효성 검증
+     * 한글, 영문, 공백만 허용됩니다.
+     */
+    private void validateDestination(String destination) {
+        if (!destination.matches("^[가-힣a-zA-Z\\s]+$")) {
+            log.warn("유효하지 않은 여행지 형식 - 여행지: {}", destination);
+            throw new InvalidDestinationException();
         }
     }
 }

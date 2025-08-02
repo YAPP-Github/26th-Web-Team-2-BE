@@ -30,7 +30,10 @@ public enum ErrorCode {
 
     // Trip Board related errors
     TRIP_BOARD_CREATION_FAILED("여행 보드 생성 실패", "여행 보드 생성에 실패했습니다.", HttpStatus.BAD_REQUEST),
-    TRIP_BOARD_PARTICIPANT_LIMIT_EXCEEDED("참여자 수 한계 초과", "여행 보드 참여자 수가 한계에 도달했습니다.", HttpStatus.BAD_REQUEST)
+    TRIP_BOARD_PARTICIPANT_LIMIT_EXCEEDED("참여자 수 한계 초과", "여행 보드 참여자 수가 한계에 도달했습니다.", HttpStatus.BAD_REQUEST),
+    DUPLICATE_INVITATION_URL("초대 링크 중복", "초대 링크 생성 중 중복이 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_DESTINATION("유효하지 않은 여행지", "유효하지 않은 여행지입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_TRAVEL_PERIOD("유효하지 않은 여행 기간", "유효하지 않은 여행 기간입니다.", HttpStatus.BAD_REQUEST)
     // 필요에 따라 추가
     ;
 
