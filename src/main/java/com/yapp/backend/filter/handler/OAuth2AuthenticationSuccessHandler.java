@@ -72,5 +72,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
+        String origin = request.getHeader(HttpHeaders.ORIGIN);
+        if (origin == null) {
+            origin = request.getHeader(HttpHeaders.REFERER);
+        }
+
+        getRedirectStrategy().sendRedirect(request, response, origin + "/oauth2/callback");
     }
 }

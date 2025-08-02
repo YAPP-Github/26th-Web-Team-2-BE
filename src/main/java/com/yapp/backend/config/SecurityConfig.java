@@ -76,6 +76,9 @@ public class SecurityConfig {
         public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
                 CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
                 repo.setCookieCustomizer(builder -> {
+                        if (cookieDomain != null && !cookieDomain.isBlank()) {
+                                builder.domain(cookieDomain);
+                        }
                         builder
                                 .domain(cookieDomain)
                                 .path("/")
