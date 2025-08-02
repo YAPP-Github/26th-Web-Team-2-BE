@@ -5,6 +5,7 @@ spring:
     import:
       - optional:classpath:config/postgresql/db-prod.yml
       - optional:classpath:config/redis/redis-prod.yml
+      - optional:classpath:config/oauth/security-prod.yml
 
 scraping:
   server:

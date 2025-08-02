@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,6 +34,12 @@ public class SecurityConfig {
         private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
         private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
         private final JwtFilter jwtFilter;
+
+        @Value("${app.security.cookie.domain}")
+        private String cookieDomain;
+
+        @Value("${app.security.cookie.secure}")
+        private boolean cookieSecure;
 
         @Value("${swagger.auth.username}")
         private String swaggerUsername;
@@ -63,36 +70,46 @@ public class SecurityConfig {
                                 .build();
         }
 
-        // todo UT 이후 재 반영 필요
         // 일반 API용 JWT 인증 설정
-//        @Bean
-//        @Order(2)
-//        public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-//                return http
-//                                .csrf(AbstractHttpConfigurer::disable)
-//                                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // WebConfig의 CORS 설정
-//                                                                                                   // 사용
-//                                .formLogin(AbstractHttpConfigurer::disable)
-//                                .addFilterBefore(jwtFilter, OAuth2LoginAuthenticationFilter.class)
-//                                .authorizeHttpRequests(authorize -> authorize
-//                                                .requestMatchers(
-//                                                                "/")
-//                                                .permitAll()
-//                                                .requestMatchers(
-//                                                                "/oauth2/authorization/**",
-//                                                                "/api/**",
-//                                                                "/oauth/authorize", // OAuth2 Authorization Endpoint
-//                                                                "/login/oauth2/**" // OAuth2 code Redirect URI
-//                                                ).permitAll()
-//                                                .anyRequest().authenticated())
-//                                .oauth2Login(oauth2 -> oauth2
-//                                                .userInfoEndpoint(userInfo -> userInfo
-//                                                                .userService(customOAuth2UserService))
-//                                                .successHandler(oAuth2AuthenticationSuccessHandler))
-//                                .exceptionHandling(exception -> exception
-//                                                .authenticationEntryPoint(customAuthenticationEntryPoint))
-//                                .build();
-//        }
+        @Bean
+        @Order(2)
+        public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+                CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+                repo.setCookieCustomizer(builder -> {
+                        builder
+                                .domain(cookieDomain)
+                                .path("/")
+                                .sameSite("None")
+                                .secure(cookieSecure)
+                                .httpOnly(false);
+                });
+
+                return http
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .csrf(csrf -> csrf
+                                        .csrfTokenRepository(repo)
+                                )
+                                .formLogin(AbstractHttpConfigurer::disable)
+                                .addFilterBefore(jwtFilter, OAuth2LoginAuthenticationFilter.class)
+                                .authorizeHttpRequests(authorize -> authorize
+                                                .requestMatchers(
+                                                                "/"
+                                                ).permitAll()
+                                                .requestMatchers(
+                                                                "/oauth2/authorization/**",
+                                                                "/api/**",
+                                                                "/oauth/authorize", // OAuth2 Authorization Endpoint
+                                                                "/login/oauth2/**" // OAuth2 code Redirect URI
+                                                ).permitAll()
+                                                .anyRequest().authenticated())
+                                .oauth2Login(oauth2 -> oauth2
+                                                .userInfoEndpoint(userInfo -> userInfo
+                                                                .userService(customOAuth2UserService))
+                                                .successHandler(oAuth2AuthenticationSuccessHandler))
+                                .exceptionHandling(exception -> exception
+                                                .authenticationEntryPoint(customAuthenticationEntryPoint))
+                                .build();
+        }
 
         @Bean
         public UserDetailsService userDetailsService() {

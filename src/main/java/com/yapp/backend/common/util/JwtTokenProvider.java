@@ -33,6 +33,12 @@ public class JwtTokenProvider {
     private final SecretKey refreshSecretKey;
     private final RefreshTokenService refreshTokenService;
 
+    @Value("${app.security.cookie.domain}")
+    private String cookieDomain;
+
+    @Value("${app.security.cookie.secure}")
+    private boolean cookieSecure;
+
     public JwtTokenProvider(
             @Value("${spring.security.jwt.access-secret-key}") String accessKey,
             @Value("${spring.security.jwt.refresh-secret-key}") String refreshKey,
@@ -47,8 +53,9 @@ public class JwtTokenProvider {
         long maxAgeInSeconds = accessTokenValidityInMs / 1_000;
         String accessToken = createAccessToken(userId);
         return ResponseCookie.from("ACCESS_TOKEN", accessToken)
+                .domain(cookieDomain)
                 .httpOnly(true)
-                .secure(true)
+                .secure(cookieSecure)
                 .path("/")
                 .maxAge(maxAgeInSeconds)
                 .sameSite("Lax")
@@ -60,8 +67,9 @@ public class JwtTokenProvider {
         String refreshToken = createRefreshToken(userId);
         refreshTokenService.storeRefresh(userId, refreshToken);
         return ResponseCookie.from("REFRESH_TOKEN", refreshToken)
+                .domain(cookieDomain)
                 .httpOnly(true)
-                .secure(true)
+                .secure(cookieSecure)
                 .path("/")
                 .maxAge(maxAgeInSeconds)
                 .sameSite("Lax")

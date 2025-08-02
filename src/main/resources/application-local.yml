@@ -3,6 +3,7 @@ spring:
     import:
       - optional:classpath:config/postgresql/db-local.yml
       - optional:classpath:config/redis/redis-local.yml
+      - optional:classpath:config/oauth/security-local.yml
 
 scraping:
   server:

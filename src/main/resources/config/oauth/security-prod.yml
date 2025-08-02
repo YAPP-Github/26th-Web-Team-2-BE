@@ -1,0 +1,5 @@
+app:
+  security:
+    cookie:
+      domain: ".ssok.info"
+      secure: true
