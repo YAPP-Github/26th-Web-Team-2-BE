@@ -1,6 +1,7 @@
 package com.yapp.backend.service;
 
 import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
+import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
 import com.yapp.backend.controller.dto.response.AccommodationPageResponse;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 
@@ -14,4 +15,6 @@ public interface AccommodationService {
     AccommodationRegisterResponse registerAccommodationCard(AccommodationRegisterRequest request);
 
     AccommodationResponse findAccommodationById(Long accommodationId);
+    
+    void updateAccommodation(UpdateAccommodationRequest request);
 }

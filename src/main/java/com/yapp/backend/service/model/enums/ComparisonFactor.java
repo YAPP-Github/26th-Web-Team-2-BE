@@ -7,18 +7,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public enum ComparisonFactor {
-    PARKING,                // 주차 가능 여부
-    BREAKFAST,              // 조식 가능 여부
-    FREE_WIFI,              // 무료 와이파이 여부
-    POOL,                   // 수영장 보유 여부
-    FITNESS,                // 피트니스, 헬스장 보유 여부
-    LUGGAGE_STORAGE,        // 짐 보관 가능 여부
-    BAR_LOUNGE,             // 바/라운지 보유 여부
-    FRONT_DESK_HOURS,       // 프론트데스크 운영시간
-    PET_FRIENDLY,           // 반려동물 동반 가능 여부
-    BUSINESS_SERVICES,      // 비즈니스 서비스
-    CLEANING_SERVICE,       // 청소 서비스
-    HANDICAP_FACILITIES;    // 장애인 편의시설
+    REVIEW_SCORE,               // 리뷰 점수
+    ATTRACTION,                 // 인근 관광지
+    TRANSPORTATION,             // 인근 교통편
+    CLEANLINESS,                // 청결도
+    AMENITY,                    // 편의 서비스
+    CHECK_TIME,                 // 체크인, 체크아웃 시간
+    REVIEW_SUMMARY,             // 리뷰 요약
+    MEMO                        // 메모
+    ;
 
     /**
      * 문자열 리스트를 ComparisonFactor 리스트로 변환
@@ -31,5 +28,12 @@ public enum ComparisonFactor {
                         .orElseThrow(() -> new InvalidFactorsException(ErrorCode.INVALID_FACTORS))
                 )
                 .collect(Collectors.toList());
+    }
+    
+    /**
+     * 디폴트 ComparisonFactor 리스트를 enum 정의 순서대로 반환
+     */
+    public static List<ComparisonFactor> getDefaultFactors() {
+        return Arrays.asList(ComparisonFactor.values());
     }
 }

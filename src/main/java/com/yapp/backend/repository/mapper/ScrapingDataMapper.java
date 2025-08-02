@@ -213,11 +213,11 @@ public class ScrapingDataMapper {
             return null;
         }
 
-        return CheckTime.builder()
-                .checkInTimeFrom(scrapingCheckTime.getCheckInTimeFrom())
-                .checkInTimeTo(scrapingCheckTime.getCheckInTimeTo())
-                .build();
-    }
+		return CheckTime.builder()
+			.from(scrapingCheckTime.getCheckInTimeFrom())
+			.to(scrapingCheckTime.getCheckInTimeTo())
+			.build();
+	}
 
     /**
      * 체크아웃 시간을 매핑합니다.
@@ -227,9 +227,9 @@ public class ScrapingDataMapper {
             return null;
         }
 
-        return CheckTime.builder()
-                .checkOutTimeFrom(scrapingCheckTime.getCheckOutTimeFrom())
-                .checkOutTimeTo(scrapingCheckTime.getCheckOutTimeTo())
-                .build();
-    }
+		return CheckTime.builder()
+			.from(scrapingCheckTime.getCheckOutTimeFrom())
+			.to(scrapingCheckTime.getCheckOutTimeTo())
+			.build();
+	}
 }

@@ -1,8 +1,15 @@
 package com.yapp.backend.service.impl;
 
+import static com.yapp.backend.service.model.Attraction.*;
+
 import com.yapp.backend.common.exception.CustomException;
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
+import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
+import com.yapp.backend.controller.dto.request.update.AmenityUpdate;
+import com.yapp.backend.controller.dto.request.update.AttractionUpdate;
+import com.yapp.backend.controller.dto.request.update.CheckTimeUpdate;
+import com.yapp.backend.controller.dto.request.update.TransportationUpdate;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 import com.yapp.backend.repository.entity.AccommodationEntity;
 import com.yapp.backend.repository.mapper.ScrapingDataMapper;
@@ -12,6 +19,10 @@ import com.yapp.backend.service.AccommodationService;
 import com.yapp.backend.service.ScrapingService;
 import com.yapp.backend.service.dto.ScrapingResponse;
 
+import com.yapp.backend.service.model.Amenity;
+import com.yapp.backend.service.model.Attraction;
+import com.yapp.backend.service.model.CheckTime;
+import com.yapp.backend.service.model.Transportation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -150,4 +161,37 @@ public class AccommodationServiceImpl implements AccommodationService {
 			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
 		}
 	}
+
+	/**
+	 * 숙소 정보 업데이트
+	 * 숙소의 세부 정보를 업데이트합니다.
+	 */
+	@Override
+	@Transactional
+	public void updateAccommodation(UpdateAccommodationRequest request) {
+		try {
+			// 기존 숙소 조회
+			Accommodation existingAccommodation = accommodationRepository.findByIdOrThrow(request.getId());
+
+			// 숙소 정보 업데이트 (도메인 객체 내부에서 부분 업데이트 처리)
+			existingAccommodation.update(request);
+			
+			// 업데이트된 숙소를 데이터베이스에 저장
+			accommodationRepository.update(existingAccommodation);
+			
+			log.info("Accommodation updated successfully for id: {}", request.getId());
+			
+		} catch (CustomException e) {
+			throw e;
+		} catch (DataAccessException e) {
+			log.error("Database error while updating accommodation id: {}", request.getId(), e);
+			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+		} catch (Exception e) {
+			log.error("Unexpected error while updating accommodation", e);
+			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+		}
+	}
+
+	// Helper methods for mapping updates
+
 }

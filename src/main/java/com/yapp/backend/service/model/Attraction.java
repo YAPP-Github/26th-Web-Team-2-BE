@@ -1,5 +1,6 @@
 package com.yapp.backend.service.model;
 
+import com.yapp.backend.controller.dto.request.update.AttractionUpdate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,4 +18,12 @@ public class Attraction {
     private String distance;
     private DistanceInfo byFoot;
     private DistanceInfo byCar;
+
+    public Attraction update(AttractionUpdate updates) {
+        this.name = updates.getName();
+        this.distance = updates.getDistance();
+        this.byFoot = updates.getByFoot();
+        this.byCar = updates.getByCar();
+        return this;
+    }
 }

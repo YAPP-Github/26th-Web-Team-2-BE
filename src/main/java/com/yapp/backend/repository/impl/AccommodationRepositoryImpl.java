@@ -77,6 +77,7 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 		return accommodationMapper.entityToDomain(accommodationEntity);
 	}
 
+
 	/**
 	 * 숙소 ID로 단건 조회합니다.
 	 */
@@ -110,6 +111,12 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	 */
 	private Accommodation convertToAccommodation(AccommodationEntity entity) {
 		return accommodationMapper.entityToDomain(entity);
+	}
+
+	@Override
+	public void update(Accommodation updatedAccommodation) {
+		AccommodationEntity accommodationEntity = accommodationMapper.domainToEntity(updatedAccommodation);
+		jpaAccommodationRepository.save(accommodationEntity);
 	}
 
 }
