@@ -35,4 +35,26 @@ public class TripBoard {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
         return startDate.format(formatter) + "~" + endDate.format(formatter);
     }
+
+    /**
+     * 시작일을 "yyyy.MM.dd" 형식으로 포맷팅하여 반환
+     */
+    public String getFormattedStartDate() {
+        if (startDate == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        return startDate.format(formatter);
+    }
+
+    /**
+     * 종료일을 "yyyy.MM.dd" 형식으로 포맷팅하여 반환
+     */
+    public String getFormattedEndDate() {
+        if (endDate == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        return endDate.format(formatter);
+    }
 }

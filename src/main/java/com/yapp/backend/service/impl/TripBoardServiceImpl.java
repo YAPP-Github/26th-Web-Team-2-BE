@@ -16,8 +16,11 @@ import com.yapp.backend.repository.entity.UserTripBoardEntity;
 import com.yapp.backend.repository.enums.TripBoardRole;
 import com.yapp.backend.repository.mapper.TripBoardMapper;
 import com.yapp.backend.repository.mapper.UserMapper;
+import com.yapp.backend.repository.mapper.UserTripBoardMapper;
 import com.yapp.backend.service.TripBoardService;
+import com.yapp.backend.service.model.TripBoard;
 import com.yapp.backend.service.model.User;
+import com.yapp.backend.service.model.UserTripBoard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -38,6 +41,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     private final JpaUserTripBoardRepository userTripBoardRepository;
     private final UserRepository userRepository;
     private final TripBoardMapper tripBoardMapper;
+    private final UserTripBoardMapper userTripBoardMapper;
     private final InvitationLinkGenerator invitationLinkGenerator;
     private final UserMapper userMapper;
 
@@ -90,26 +94,30 @@ public class TripBoardServiceImpl implements TripBoardService {
             UserTripBoardEntity savedUserTripBoard = userTripBoardRepository.save(userTripBoardEntity);
             log.debug("사용자-여행보드 매핑 저장 완료 - ID: {}", savedUserTripBoard.getId());
 
-            // 7. 응답 생성
+            // 7. Entity를 Domain Model로 변환
+            TripBoard tripBoardDomain = tripBoardMapper.entityToDomain(savedTripBoard);
+            UserTripBoard userTripBoardDomain = userTripBoardMapper.entityToDomain(savedUserTripBoard);
+
+            // 8. Domain Model을 이용해서 응답 DTO 생성
             TripBoardCreateResponse response = TripBoardCreateResponse.builder()
-                    .boardId(savedTripBoard.getId())
-                    .boardName(savedTripBoard.getBoardName())
-                    .destination(savedTripBoard.getDestination())
-                    .travelPeriod(savedTripBoard.getFormattedTravelPeriod())
-                    .startDate(savedTripBoard.getStartDate())
-                    .endDate(savedTripBoard.getEndDate())
-                    .invitationUrl(invitationUrl)
-                    .invitationActive(true)
+                    .boardId(tripBoardDomain.getId())
+                    .boardName(tripBoardDomain.getBoardName())
+                    .destination(tripBoardDomain.getDestination())
+                    .travelPeriod(tripBoardDomain.getFormattedTravelPeriod())
+                    .startDate(tripBoardDomain.getFormattedStartDate())
+                    .endDate(tripBoardDomain.getFormattedEndDate())
+                    .invitationUrl(userTripBoardDomain.getInvitationUrl())
+                    .invitationActive(userTripBoardDomain.getInvitationActive())
                     .creator(TripBoardCreateResponse.UserInfo.builder()
-                            .id(user.getId())
-                            .nickname(user.getNickname())
-                            .email(user.getEmail())
-                            .profileImage(user.getProfileImage())
+                            .id(tripBoardDomain.getCreatedBy().getId())
+                            .nickname(tripBoardDomain.getCreatedBy().getNickname())
+                            .email(tripBoardDomain.getCreatedBy().getEmail())
+                            .profileImage(tripBoardDomain.getCreatedBy().getProfileImage())
                             .build())
-                    .createdAt(savedTripBoard.getCreatedAt())
+                    .createdAt(tripBoardDomain.getCreatedAt())
                     .build();
 
-            log.info("여행 보드 생성 완료 - 보드 ID: {}, 사용자 ID: {}", savedTripBoard.getId(), userId);
+            log.info("여행 보드 생성 완료 - 보드 ID: {}, 사용자 ID: {}", tripBoardDomain.getId(), userId);
             return response;
 
         } catch (TripBoardParticipantLimitExceededException e) {

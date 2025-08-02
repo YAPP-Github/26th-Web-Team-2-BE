@@ -67,15 +67,4 @@ public class TripBoardEntity {
     )
     @Builder.Default
     private List<ComparisonTableEntity> comparisonTables = new ArrayList<>();
-
-    /**
-     * 여행 기간을 "yy.MM.dd~yy.MM.dd" 형식으로 포맷팅하여 반환
-     */
-    public String getFormattedTravelPeriod() {
-        if (startDate == null || endDate == null) {
-            return "";
-        }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
-        return startDate.format(formatter) + "~" + endDate.format(formatter);
-    }
 }

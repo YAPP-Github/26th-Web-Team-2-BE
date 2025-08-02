@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -17,8 +16,8 @@ public class TripBoardCreateResponse {
     private String boardName;
     private String destination;
     private String travelPeriod; // "25.08.14~08.16" 형식
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String startDate; // "2025.08.02" 형식
+    private String endDate; // "2025.08.02" 형식
     private String invitationUrl;
     private Boolean invitationActive;
     private UserInfo creator;
