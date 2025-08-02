@@ -10,7 +10,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -31,8 +33,17 @@ public class TripBoardEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "group_name")
-    private String groupName;
+    @Column(name = "board_name")
+    private String boardName;
+
+    @Column(name = "destination", length = 20, nullable = false)
+    private String destination;
+
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -50,11 +61,10 @@ public class TripBoardEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(
-            mappedBy = "tripBoardEntity"
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true
+    @OneToMany(mappedBy = "tripBoardEntity"
+    // cascade = CascadeType.ALL,
+    // orphanRemoval = true
     )
+    @Builder.Default
     private List<ComparisonTableEntity> comparisonTables = new ArrayList<>();
-
 }

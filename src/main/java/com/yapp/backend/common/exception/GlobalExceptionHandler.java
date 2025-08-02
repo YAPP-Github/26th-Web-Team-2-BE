@@ -30,6 +30,7 @@ public class GlobalExceptionHandler {
 		problemDetail.setDetail(detail);
 		return problemDetail;
 	}
+
 	private ProblemDetail createProblemDetail(ErrorCode errorCode) {
 		ProblemDetail problemDetail = ProblemDetail.forStatus(errorCode.getHttpStatus());
 		problemDetail.setTitle(errorCode.getTitle());
@@ -42,16 +43,15 @@ public class GlobalExceptionHandler {
 		log.error("Unhandled exception occurred", e);
 		Sentry.captureException(e);
 		String message = (e.getMessage() != null && !e.getMessage().isEmpty())
-			? e.getMessage()
-			: DEFAULT_ERROR_MESSAGE;
+				? e.getMessage()
+				: DEFAULT_ERROR_MESSAGE;
 
 		ProblemDetail problemDetail = createProblemDetail(
-			HttpStatus.INTERNAL_SERVER_ERROR,
-			"Internal Server Error",
-			message
-		);
+				HttpStatus.INTERNAL_SERVER_ERROR,
+				"Internal Server Error",
+				message);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-			.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 
 	@ExceptionHandler(CustomException.class)
@@ -61,44 +61,99 @@ public class GlobalExceptionHandler {
 		ErrorCode errorCode = e.getErrorCode();
 		ProblemDetail problemDetail = createProblemDetail(errorCode);
 		return ResponseEntity.status(errorCode.getHttpStatus())
-			.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
-	
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<StandardResponse<ProblemDetail>> handleValidationException(MethodArgumentNotValidException e) {
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleValidationException(
+			MethodArgumentNotValidException e) {
 		log.warn("Validation exception occurred", e);
 		Sentry.captureException(e);
-		
+
 		String errorMessage = e.getBindingResult().getFieldErrors().stream()
-			.map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
-			.collect(Collectors.joining(", "));
-		
+				.map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+				.collect(Collectors.joining(", "));
+
 		ProblemDetail problemDetail = createProblemDetail(
-			HttpStatus.BAD_REQUEST,
-			"Validation Failed",
-			errorMessage
-		);
-		
+				HttpStatus.BAD_REQUEST,
+				"Validation Failed",
+				errorMessage);
+
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
-	
+
 	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<StandardResponse<ProblemDetail>> handleConstraintViolationException(ConstraintViolationException e) {
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleConstraintViolationException(
+			ConstraintViolationException e) {
 		log.warn("Constraint violation exception occurred", e);
 		Sentry.captureException(e);
-		
+
 		String errorMessage = e.getConstraintViolations().stream()
-			.map(ConstraintViolation::getMessage)
-			.collect(Collectors.joining(", "));
-		
+				.map(ConstraintViolation::getMessage)
+				.collect(Collectors.joining(", "));
+
 		ProblemDetail problemDetail = createProblemDetail(
-			HttpStatus.BAD_REQUEST,
-			"Validation Failed",
-			errorMessage
-		);
-		
+				HttpStatus.BAD_REQUEST,
+				"Validation Failed",
+				errorMessage);
+
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
-} 
+
+	@ExceptionHandler(TripBoardCreationException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleTripBoardCreationException(
+			TripBoardCreationException e) {
+		log.warn("Trip board creation exception occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	@ExceptionHandler(TripBoardParticipantLimitExceededException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleTripBoardParticipantLimitExceededException(
+			TripBoardParticipantLimitExceededException e) {
+		log.warn("Trip board participant limit exceeded exception occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	@ExceptionHandler(DuplicateInvitationUrlException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleDuplicateInvitationUrlException(
+			DuplicateInvitationUrlException e) {
+		log.error("Duplicate invitation URL exception occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	@ExceptionHandler(InvalidDestinationException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleInvalidDestinationException(
+			InvalidDestinationException e) {
+		log.warn("Invalid destination exception occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	@ExceptionHandler(InvalidTravelPeriodException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleInvalidTravelPeriodException(
+			InvalidTravelPeriodException e) {
+		log.warn("Invalid travel period exception occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+}
