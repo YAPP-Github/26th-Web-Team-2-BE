@@ -72,4 +72,8 @@ public class ComparisonTableEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    public void update(ComparisonTable updatedComparison) {
+        this.tableName = updatedComparison.getTableName();
+        this.factors = updatedComparison.getFactors();
+    }
 }

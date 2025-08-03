@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CheckTime {
-    private String checkInTimeFrom;
-    private String checkInTimeTo;
-    private String checkOutTimeFrom;
-    private String checkOutTimeTo;
+    private String from;
+    private String to;
 }
