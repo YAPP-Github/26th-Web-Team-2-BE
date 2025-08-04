@@ -3,6 +3,7 @@ package com.yapp.backend.controller.docs;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
+import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,9 +11,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "여행 보드 API", description = "여행 보드 관련 API")
 public interface TripBoardDocs {
@@ -20,5 +24,11 @@ public interface TripBoardDocs {
         @Operation(summary = "여행 보드 생성", description = "새로운 여행 보드를 생성합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 생성자는 자동으로 OWNER 역할로 등록되며 고유한 초대 링크가 생성됩니다.")
         ResponseEntity<StandardResponse<TripBoardCreateResponse>> createTripBoard(
                         @RequestBody @Valid TripBoardCreateRequest request,
+                        @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
+
+        @Operation(summary = "여행 보드 목록 조회", description = "사용자가 참여한 여행 보드 목록을 페이징으로 조회합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 최신순으로 정렬된 결과를 반환합니다.")
+        ResponseEntity<StandardResponse<TripBoardPageResponse>> getTripBoards(
+                        @Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") @NotNull(message = "페이지 번호는 필수입니다.") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
+                        @Parameter(description = "페이지 크기", example = "10") @RequestParam(defaultValue = "10") @NotNull(message = "페이지 크기는 필수입니다.") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 }
