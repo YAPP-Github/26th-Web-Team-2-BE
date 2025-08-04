@@ -52,9 +52,9 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         }
 
         // TODO : request boardId에서 DB에서 실제 trip board data 가져오기
-        TripBoard tripGroup = TripBoard.builder()
+        TripBoard tripBoard = TripBoard.builder()
                 .id(request.getBoardId())
-                .name("테스트 여행 그룹 " + request.getBoardId())
+                .boardName("테스트 여행 그룹 " + request.getBoardId())
                 .createdBy(User.builder()
                         .id(userId)
                         .nickname("그룹생성자" + userId)
@@ -71,7 +71,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
                 ComparisonTable.from(
                         request.getTableName(),
                         userRepository.findByIdOrThrow(userId),
-                        tripGroup,
+                        tripBoard,
                         accommodationList,
                         factors
                 )
