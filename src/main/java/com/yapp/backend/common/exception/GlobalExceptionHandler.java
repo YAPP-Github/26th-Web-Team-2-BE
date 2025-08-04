@@ -156,4 +156,15 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(errorCode.getHttpStatus())
 				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
+
+	@ExceptionHandler(InvalidPagingParameterException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleInvalidPagingParameterException(
+			InvalidPagingParameterException e) {
+		log.warn("Invalid paging parameter exception occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
 }
