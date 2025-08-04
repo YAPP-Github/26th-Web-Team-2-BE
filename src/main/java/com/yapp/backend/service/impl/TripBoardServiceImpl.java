@@ -1,14 +1,20 @@
 package com.yapp.backend.service.impl;
 
 import com.yapp.backend.common.exception.InvalidDestinationException;
+import com.yapp.backend.common.exception.InvalidPagingParameterException;
 import com.yapp.backend.common.exception.InvalidTravelPeriodException;
 import com.yapp.backend.common.exception.TripBoardCreationException;
 import com.yapp.backend.common.exception.TripBoardParticipantLimitExceededException;
 import com.yapp.backend.common.util.InvitationLinkGenerator;
+import com.yapp.backend.common.util.PageUtil;
 import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
+import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
+import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
+import com.yapp.backend.controller.mapper.TripBoardSummaryMapper;
 import com.yapp.backend.repository.JpaTripBoardRepository;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
+import com.yapp.backend.repository.TripBoardRepository;
 import com.yapp.backend.repository.UserRepository;
 import com.yapp.backend.repository.entity.TripBoardEntity;
 import com.yapp.backend.repository.entity.UserEntity;
@@ -18,14 +24,22 @@ import com.yapp.backend.repository.mapper.TripBoardMapper;
 import com.yapp.backend.repository.mapper.UserMapper;
 import com.yapp.backend.repository.mapper.UserTripBoardMapper;
 import com.yapp.backend.service.TripBoardService;
+import com.yapp.backend.service.dto.ParticipantProfile;
+import com.yapp.backend.service.dto.TripBoardSummary;
 import com.yapp.backend.service.model.TripBoard;
 import com.yapp.backend.service.model.User;
 import com.yapp.backend.service.model.UserTripBoard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 여행 보드 도메인 서비스 구현체
@@ -37,13 +51,17 @@ public class TripBoardServiceImpl implements TripBoardService {
 
     private static final int MAX_PARTICIPANTS = 10;
 
-    private final JpaTripBoardRepository tripBoardRepository;
+    private final JpaTripBoardRepository jpaTripBoardRepository;
     private final JpaUserTripBoardRepository userTripBoardRepository;
+    private final TripBoardRepository tripBoardRepository;
     private final UserRepository userRepository;
+
+    private final UserMapper userMapper;
     private final TripBoardMapper tripBoardMapper;
     private final UserTripBoardMapper userTripBoardMapper;
+    private final TripBoardSummaryMapper tripBoardSummaryMapper;
+
     private final InvitationLinkGenerator invitationLinkGenerator;
-    private final UserMapper userMapper;
 
     /**
      * 여행 보드 생성
@@ -75,7 +93,7 @@ public class TripBoardServiceImpl implements TripBoardService {
                     .build();
 
             // 4. 여행 보드 저장
-            TripBoardEntity savedTripBoard = tripBoardRepository.save(tripBoardEntity);
+            TripBoardEntity savedTripBoard = jpaTripBoardRepository.save(tripBoardEntity);
             log.debug("여행 보드 저장 완료 - ID: {}", savedTripBoard.getId());
 
             // 5. 생성자용 고유 초대 링크 생성
@@ -153,4 +171,57 @@ public class TripBoardServiceImpl implements TripBoardService {
             throw new InvalidDestinationException();
         }
     }
+
+    /**
+     * 사용자가 참여한 여행 보드 목록 조회
+     * 페이징과 정렬을 지원하며, 최신순으로 정렬됩니다.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public TripBoardPageResponse getTripBoards(Long userId, Pageable pageable) {
+        try {
+            log.info("여행 보드 목록 조회 시작 - 사용자 ID: {}, 페이지: {}, 크기: {}",
+                    userId, pageable.getPageNumber(), pageable.getPageSize());
+
+            // 1. 페이징 파라미터 유효성 검증
+            PageUtil.validatePagingParameters(pageable);
+
+            // 2. Repository 계층에서 페이징된 여행보드 조회 (최신순 정렬)
+            Page<TripBoardSummary> tripBoardPage = tripBoardRepository.findTripBoardsByUser(userId, pageable);
+
+            // 3. 참여자 프로필 정보를 조회 (N+1 문제 방지)
+            List<Long> tripBoardIds = tripBoardPage.getContent().stream()
+                    .map(TripBoardSummary::getBoardId)
+                    .collect(Collectors.toList());
+
+            List<ParticipantProfile> participantProfiles = tripBoardRepository
+                    .findParticipantsByTripBoardIds(tripBoardIds);
+
+            // 4. 응답 DTO 변환
+            List<TripBoardSummaryResponse> content = tripBoardSummaryMapper
+                    .toResponseList(tripBoardPage.getContent(), participantProfiles);
+
+            // 5. 무한 스크롤 응답 생성
+            TripBoardPageResponse response = TripBoardPageResponse.builder()
+                    .tripBoards(content)
+                    .hasNext(tripBoardPage.hasNext())
+                    .build();
+
+            log.info("여행 보드 목록 조회 완료 - 사용자 ID: {}, 조회된 개수: {}, 전체 개수: {}",
+                    userId, content.size(), tripBoardPage.getTotalElements());
+
+            return response;
+
+        } catch (InvalidPagingParameterException e) {
+            log.error("여행 보드 목록 조회 실패 - 잘못된 페이징 파라미터: 사용자 ID: {}", userId, e);
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("여행 보드 목록 조회 중 데이터베이스 오류 발생 - 사용자 ID: {}", userId, e);
+            throw new RuntimeException("여행 보드 목록 조회에 실패했습니다.", e);
+        } catch (Exception e) {
+            log.error("여행 보드 목록 조회 중 예상치 못한 오류 발생 - 사용자 ID: {}", userId, e);
+            throw new RuntimeException("여행 보드 목록 조회에 실패했습니다.", e);
+        }
+    }
+
 }
