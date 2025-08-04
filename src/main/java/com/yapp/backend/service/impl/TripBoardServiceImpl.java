@@ -117,23 +117,7 @@ public class TripBoardServiceImpl implements TripBoardService {
             UserTripBoard userTripBoardDomain = userTripBoardMapper.entityToDomain(savedUserTripBoard);
 
             // 8. Domain Model을 이용해서 응답 DTO 생성
-            TripBoardCreateResponse response = TripBoardCreateResponse.builder()
-                    .boardId(tripBoardDomain.getId())
-                    .boardName(tripBoardDomain.getBoardName())
-                    .destination(tripBoardDomain.getDestination())
-                    .travelPeriod(tripBoardDomain.getFormattedTravelPeriod())
-                    .startDate(tripBoardDomain.getFormattedStartDate())
-                    .endDate(tripBoardDomain.getFormattedEndDate())
-                    .invitationUrl(userTripBoardDomain.getInvitationUrl())
-                    .invitationActive(userTripBoardDomain.getInvitationActive())
-                    .creator(TripBoardCreateResponse.UserInfo.builder()
-                            .id(tripBoardDomain.getCreatedBy().getId())
-                            .nickname(tripBoardDomain.getCreatedBy().getNickname())
-                            .email(tripBoardDomain.getCreatedBy().getEmail())
-                            .profileImage(tripBoardDomain.getCreatedBy().getProfileImage())
-                            .build())
-                    .createdAt(tripBoardDomain.getCreatedAt())
-                    .build();
+            TripBoardCreateResponse response = TripBoardCreateResponse.from(tripBoardDomain, userTripBoardDomain);
 
             log.info("여행 보드 생성 완료 - 보드 ID: {}, 사용자 ID: {}", tripBoardDomain.getId(), userId);
             return response;
