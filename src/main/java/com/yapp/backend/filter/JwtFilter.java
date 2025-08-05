@@ -43,8 +43,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 || uri.startsWith("/v3/api-docs")
                 || uri.startsWith("/api/comparison/factors")
                 || uri.startsWith("/api/oauth/kakao")
-                // todo UT 이후 제거 필요
-                || uri.startsWith("/api")
                 ;
     }
 
