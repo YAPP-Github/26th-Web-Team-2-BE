@@ -72,6 +72,7 @@ public class SecurityConfig {
                                                 .requestMatchers(
                                                                 "/",
                                                                 "/api/**",
+                                                                "/login/oauth2/**",
                                                                 "/oauth/authorize" // OAuth2 Authorization Endpoint
                                                 ).permitAll()
                                                 .anyRequest().authenticated())

@@ -1,6 +1,6 @@
 package com.yapp.backend.service;
 
-import com.yapp.backend.controller.dto.response.OauthTokenResponse;
+import com.yapp.backend.controller.dto.response.OauthLoginResponse;
 
 public interface OauthService {
     
@@ -19,5 +19,10 @@ public interface OauthService {
      * @param code OAuth 공급자에서 발급받은 인가 코드
      * @return JWT 토큰 응답
      */
-    OauthTokenResponse exchangeCodeForToken(String provider, String code);
+    OauthLoginResponse exchangeCodeForToken(String provider, String code);
+
+    /**
+     * 토큰 정보를 담는 레코드
+     */
+    record TokenInfo(String accessToken, String refreshToken) {}
 }

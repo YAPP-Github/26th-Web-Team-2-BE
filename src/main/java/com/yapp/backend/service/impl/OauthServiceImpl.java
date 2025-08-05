@@ -1,7 +1,7 @@
 package com.yapp.backend.service.impl;
 
 import com.yapp.backend.common.util.JwtTokenProvider;
-import com.yapp.backend.controller.dto.response.OauthTokenResponse;
+import com.yapp.backend.controller.dto.response.OauthLoginResponse;
 import com.yapp.backend.filter.dto.SocialUserInfo;
 import com.yapp.backend.service.OauthService;
 import com.yapp.backend.service.UserLoginService;
@@ -42,7 +42,7 @@ public class OauthServiceImpl implements OauthService {
     }
     
     @Override
-    public OauthTokenResponse exchangeCodeForToken(String provider, String code) {
+    public OauthLoginResponse exchangeCodeForToken(String provider, String code) {
         try {
             OAuthCodeUserInfoProvider userInfoProvider = getProviderOrThrow(provider);
             
@@ -55,11 +55,11 @@ public class OauthServiceImpl implements OauthService {
             // 3. 사용자 저장 또는 조회
             User user = userLoginService.handleOAuthLogin(socialUser);
             
-            // 4. JWT 토큰 발급
-            String accessToken = jwtTokenProvider.createAccessToken(user.getId());
-            String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
-            
-            return new OauthTokenResponse(user.getId(), accessToken, refreshToken);
+            // 4. 사용자 정보로 응답 생성 (토큰은 컨트롤러에서 쿠키로 설정)
+            return new OauthLoginResponse(
+                    user.getId(),
+                    socialUserInfo.getNickname()
+            );
             
         } catch (KakaoOAuthException e) {
             log.warn("{} OAuth 처리 중 카카오 OAuth 예외 발생: {}", provider, e.getMessage());
@@ -69,7 +69,7 @@ public class OauthServiceImpl implements OauthService {
             throw new RuntimeException(provider + " OAuth 토큰 교환 중 예상치 못한 오류가 발생했습니다.", e);
         }
     }
-    
+
     private OAuthCodeUserInfoProvider getProviderOrThrow(String provider) {
         OAuthCodeUserInfoProvider userInfoProvider = providers.get(provider);
         if (userInfoProvider == null) {

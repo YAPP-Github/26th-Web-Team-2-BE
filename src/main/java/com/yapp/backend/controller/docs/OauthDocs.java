@@ -1,14 +1,15 @@
 package com.yapp.backend.controller.docs;
 
 import com.yapp.backend.common.response.StandardResponse;
-import com.yapp.backend.controller.dto.request.OauthTokenRequest;
 import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
-import com.yapp.backend.controller.dto.response.OauthTokenResponse;
+import com.yapp.backend.controller.dto.response.OauthLoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "OAUTH API", description = "소셜 로그인 API - 확장 가능한 어댑터 패턴 구조")
 public interface OauthDocs {
@@ -25,12 +26,17 @@ public interface OauthDocs {
 
     @Operation(
             summary = "카카오 OAuth 토큰 교환",
-            description = "카카오에서 발급받은 인가 코드를 통해 액세스 토큰을 획득하고, 사용자 정보를 조회하여 JWT 토큰을 발급합니다."
+            description = "카카오에서 발급받은 인가 코드를 통해 액세스 토큰을 획득하고, 사용자 정보를 조회하여 JWT 토큰을 쿠키로 설정합니다. " +
+                         "JWT 토큰은 HttpOnly 쿠키로 전달되며, 응답 바디에는 사용자 정보만 포함됩니다. " +
+                         "인가 코드는 Request Body 또는 Query Parameter로 전달할 수 있습니다."
     )
     @ApiResponse(
             responseCode = "200", 
-            description = "JWT 토큰이 성공적으로 발급됩니다."
+            description = "JWT 토큰이 쿠키로 성공적으로 설정되고, 사용자 정보가 반환됩니다."
     )
-    ResponseEntity<StandardResponse<OauthTokenResponse>> exchangeKakaoToken(@RequestBody OauthTokenRequest request);
+    ResponseEntity<StandardResponse<OauthLoginResponse>> exchangeKakaoToken(
+            @RequestParam(value = "code", required = false) String codeParam,
+            @Parameter(hidden = true) HttpServletResponse response
+    );
 
 }

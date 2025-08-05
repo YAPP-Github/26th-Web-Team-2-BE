@@ -2,21 +2,21 @@ package com.yapp.backend.controller;
 
 import static com.yapp.backend.common.response.ResponseType.*;
 
-import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
+import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.controller.docs.OauthDocs;
-import com.yapp.backend.controller.dto.request.OauthTokenRequest;
 import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
-import com.yapp.backend.controller.dto.response.OauthTokenResponse;
+import com.yapp.backend.controller.dto.response.OauthLoginResponse;
 import com.yapp.backend.service.OauthService;
-import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OauthController implements OauthDocs {
 
     private final OauthService oauthService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 카카오 OAuth 인가 URL을 반환합니다.
@@ -40,15 +41,32 @@ public class OauthController implements OauthDocs {
     }
 
     /**
-     * 카카오 인가 코드를 통해 토큰을 교환하고 JWT를 발급합니다.
+     * 카카오 인가 코드를 통해 토큰을 교환하고 JWT를 쿠키로 설정합니다.
+     * Request Body 또는 Query Parameter 모두 지원합니다.
      *
-     * @param request 인가 코드가 포함된 요청
-     * @return JWT 토큰 응답
+     * @param code 인가 코드 Query Parameter (선택사항)
+     * @param response HTTP 응답 (쿠키 설정용)
+     * @return 사용자 정보 응답 (토큰은 쿠키로 전달)
      */
     @Override
     @PostMapping("/kakao/token")
-    public ResponseEntity<StandardResponse<OauthTokenResponse>> exchangeKakaoToken(@Valid @RequestBody OauthTokenRequest request) {
-        OauthTokenResponse response = oauthService.exchangeCodeForToken("kakao", request.code());
-        return ResponseEntity.ok(new StandardResponse<>(SUCCESS, response));
+    public ResponseEntity<StandardResponse<OauthLoginResponse>> exchangeKakaoToken(
+            @RequestParam(value = "code", required = false) String code,
+            HttpServletResponse response) {
+        
+        // 1. OAuth 인증 처리 및 사용자 정보 조회
+        OauthLoginResponse oauthResponse = oauthService.exchangeCodeForToken("kakao", code);
+        
+        // 2. 쿠키로 토큰 설정
+        ResponseCookie accessTokenCookie = jwtTokenProvider.generateAccessTokenCookie(oauthResponse.userId());
+        ResponseCookie refreshTokenCookie = jwtTokenProvider.generateRefreshTokenCookie(oauthResponse.userId());
+        
+        // 3. HTTP 응답에 쿠키 추가
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+        
+        // 4. 사용자 정보만 응답 바디로 반환 (토큰은 쿠키로 전달됨)
+        return ResponseEntity.ok(new StandardResponse<>(SUCCESS, oauthResponse));
     }
+    
 }
