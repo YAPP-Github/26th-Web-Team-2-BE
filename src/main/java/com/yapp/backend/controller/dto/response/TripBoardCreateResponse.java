@@ -1,5 +1,6 @@
 package com.yapp.backend.controller.dto.response;
 
+import com.yapp.backend.common.util.DateUtil;
 import com.yapp.backend.service.model.TripBoard;
 import com.yapp.backend.service.model.UserTripBoard;
 import lombok.AllArgsConstructor;
@@ -44,9 +45,9 @@ public class TripBoardCreateResponse {
                 .boardId(tripBoard.getId())
                 .boardName(tripBoard.getBoardName())
                 .destination(tripBoard.getDestination())
-                .travelPeriod(tripBoard.getFormattedTravelPeriod())
-                .startDate(tripBoard.getFormattedStartDate())
-                .endDate(tripBoard.getFormattedEndDate())
+                .travelPeriod(DateUtil.formatTravelPeriod(tripBoard.getStartDate(), tripBoard.getEndDate()))
+                .startDate(DateUtil.formatFullDate(tripBoard.getStartDate()))
+                .endDate(DateUtil.formatFullDate(tripBoard.getEndDate()))
                 .invitationUrl(userTripBoard.getInvitationUrl())
                 .invitationActive(userTripBoard.getInvitationActive())
                 .creator(UserInfo.builder()

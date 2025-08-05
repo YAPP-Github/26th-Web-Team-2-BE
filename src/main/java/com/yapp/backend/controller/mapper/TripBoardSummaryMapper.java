@@ -39,6 +39,7 @@ public class TripBoardSummaryMapper {
                 .destination(tripBoardSummary.getDestination())
                 .startDate(tripBoardSummary.getStartDate())
                 .endDate(tripBoardSummary.getEndDate())
+                .travelPeriod(tripBoardSummary.getTravelPeriod())
                 .userRole(tripBoardSummary.getUserRole())
                 .participantCount(participants.size())
                 .participants(participants)

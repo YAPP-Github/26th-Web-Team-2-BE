@@ -1,5 +1,6 @@
 package com.yapp.backend.repository.mapper;
 
+import com.yapp.backend.common.util.DateUtil;
 import com.yapp.backend.repository.entity.TripBoardEntity;
 import com.yapp.backend.repository.entity.UserTripBoardEntity;
 import com.yapp.backend.service.dto.ParticipantProfile;
@@ -79,6 +80,7 @@ public class UserTripBoardMapper {
                 .destination(tripBoard.getDestination())
                 .startDate(tripBoard.getStartDate())
                 .endDate(tripBoard.getEndDate())
+                .travelPeriod(DateUtil.formatTravelPeriod(tripBoard.getStartDate(), tripBoard.getEndDate()))
                 .userRole(userTripBoard.getRole())
                 .createdAt(tripBoard.getCreatedAt())
                 .updatedAt(tripBoard.getUpdatedAt())

@@ -24,20 +24,8 @@ public class TripBoardSummary {
     private String destination;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String travelPeriod; // "25.08.14~08.16" 형식
     private TripBoardRole userRole;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    /**
-     * 여행 기간을 "yy.MM.dd~yy.MM.dd" 형식으로 포맷팅하여 반환
-     * 
-     * @return 포맷팅된 여행 기간 문자열 (예: "25.08.14~25.08.16")
-     */
-    public String getTravelPeriod() {
-        if (startDate == null || endDate == null) {
-            return "";
-        }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
-        return startDate.format(formatter) + "~" + endDate.format(formatter);
-    }
 }
