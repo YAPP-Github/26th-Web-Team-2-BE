@@ -9,8 +9,4 @@ public class InvalidPagingParameterException extends CustomException {
     public InvalidPagingParameterException() {
         super(ErrorCode.INVALID_PAGING_PARAMETER);
     }
-
-    public InvalidPagingParameterException(String customMessage) {
-        super(ErrorCode.INVALID_PAGING_PARAMETER);
-    }
 }
