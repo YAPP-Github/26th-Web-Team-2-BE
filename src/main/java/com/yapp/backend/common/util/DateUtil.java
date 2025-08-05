@@ -1,18 +1,11 @@
 package com.yapp.backend.common.util;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
  * 날짜 관련 유틸리티 클래스
  */
-@Slf4j
-@Component
-@RequiredArgsConstructor
 public class DateUtil {
 
     private static final DateTimeFormatter SHORT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yy.MM.dd");

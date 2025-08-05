@@ -1,17 +1,13 @@
 package com.yapp.backend.common.util;
 
 import com.yapp.backend.common.exception.InvalidPagingParameterException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 
 /**
  * 페이징 관련 유틸리티 클래스
  */
 @Slf4j
-@Component
-@RequiredArgsConstructor
 public class PageUtil {
 
     // todo 페이지 사이즈 제한 확인 및 Controller layer 유효성 검증 확인 필요
