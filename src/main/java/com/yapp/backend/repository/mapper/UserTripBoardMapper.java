@@ -97,6 +97,7 @@ public class UserTripBoardMapper {
         return new ParticipantProfile(
                 userTripBoard.getTripBoard().getId(),
                 userTripBoard.getUser().getId(),
+                userTripBoard.getUser().getNickname(),
                 userTripBoard.getUser().getProfileImage(),
                 userTripBoard.getRole());
     }

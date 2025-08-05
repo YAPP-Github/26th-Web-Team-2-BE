@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class ParticipantProfile {
     private Long tripBoardId;
     private Long userId;
+    private String nickname;
     private String profileImageUrl;
     private TripBoardRole role;
 }

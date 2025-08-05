@@ -57,6 +57,7 @@ public class TripBoardSummaryMapper {
         return ParticipantProfileResponse.builder()
                 .userId(profile.getUserId())
                 .profileImageUrl(profile.getProfileImageUrl())
+                .nickname(profile.getNickname())
                 .role(profile.getRole())
                 .build();
     }

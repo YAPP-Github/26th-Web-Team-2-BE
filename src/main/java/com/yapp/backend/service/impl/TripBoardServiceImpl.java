@@ -173,11 +173,12 @@ public class TripBoardServiceImpl implements TripBoardService {
             // 2. Repository 계층에서 페이징된 여행보드 조회 (최신순 정렬)
             Page<TripBoardSummary> tripBoardPage = tripBoardRepository.findTripBoardsByUser(userId, pageable);
 
-            // 3. 참여자 프로필 정보를 조회 (N+1 문제 방지)
+            // 3. 유저가 참여한 보드 ID 목록 조회
             List<Long> tripBoardIds = tripBoardPage.getContent().stream()
                     .map(TripBoardSummary::getBoardId)
                     .collect(Collectors.toList());
 
+            // 4. 보드들에 참여한 모든 유저 ID 조회
             List<ParticipantProfile> participantProfiles = tripBoardRepository
                     .findParticipantsByTripBoardIds(tripBoardIds);
 
