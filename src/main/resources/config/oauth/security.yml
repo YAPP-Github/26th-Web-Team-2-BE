@@ -1,6 +1,5 @@
 spring:
   security:
-    base-url: ${BASE_URL}
     oauth2:
       client:
         registration:
