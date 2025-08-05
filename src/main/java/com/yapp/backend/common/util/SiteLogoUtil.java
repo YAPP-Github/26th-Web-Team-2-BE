@@ -1,11 +1,18 @@
 package com.yapp.backend.common.util;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 사이트명에 따른 로고 URL을 제공하는 유틸리티 클래스
  */
+@Slf4j
+@Component
+@RequiredArgsConstructor
 public class SiteLogoUtil {
 
     private static final Map<String, String> SITE_LOGO_MAP = new HashMap<>();
