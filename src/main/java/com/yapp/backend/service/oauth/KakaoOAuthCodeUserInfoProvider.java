@@ -28,11 +28,6 @@ public class KakaoOAuthCodeUserInfoProvider implements OAuthCodeUserInfoProvider
     @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
     private String kakaoClientSecret;
     
-    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-    private String kakaoRedirectUri;
-    
-    // OAuth Properties에서 스코프를 가져오도록 변경
-    
     private static final String KAKAO_AUTHORIZE_URL = "https://kauth.kakao.com/oauth/authorize";
     
     @Override
@@ -41,10 +36,12 @@ public class KakaoOAuthCodeUserInfoProvider implements OAuthCodeUserInfoProvider
     }
     
     @Override
-    public String generateAuthorizeUrl() {
-        return UriComponentsBuilder.fromHttpUrl(KAKAO_AUTHORIZE_URL)
+    public String generateAuthorizeUrl(String baseUrl) {
+        String redirectUri = baseUrl + "/login/oauth2/code/kakao";
+        
+        return UriComponentsBuilder.fromUriString(KAKAO_AUTHORIZE_URL)
                 .queryParam("client_id", kakaoClientId)
-                .queryParam("redirect_uri", kakaoRedirectUri)
+                .queryParam("redirect_uri", redirectUri)
                 .queryParam("response_type", "code")
                 .queryParam("scope", "profile_nickname,profile_image")
                 .build()
@@ -52,14 +49,16 @@ public class KakaoOAuthCodeUserInfoProvider implements OAuthCodeUserInfoProvider
     }
     
     @Override
-    public SocialUserInfo getUserInfoByCode(String code) {
+    public SocialUserInfo getUserInfoByCode(String code, String baseUrl) {
         try {
+            String redirectUri = baseUrl + "/login/oauth2/code/kakao";
+            
             // 1. 카카오에서 액세스 토큰 획득
             KakaoTokenResponse kakaoTokenResponse = kakaoOauthClient.getAccessToken(
                     "authorization_code",
                     kakaoClientId,
                     kakaoClientSecret,
-                    kakaoRedirectUri,
+                    redirectUri,
                     code
             );
 

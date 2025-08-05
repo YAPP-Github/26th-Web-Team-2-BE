@@ -20,14 +20,16 @@ public interface OAuthCodeUserInfoProvider {
      * 공통 SocialUserInfo 객체로 변환합니다.
      * 
      * @param code OAuth 인가 코드
+     * @param baseUrl 클라이언트의 베이스 URL (토큰 교환 시 redirect_uri 생성용)
      * @return 공통 사용자 정보 객체
      */
-    SocialUserInfo getUserInfoByCode(String code);
+    SocialUserInfo getUserInfoByCode(String code, String baseUrl);
     
     /**
      * OAuth 인가 URL을 생성합니다.
      * 
+     * @param baseUrl 클라이언트의 베이스 URL (예: http://localhost:3000)
      * @return OAuth 인가 URL
      */
-    String generateAuthorizeUrl();
+    String generateAuthorizeUrl(String baseUrl);
 }

@@ -34,8 +34,9 @@ public class OauthController implements OauthDocs {
      */
     @Override
     @GetMapping("/kakao/authorize")
-    public ResponseEntity<StandardResponse<AuthorizeUrlResponse>> getKakaoAuthorizeUrl() {
-        String authorizeUrl = oauthService.generateAuthorizeUrl("kakao");
+    public ResponseEntity<StandardResponse<AuthorizeUrlResponse>> getKakaoAuthorizeUrl(
+            @RequestParam("baseUrl") String baseUrl) {
+        String authorizeUrl = oauthService.generateAuthorizeUrl("kakao", baseUrl);
         AuthorizeUrlResponse response = new AuthorizeUrlResponse(authorizeUrl);
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, response));
     }
@@ -44,18 +45,20 @@ public class OauthController implements OauthDocs {
      * 카카오 인가 코드를 통해 토큰을 교환하고 JWT를 쿠키로 설정합니다.
      * Request Body 또는 Query Parameter 모두 지원합니다.
      *
-     * @param code 인가 코드 Query Parameter (선택사항)
+     * @param code 인가 코드 Query Parameter
+     * @param baseUrl 클라이언트의 베이스 URL (토큰 교환 시 redirect_uri 생성용)
      * @param response HTTP 응답 (쿠키 설정용)
      * @return 사용자 정보 응답 (토큰은 쿠키로 전달)
      */
     @Override
     @PostMapping("/kakao/token")
     public ResponseEntity<StandardResponse<OauthLoginResponse>> exchangeKakaoToken(
-            @RequestParam(value = "code", required = false) String code,
+            @RequestParam("code") String code,
+            @RequestParam("baseUrl") String baseUrl,
             HttpServletResponse response) {
         
         // 1. OAuth 인증 처리 및 사용자 정보 조회
-        OauthLoginResponse oauthResponse = oauthService.exchangeCodeForToken("kakao", code);
+        OauthLoginResponse oauthResponse = oauthService.exchangeCodeForToken("kakao", code, baseUrl);
         
         // 2. 쿠키로 토큰 설정
         ResponseCookie accessTokenCookie = jwtTokenProvider.generateAccessTokenCookie(oauthResponse.userId());

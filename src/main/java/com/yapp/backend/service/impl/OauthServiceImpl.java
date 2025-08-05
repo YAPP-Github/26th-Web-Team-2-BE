@@ -36,18 +36,18 @@ public class OauthServiceImpl implements OauthService {
     }
     
     @Override
-    public String generateAuthorizeUrl(String provider) {
+    public String generateAuthorizeUrl(String provider, String baseUrl) {
         OAuthCodeUserInfoProvider userInfoProvider = getProviderOrThrow(provider);
-        return userInfoProvider.generateAuthorizeUrl();
+        return userInfoProvider.generateAuthorizeUrl(baseUrl);
     }
     
     @Override
-    public OauthLoginResponse exchangeCodeForToken(String provider, String code) {
+    public OauthLoginResponse exchangeCodeForToken(String provider, String code, String baseUrl) {
         try {
             OAuthCodeUserInfoProvider userInfoProvider = getProviderOrThrow(provider);
             
             // 1. 공급자별 어댑터를 통해 사용자 정보 조회
-            SocialUserInfo socialUserInfo = userInfoProvider.getUserInfoByCode(code);
+            SocialUserInfo socialUserInfo = userInfoProvider.getUserInfoByCode(code, baseUrl);
 
             // 2. SocialUserInfo를 User 객체로 변환
             User socialUser = socialUserInfo.toModel();
