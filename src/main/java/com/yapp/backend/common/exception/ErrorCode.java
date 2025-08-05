@@ -42,7 +42,9 @@ public enum ErrorCode {
     INVALID_AUTHORIZATION_CODE("인가 코드 오류", "인가 코드가 유효하지 않거나 이미 사용되었습니다. 새로운 인가 코드를 발급받아 주세요.", HttpStatus.BAD_REQUEST),
     OAUTH_PARAMETER_ERROR("OAuth 파라미터 오류", "OAuth 요청 파라미터가 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     OAUTH_CLIENT_AUTH_ERROR("OAuth 클라이언트 인증 오류", "OAuth 클라이언트 인증에 실패했습니다. 클라이언트 정보를 확인해 주세요.", HttpStatus.UNAUTHORIZED),
-    OAUTH_TOKEN_EXCHANGE_FAILED("OAuth 토큰 교환 실패", "OAuth 토큰 교환 과정에서 오류가 발생했습니다.", HttpStatus.BAD_REQUEST)
+    OAUTH_TOKEN_EXCHANGE_FAILED("OAuth 토큰 교환 실패", "OAuth 토큰 교환 과정에서 오류가 발생했습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_OAUTH_BASE_URL("허용되지 않은 Base URL", "OAuth 요청에서 허용되지 않은 Base URL이 사용되었습니다. 관리자에게 문의하세요.", HttpStatus.FORBIDDEN),
+    UNSUPPORTED_OAUTH_PROVIDER("지원하지 않는 OAuth 공급자", "요청한 OAuth 공급자는 현재 지원되지 않습니다. 지원 가능한 공급자를 확인해 주세요.", HttpStatus.BAD_REQUEST)
     // 필요에 따라 추가
     ;
 

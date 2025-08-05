@@ -15,6 +15,8 @@ import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.common.exception.oauth.KakaoOAuthException;
 import com.yapp.backend.common.exception.oauth.InvalidAuthorizationCodeException;
+import com.yapp.backend.common.exception.oauth.InvalidBaseUrlException;
+import com.yapp.backend.common.exception.oauth.UnsupportedOAuthProviderException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -176,6 +178,32 @@ public class GlobalExceptionHandler {
 			InvalidAuthorizationCodeException e) {
 		log.warn("Authorization Code Exception: {} - Kakao ErrorCode: {}", e.getMessage(), e.getKakaoErrorCode(), e);
 
+		Sentry.captureException(e);
+		
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	@ExceptionHandler(InvalidBaseUrlException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleInvalidBaseUrlException(
+			InvalidBaseUrlException e) {
+		log.warn("Invalid Base URL Exception: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	@ExceptionHandler(UnsupportedOAuthProviderException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleUnsupportedOAuthProviderException(
+			UnsupportedOAuthProviderException e) {
+		log.warn("Unsupported OAuth Provider Exception: {}", e.getMessage(), e);
 		Sentry.captureException(e);
 		
 		ErrorCode errorCode = e.getErrorCode();
