@@ -66,10 +66,8 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
             return List.of();
         }
 
-        // JpaRepository를 사용하여 참여자 정보 조회
-        List<UserTripBoardEntity> userTripBoards = tripBoardIds.stream()
-                .flatMap(tripBoardId -> jpaUserTripBoardRepository.findByTripBoardIdWithUser(tripBoardId).stream())
-                .toList();
+        // IN 절을 사용하여 한 번의 쿼리로 모든 참여자 정보 조회
+        List<UserTripBoardEntity> userTripBoards = jpaUserTripBoardRepository.findByTripBoardIdsWithUser(tripBoardIds);
 
         // UserTripBoardEntity를 ParticipantProfile로 변환
         return userTripBoards.stream()
