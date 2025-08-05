@@ -62,8 +62,8 @@ public class TripBoardController implements TripBoardDocs {
     @Override
     @GetMapping("/search")
     public ResponseEntity<StandardResponse<TripBoardPageResponse>> getTripBoards(
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam Integer page,
+            @RequestParam Integer size,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         // JWT 인증을 통한 현재 사용자 정보 추출

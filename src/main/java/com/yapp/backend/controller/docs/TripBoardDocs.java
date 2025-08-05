@@ -8,6 +8,8 @@ import com.yapp.backend.filter.dto.CustomUserDetails;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
@@ -28,7 +30,7 @@ public interface TripBoardDocs {
 
         @Operation(summary = "여행 보드 목록 조회", description = "사용자가 참여한 여행 보드 목록을 페이징으로 조회합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 최신순으로 정렬된 결과를 반환합니다.")
         ResponseEntity<StandardResponse<TripBoardPageResponse>> getTripBoards(
-                        @Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") @NotNull(message = "페이지 번호는 필수입니다.") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
-                        @Parameter(description = "페이지 크기", example = "10") @RequestParam(defaultValue = "10") @NotNull(message = "페이지 크기는 필수입니다.") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size,
+                @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 번호") @NotNull(message = "페이지 번호는 필수입니다.") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
+                @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 크기") @NotNull(message = "페이지 크기는 필수입니다.") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 }
