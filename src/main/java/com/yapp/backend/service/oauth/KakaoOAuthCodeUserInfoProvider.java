@@ -62,13 +62,11 @@ public class KakaoOAuthCodeUserInfoProvider implements OAuthCodeUserInfoProvider
                     kakaoRedirectUri,
                     code
             );
-            log.info("카카오 토큰 발급 성공: {}", kakaoTokenResponse.accessToken());
-            
+
             // 2. 액세스 토큰으로 사용자 정보 조회
             String authorization = "Bearer " + kakaoTokenResponse.accessToken();
             KakaoUserInfoResponse userInfo = kakaoApiClient.getUserInfo(authorization);
-            log.info("카카오 사용자 정보 조회 성공: {}", userInfo.id());
-            
+
             // 3. 공통 SocialUserInfo 객체로 변환
             return new SocialUserInfo(
                     getProviderKey(),
