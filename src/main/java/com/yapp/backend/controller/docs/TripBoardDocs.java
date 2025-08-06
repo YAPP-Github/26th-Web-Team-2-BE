@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
@@ -26,17 +27,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface TripBoardDocs {
 
         @Operation(summary = "여행 보드 생성", description = "새로운 여행 보드를 생성합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 생성자는 자동으로 OWNER 역할로 등록되며 고유한 초대 링크가 생성됩니다.")
+        @SecurityRequirement(name = "JWT")
         ResponseEntity<StandardResponse<TripBoardCreateResponse>> createTripBoard(
                         @RequestBody @Valid TripBoardCreateRequest request,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 
         @Operation(summary = "여행 보드 목록 조회", description = "사용자가 참여한 여행 보드 목록을 페이징으로 조회합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 최신순으로 정렬된 결과를 반환합니다.")
+        @SecurityRequirement(name = "JWT")
         ResponseEntity<StandardResponse<TripBoardPageResponse>> getTripBoards(
                         @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 번호") @NotNull(message = "페이지 번호는 필수입니다.") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
                         @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 크기") @NotNull(message = "페이지 크기는 필수입니다.") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 
         @Operation(summary = "여행 보드 수정", description = "기존 여행 보드의 기본 정보(보드 이름, 목적지, 여행 기간)를 수정합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 수정된 보드 정보를 반환합니다.")
+        @SecurityRequirement(name = "JWT")
         ResponseEntity<StandardResponse<TripBoardUpdateResponse>> updateTripBoard(
                         @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
                         @RequestBody @Valid TripBoardUpdateRequest request,
