@@ -229,7 +229,7 @@ public class TripBoardServiceImpl implements TripBoardService {
             validateDestination(request.getDestination());
 
             // 2. 여행보드 존재 여부 확인
-            TripBoard existingTripBoard = tripBoardRepository.findById(tripBoardId)
+            tripBoardRepository.findById(tripBoardId)
                     .orElseThrow(() -> {
                         log.warn("존재하지 않는 여행보드 수정 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
                         return new TripBoardNotFoundException();
