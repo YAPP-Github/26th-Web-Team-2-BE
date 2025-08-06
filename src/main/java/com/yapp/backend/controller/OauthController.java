@@ -1,6 +1,7 @@
 package com.yapp.backend.controller;
 
 import static com.yapp.backend.common.response.ResponseType.*;
+import static com.yapp.backend.filter.JwtFilter.ACCESS_TOKEN_HEADER;
 
 import com.google.common.net.HttpHeaders;
 import com.yapp.backend.common.response.StandardResponse;
@@ -28,9 +29,6 @@ public class OauthController implements OauthDocs {
     private final OauthService oauthService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
-
-    private static final String ACCESS_TOKEN_PREFIX = "ACCESS_TOKEN";
-
 
     /**
      * 카카오 OAuth 인가 URL을 반환합니다.
@@ -74,7 +72,7 @@ public class OauthController implements OauthDocs {
         refreshTokenService.storeRefresh(oauthResponse.userId(), refreshToken);
         
         // 4. HTTP 응답에 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
-        response.setHeader(ACCESS_TOKEN_PREFIX, accessToken);
+        response.setHeader(ACCESS_TOKEN_HEADER, accessToken);
         ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(oauthResponse.userId());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         
