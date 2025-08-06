@@ -172,44 +172,4 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(errorCode.getHttpStatus())
 				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
-
-	@ExceptionHandler(InvalidAuthorizationCodeException.class)
-	public ResponseEntity<StandardResponse<ProblemDetail>> handleInvalidAuthorizationCodeException(
-			InvalidAuthorizationCodeException e) {
-		log.warn("Authorization Code Exception: {} - Kakao ErrorCode: {}", e.getMessage(), e.getKakaoErrorCode(), e);
-
-		Sentry.captureException(e);
-		
-		ErrorCode errorCode = e.getErrorCode();
-		ProblemDetail problemDetail = createProblemDetail(errorCode);
-
-		return ResponseEntity.status(errorCode.getHttpStatus())
-				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
-	}
-
-	@ExceptionHandler(InvalidBaseUrlException.class)
-	public ResponseEntity<StandardResponse<ProblemDetail>> handleInvalidBaseUrlException(
-			InvalidBaseUrlException e) {
-		log.warn("Invalid Base URL Exception: {}", e.getMessage(), e);
-		Sentry.captureException(e);
-		
-		ErrorCode errorCode = e.getErrorCode();
-		ProblemDetail problemDetail = createProblemDetail(errorCode);
-
-		return ResponseEntity.status(errorCode.getHttpStatus())
-				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
-	}
-
-	@ExceptionHandler(UnsupportedOAuthProviderException.class)
-	public ResponseEntity<StandardResponse<ProblemDetail>> handleUnsupportedOAuthProviderException(
-			UnsupportedOAuthProviderException e) {
-		log.warn("Unsupported OAuth Provider Exception: {}", e.getMessage(), e);
-		Sentry.captureException(e);
-		
-		ErrorCode errorCode = e.getErrorCode();
-		ProblemDetail problemDetail = createProblemDetail(errorCode);
-
-		return ResponseEntity.status(errorCode.getHttpStatus())
-				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
-	}
 }
