@@ -72,8 +72,7 @@ public class SecurityConfig {
                                                 .requestMatchers(
                                                                 "/",
                                                                 "/api/**",
-                                                                "/login/oauth2/**",
-                                                                "/oauth/authorize" // OAuth2 Authorization Endpoint
+                                                                "/login/oauth2/**"
                                                 ).permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(exception -> exception
