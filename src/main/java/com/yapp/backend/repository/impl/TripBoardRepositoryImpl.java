@@ -75,4 +75,11 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public TripBoard updateTripBoard(TripBoard tripBoard) {
+        TripBoardEntity entity = tripBoardMapper.domainToEntity(tripBoard);
+        TripBoardEntity updatedEntity = jpaTripBoardRepository.save(entity);
+        return tripBoardMapper.entityToDomain(updatedEntity);
+    }
+
 }
