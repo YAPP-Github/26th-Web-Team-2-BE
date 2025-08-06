@@ -25,10 +25,10 @@ public class KakaoOAuthException extends CustomException {
     }
 
     public String getKakaoErrorCode() {
-        return kakaoError != null ? kakaoError.errorCode() : null;
+        return kakaoError != null ? kakaoError.getErrorCode() : null;
     }
     
     public String getKakaoErrorDescription() {
-        return kakaoError != null ? kakaoError.errorDescription() : null;
+        return kakaoError != null ? kakaoError.getErrorDescription() : null;
     }
 }
