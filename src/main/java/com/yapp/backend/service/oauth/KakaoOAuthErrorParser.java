@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yapp.backend.client.dto.KakaoErrorResponse;
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.exception.oauth.InvalidAuthorizationCodeException;
+import com.yapp.backend.common.exception.oauth.KakaoErrorCode;
 import com.yapp.backend.common.exception.oauth.KakaoOAuthException;
 import com.yapp.backend.common.exception.oauth.OAuthClientAuthException;
 import com.yapp.backend.common.exception.oauth.OAuthParameterException;
@@ -63,15 +64,17 @@ public class KakaoOAuthErrorParser {
      * 카카오 에러 응답에 따라 구체적인 예외를 생성합니다.
      */
     private KakaoOAuthException createSpecificException(KakaoErrorResponse kakaoError) {
-        if (kakaoError.isAuthorizationCodeError()) {
+        KakaoErrorCode errorCodeEnum = KakaoErrorCode.fromCode(kakaoError.getErrorCode());
+
+        if (errorCodeEnum != null && errorCodeEnum.isAuthorizationCodeError()) {
             return new InvalidAuthorizationCodeException(kakaoError);
         }
         
-        if (kakaoError.isParameterError()) {
+        if (errorCodeEnum != null && errorCodeEnum.isParameterError()) {
             return new OAuthParameterException(kakaoError);
         }
         
-        if (kakaoError.isClientAuthError()) {
+        if (errorCodeEnum != null && errorCodeEnum.isClientAuthError()) {
             return new OAuthClientAuthException(kakaoError);
         }
         
