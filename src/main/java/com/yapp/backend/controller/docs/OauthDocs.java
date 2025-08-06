@@ -32,7 +32,7 @@ public interface OauthDocs {
             description = "카카오에서 발급받은 인가 코드를 통해 액세스 토큰을 획득하고, 사용자 정보를 조회하여 JWT 토큰을 헤더로 설정합니다. " +
                          "JWT 토큰은 응답 헤더로 전달되며, 응답 바디에는 사용자 정보만 포함됩니다. " +
                          "인가 코드와 baseUrl은 Query Parameter로 전달해야 합니다. " +
-                         "로그인 성공 후 응답 헤더의 ACCESS_TOKEN, 쿠키에 REFRESH_TOKEN이 전달됩니다."
+                         "로그인 성공 후 응답 헤더 ACCESS_TOKEN, 쿠키 REFRESH_TOKEN 로 각각 액세스 토큰, 리프레시 토큰이 전달됩니다."
     )
     @ApiResponse(
             responseCode = "200", 

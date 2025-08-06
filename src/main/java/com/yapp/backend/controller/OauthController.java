@@ -65,6 +65,7 @@ public class OauthController implements OauthDocs {
         // 1. OAuth 인증 처리 및 사용자 정보 조회
         OauthLoginResponse oauthResponse = oauthService.exchangeCodeForToken("kakao", code, baseUrl);
 
+        // TODO: access, refresh 생성 메서드 재활용 가능하도록 리팩토링
         // 2. 토큰 생성
         String accessToken = jwtTokenProvider.createAccessToken(oauthResponse.userId());
         String refreshToken = jwtTokenProvider.createRefreshToken(oauthResponse.userId());

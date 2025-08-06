@@ -28,19 +28,4 @@ public class TokenUtil {
         return authHeader.substring(BEARER_PREFIX.length());
     }
     
-    /**
-     * Refresh Token 헤더에서 토큰을 추출합니다.
-     * 
-     * @param request HTTP 요청
-     * @return 토큰 문자열, 없으면 null
-     */
-    public static String extractRefreshTokenFromHeader(HttpServletRequest request) {
-        String refreshHeader = request.getHeader("Refresh-Token");
-        
-        if (refreshHeader == null || refreshHeader.trim().isEmpty()) {
-            return null;
-        }
-        
-        return refreshHeader.trim();
-    }
 }
