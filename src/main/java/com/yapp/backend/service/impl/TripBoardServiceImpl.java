@@ -4,14 +4,19 @@ import com.yapp.backend.common.exception.InvalidDestinationException;
 import com.yapp.backend.common.exception.InvalidPagingParameterException;
 import com.yapp.backend.common.exception.InvalidTravelPeriodException;
 import com.yapp.backend.common.exception.TripBoardCreationException;
+import com.yapp.backend.common.exception.TripBoardNotFoundException;
 import com.yapp.backend.common.exception.TripBoardParticipantLimitExceededException;
-import com.yapp.backend.common.util.InvitationLinkGenerator;
+import com.yapp.backend.common.exception.TripBoardUpdateException;
+import com.yapp.backend.common.util.InvitationLinkGeneratorUtil;
 import com.yapp.backend.common.util.PageUtil;
 import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
+import com.yapp.backend.controller.dto.request.TripBoardUpdateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
+import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
 import com.yapp.backend.controller.mapper.TripBoardSummaryMapper;
+import com.yapp.backend.controller.mapper.TripBoardUpdateMapper;
 import com.yapp.backend.repository.JpaTripBoardRepository;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
 import com.yapp.backend.repository.TripBoardRepository;
@@ -60,8 +65,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     private final TripBoardMapper tripBoardMapper;
     private final UserTripBoardMapper userTripBoardMapper;
     private final TripBoardSummaryMapper tripBoardSummaryMapper;
-
-    private final InvitationLinkGenerator invitationLinkGenerator;
+    private final TripBoardUpdateMapper tripBoardUpdateMapper;
 
     /**
      * 여행 보드 생성
@@ -97,7 +101,7 @@ public class TripBoardServiceImpl implements TripBoardService {
             log.debug("여행 보드 저장 완료 - ID: {}", savedTripBoard.getId());
 
             // 5. 생성자용 고유 초대 링크 생성
-            String invitationUrl = invitationLinkGenerator.generateUniqueInvitationUrl();
+            String invitationUrl = InvitationLinkGeneratorUtil.generateUniqueInvitationUrl();
             log.debug("초대 링크 생성 완료: {}", invitationUrl);
 
             // 6. 생성자를 OWNER 역할로 자동 등록
@@ -206,6 +210,59 @@ public class TripBoardServiceImpl implements TripBoardService {
         } catch (Exception e) {
             log.error("여행 보드 목록 조회 중 예상치 못한 오류 발생 - 사용자 ID: {}", userId, e);
             throw new RuntimeException("여행 보드 목록 조회에 실패했습니다.", e);
+        }
+    }
+
+    /**
+     * 여행 보드 수정
+     * 기존 여행보드의 기본 정보(보드 이름, 목적지, 여행 기간)를 수정합니다.
+     */
+    @Override
+    @Transactional
+    public TripBoardUpdateResponse updateTripBoard(Long tripBoardId, TripBoardUpdateRequest request, Long userId) {
+        try {
+            log.info("여행 보드 수정 시작 - 보드 ID: {}, 사용자 ID: {}, 보드명: {}, 여행지: {}",
+                    tripBoardId, userId, request.getBoardName(), request.getDestination());
+
+            // 1. 입력 데이터 유효성 검증
+            validateTravelPeriod(request.getStartDate(), request.getEndDate());
+            validateDestination(request.getDestination());
+
+            // 2. 여행보드 존재 여부 확인
+            tripBoardRepository.findById(tripBoardId)
+                    .orElseThrow(() -> {
+                        log.warn("존재하지 않는 여행보드 수정 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+                        return new TripBoardNotFoundException();
+                    });
+
+            // 3. 수정을 수행하는 사용자 조회
+            User updatedByUser = userRepository.findByIdOrThrow(userId);
+
+            // 4. Request DTO를 Domain 모델로 변환
+            TripBoard tripBoardToUpdate = tripBoardUpdateMapper.requestToDomain(request, tripBoardId, updatedByUser);
+
+            // 5. 여행보드 업데이트 실행
+            TripBoard updatedTripBoard = tripBoardRepository.updateTripBoard(tripBoardToUpdate);
+            log.debug("여행 보드 업데이트 완료 - 보드 ID: {}", updatedTripBoard.getId());
+
+            // 6. Domain 모델을 Response DTO로 변환
+            TripBoardUpdateResponse response = tripBoardUpdateMapper.domainToResponse(updatedTripBoard);
+
+            log.info("여행 보드 수정 완료 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+            return response;
+
+        } catch (TripBoardNotFoundException e) {
+            log.error("여행 보드 수정 실패 - 보드를 찾을 수 없음: 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+            throw e;
+        } catch (InvalidDestinationException | InvalidTravelPeriodException e) {
+            log.error("여행 보드 수정 실패 - 입력 데이터 유효성 검증 실패: 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("여행 보드 수정 중 데이터베이스 오류 발생 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
+            throw new TripBoardUpdateException();
+        } catch (Exception e) {
+            log.error("여행 보드 수정 중 예상치 못한 오류 발생 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
+            throw new TripBoardUpdateException();
         }
     }
 

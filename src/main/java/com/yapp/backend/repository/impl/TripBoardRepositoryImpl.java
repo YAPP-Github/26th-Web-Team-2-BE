@@ -7,6 +7,7 @@ import com.yapp.backend.repository.entity.TripBoardEntity;
 import com.yapp.backend.repository.entity.UserTripBoardEntity;
 import com.yapp.backend.repository.mapper.TripBoardMapper;
 import com.yapp.backend.repository.mapper.UserTripBoardMapper;
+import com.yapp.backend.repository.mapper.UserMapper;
 import com.yapp.backend.service.dto.ParticipantProfile;
 import com.yapp.backend.service.dto.TripBoardSummary;
 import com.yapp.backend.service.model.TripBoard;
@@ -32,6 +33,7 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
 
     private final TripBoardMapper tripBoardMapper;
     private final UserTripBoardMapper userTripBoardMapper;
+    private final UserMapper userMapper;
 
     @Override
     public TripBoard save(TripBoard tripBoard) {
@@ -73,6 +75,25 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
         return userTripBoards.stream()
                 .map(userTripBoardMapper::entityToParticipantProfile)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public TripBoard updateTripBoard(TripBoard tripBoard) {
+        // 기존 엔티티를 조회합니다
+        TripBoardEntity existingEntity = jpaTripBoardRepository.findById(tripBoard.getId())
+                .orElseThrow(() -> new RuntimeException("여행보드를 찾을 수 없습니다."));
+
+        // 기존 엔티티의 필드를 업데이트합니다
+        existingEntity.updateTripBoard(
+                tripBoard.getBoardName(),
+                tripBoard.getDestination(),
+                tripBoard.getStartDate(),
+                tripBoard.getEndDate(),
+                userMapper.domainToEntity(tripBoard.getUpdatedBy()));
+
+        // 변경된 엔티티를 저장합니다 (더티 체킹에 의해 자동으로 UPDATE 쿼리 실행)
+        TripBoardEntity updatedEntity = jpaTripBoardRepository.save(existingEntity);
+        return tripBoardMapper.entityToDomain(updatedEntity);
     }
 
 }

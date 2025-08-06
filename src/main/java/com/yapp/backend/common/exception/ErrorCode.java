@@ -38,6 +38,8 @@ public enum ErrorCode {
     DUPLICATE_INVITATION_URL("초대 링크 중복", "초대 링크 생성 중 중복이 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_DESTINATION("유효하지 않은 여행지", "유효하지 않은 여행지입니다.", HttpStatus.BAD_REQUEST),
     INVALID_TRAVEL_PERIOD("유효하지 않은 여행 기간", "유효하지 않은 여행 기간입니다.", HttpStatus.BAD_REQUEST),
+    TRIP_BOARD_NOT_FOUND("여행보드 존재하지 않음", "여행보드를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    TRIP_BOARD_UPDATE_FAILED("여행보드 수정 실패", "여행보드 수정에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // OAuth related errors
     INVALID_AUTHORIZATION_CODE("인가 코드 오류", "인가 코드가 유효하지 않거나 이미 사용되었습니다. 새로운 인가 코드를 발급받아 주세요.", HttpStatus.BAD_REQUEST),

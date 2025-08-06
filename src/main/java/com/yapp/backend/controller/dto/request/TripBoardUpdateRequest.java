@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TripBoardCreateRequest {
+public class TripBoardUpdateRequest {
     @NotBlank(message = "여행 보드 제목은 필수입니다.")
     @Size(max = 20, message = "제목은 20자를 초과할 수 없습니다.")
     private String boardName;

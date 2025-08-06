@@ -35,4 +35,9 @@ public interface TripBoardRepository {
      * N+1 문제를 방지하기 위해 단일 쿼리로 모든 참여자 정보를 조회합니다.
      */
     List<ParticipantProfile> findParticipantsByTripBoardIds(List<Long> tripBoardIds);
+
+    /**
+     * 여행 보드를 업데이트합니다.
+     */
+    TripBoard updateTripBoard(TripBoard tripBoard);
 }
