@@ -1,13 +1,17 @@
 package com.yapp.backend.repository.mapper;
 
+import com.yapp.backend.common.util.DateUtil;
+import com.yapp.backend.repository.entity.TripBoardEntity;
 import com.yapp.backend.repository.entity.UserTripBoardEntity;
+import com.yapp.backend.service.dto.ParticipantProfile;
+import com.yapp.backend.service.dto.TripBoardSummary;
 import com.yapp.backend.service.model.UserTripBoard;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * Mapper utility for converting between UserTripBoardEntity and UserTripBoard
- * domain model
+ * Mapper utility for converting between UserTripBoardEntity and various
+ * models/DTOs
  */
 @Component
 @RequiredArgsConstructor
@@ -54,5 +58,49 @@ public class UserTripBoardMapper {
                 .createdAt(userTripBoard.getCreatedAt())
                 .updatedAt(userTripBoard.getUpdatedAt())
                 .build();
+    }
+
+    /**
+     * UserTripBoardEntity -> TripBoardSummary 변환
+     * Repository 계층에서 Service 계층으로 데이터 전달 시 사용
+     */
+    public TripBoardSummary entityToTripBoardSummary(UserTripBoardEntity userTripBoard) {
+        if (userTripBoard == null) {
+            return null;
+        }
+
+        TripBoardEntity tripBoard = userTripBoard.getTripBoard();
+        if (tripBoard == null) {
+            return null;
+        }
+
+        return TripBoardSummary.builder()
+                .boardId(tripBoard.getId())
+                .boardName(tripBoard.getBoardName())
+                .destination(tripBoard.getDestination())
+                .startDate(tripBoard.getStartDate())
+                .endDate(tripBoard.getEndDate())
+                .travelPeriod(DateUtil.formatTravelPeriod(tripBoard.getStartDate(), tripBoard.getEndDate()))
+                .userRole(userTripBoard.getRole())
+                .createdAt(tripBoard.getCreatedAt())
+                .updatedAt(tripBoard.getUpdatedAt())
+                .build();
+    }
+
+    /**
+     * UserTripBoardEntity -> ParticipantProfile 변환
+     * 참여자 프로필 정보 조회 시 사용
+     */
+    public ParticipantProfile entityToParticipantProfile(UserTripBoardEntity userTripBoard) {
+        if (userTripBoard == null) {
+            return null;
+        }
+
+        return new ParticipantProfile(
+                userTripBoard.getTripBoard().getId(),
+                userTripBoard.getUser().getId(),
+                userTripBoard.getUser().getNickname(),
+                userTripBoard.getUser().getProfileImage(),
+                userTripBoard.getRole());
     }
 }
