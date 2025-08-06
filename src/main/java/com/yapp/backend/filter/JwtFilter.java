@@ -3,6 +3,7 @@ package com.yapp.backend.filter;
 import static com.yapp.backend.common.util.TokenUtil.extractTokenFromHeader;
 import static com.yapp.backend.common.util.CookieUtil.getCookieValue;
 
+import com.google.common.net.HttpHeaders;
 import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.filter.service.AuthContextService;
 import com.yapp.backend.filter.service.RefreshTokenService;
@@ -29,6 +30,9 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthContextService authContextService;
     private final RefreshTokenService refreshTokenService;
+
+    private static final String ACCESS_TOKEN_PREFIX = "ACCESS_TOKEN";
+    private static final String REFRESH_TOKEN_PREFIX = "REFRESH_TOKEN";
 
     // 스킵할 URI(인증이 필요 없는 엔드포인트)
     @Override
@@ -61,7 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (JwtException | IllegalArgumentException bad) {
             // CASE 2: InValid Access Token - Refresh Token은 쿠키에서 추출 (보안상)
-            String refreshToken = getCookieValue(request, "REFRESH_TOKEN");
+            String refreshToken = getCookieValue(request, REFRESH_TOKEN_PREFIX);
             if (validateRefreshToken(refreshToken)) {
                 Long userId = Long.valueOf(jwtTokenProvider.getRefreshUsername(refreshToken));
                 updateAccessAndRefreshToken(response, userId);
@@ -100,9 +104,9 @@ public class JwtFilter extends OncePerRequestFilter {
         refreshTokenService.rotateRefresh(userId, newRefresh);
 
         // 3) 새로운 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
-        response.setHeader("ACCESS_TOKEN", newAccess);
+        response.setHeader(ACCESS_TOKEN_PREFIX, newAccess);
         ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(userId);
-        response.addHeader("Set-Cookie", refreshCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         // 4) 인증 객체 세팅
         authContextService.createAuthContext(newAccess);

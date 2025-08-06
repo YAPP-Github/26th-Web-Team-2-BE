@@ -2,6 +2,7 @@ package com.yapp.backend.controller;
 
 import static com.yapp.backend.common.response.ResponseType.*;
 
+import com.google.common.net.HttpHeaders;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.controller.docs.OauthDocs;
@@ -27,6 +28,9 @@ public class OauthController implements OauthDocs {
     private final OauthService oauthService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+
+    private static final String ACCESS_TOKEN_PREFIX = "ACCESS_TOKEN";
+
 
     /**
      * 카카오 OAuth 인가 URL을 반환합니다.
@@ -60,7 +64,7 @@ public class OauthController implements OauthDocs {
         
         // 1. OAuth 인증 처리 및 사용자 정보 조회
         OauthLoginResponse oauthResponse = oauthService.exchangeCodeForToken("kakao", code, baseUrl);
-        
+
         // 2. 토큰 생성
         String accessToken = jwtTokenProvider.createAccessToken(oauthResponse.userId());
         String refreshToken = jwtTokenProvider.createRefreshToken(oauthResponse.userId());
@@ -69,9 +73,9 @@ public class OauthController implements OauthDocs {
         refreshTokenService.storeRefresh(oauthResponse.userId(), refreshToken);
         
         // 4. HTTP 응답에 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
-        response.setHeader("ACCESS_TOKEN", accessToken);
+        response.setHeader(ACCESS_TOKEN_PREFIX, accessToken);
         ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(oauthResponse.userId());
-        response.addHeader("Set-Cookie", refreshCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         
         // 5. 사용자 정보만 응답 바디로 반환 (토큰은 헤더로 전달됨)
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, oauthResponse));
