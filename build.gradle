@@ -69,7 +69,6 @@ dependencies {
 	implementation 'org.springframework.data:spring-data-keyvalue'
 
 	// security
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	// jwt

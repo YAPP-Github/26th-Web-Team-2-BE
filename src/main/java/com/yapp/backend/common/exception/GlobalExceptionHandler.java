@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
+import com.yapp.backend.common.exception.oauth.KakaoOAuthException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -167,4 +168,18 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(errorCode.getHttpStatus())
 				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
+
+
+    @ExceptionHandler(KakaoOAuthException.class)
+    public ResponseEntity<StandardResponse<ProblemDetail>> handleKakaoOAuthException(KakaoOAuthException e) {
+        log.warn("Kakao OAuth Exception: {} - Kakao ErrorCode: {}", e.getMessage(), e.getKakaoErrorCode(), e);
+        Sentry.captureException(e);
+
+        ErrorCode errorCode = e.getErrorCode();
+        ProblemDetail problemDetail = createProblemDetail(errorCode);
+
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+    }
+
 }

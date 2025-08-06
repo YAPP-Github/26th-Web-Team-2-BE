@@ -1,6 +1,5 @@
 spring:
   security:
-    base-url: ${BASE_URL}
     oauth2:
       client:
         registration:
@@ -22,3 +21,13 @@ spring:
       refresh-secret-key: ${JWT_REFRESH_SECRET_KEY}
       access-token-validity-in-ms: 3600000           # 1시간
       refresh-token-validity-in-ms: 604800000       # 7일
+
+oauth:
+  security:
+    # OAuth 리다이렉트 허용 도메인 화이트리스트
+    allowed-domains:
+      - "http://localhost:3000"
+      - "http://localhost:8080"
+      - "https://ssok.info"
+      - "https://api.ssok.info"
+      - "https://dev-api.ssok.info"
