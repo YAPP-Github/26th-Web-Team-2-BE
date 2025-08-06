@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.common.exception.oauth.KakaoOAuthException;
-import com.yapp.backend.common.exception.oauth.InvalidAuthorizationCodeException;
-import com.yapp.backend.common.exception.oauth.InvalidBaseUrlException;
-import com.yapp.backend.common.exception.oauth.UnsupportedOAuthProviderException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -161,15 +158,28 @@ public class GlobalExceptionHandler {
 				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 
-	@ExceptionHandler(KakaoOAuthException.class)
-	public ResponseEntity<StandardResponse<ProblemDetail>> handleKakaoOAuthException(KakaoOAuthException e) {
-		log.warn("Kakao OAuth Exception: {} - Kakao ErrorCode: {}", e.getMessage(), e.getKakaoErrorCode(), e);
+	@ExceptionHandler(InvalidPagingParameterException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleInvalidPagingParameterException(
+			InvalidPagingParameterException e) {
+		log.warn("Invalid paging parameter exception occurred: {}", e.getMessage(), e);
 		Sentry.captureException(e);
-		
 		ErrorCode errorCode = e.getErrorCode();
 		ProblemDetail problemDetail = createProblemDetail(errorCode);
-		
 		return ResponseEntity.status(errorCode.getHttpStatus())
 				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
+
+
+    @ExceptionHandler(KakaoOAuthException.class)
+    public ResponseEntity<StandardResponse<ProblemDetail>> handleKakaoOAuthException(KakaoOAuthException e) {
+        log.warn("Kakao OAuth Exception: {} - Kakao ErrorCode: {}", e.getMessage(), e.getKakaoErrorCode(), e);
+        Sentry.captureException(e);
+
+        ErrorCode errorCode = e.getErrorCode();
+        ProblemDetail problemDetail = createProblemDetail(errorCode);
+
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+    }
+
 }

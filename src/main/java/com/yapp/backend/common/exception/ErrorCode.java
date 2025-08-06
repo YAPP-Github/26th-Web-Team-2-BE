@@ -25,6 +25,7 @@ public enum ErrorCode {
     DATABASE_CONNECTION_ERROR("데이터베이스 연결 오류", "데이터베이스 연결에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     DATABASE_CONSTRAINT_VIOLATION("데이터베이스 제약 조건 위반", "데이터베이스 제약 조건을 위반했습니다.", HttpStatus.BAD_REQUEST),
     INVALID_PAGINATION_PARAMETERS("잘못된 페이징 파라미터", "페이지 번호나 크기가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_PAGING_PARAMETER("잘못된 페이징 파라미터", "페이지 번호는 0 이상이어야 하고, 페이지 크기는 1-100 사이여야 합니다.", HttpStatus.BAD_REQUEST),
     INVALID_FACTORS("잘못된 비교 기준", "잘못된 비교 기준입니다.", HttpStatus.BAD_REQUEST),
 
     // Scraping related errors
