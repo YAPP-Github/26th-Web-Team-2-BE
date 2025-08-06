@@ -101,39 +101,45 @@ public class AccommodationServiceImpl implements AccommodationService {
 	/**
 	 * 숙소 카드 등록
 	 * URL을 통해 외부 스크래핑 서버에서 숙소 정보를 가져와 등록합니다.
+	 * 인증된 사용자 정보를 created_by 필드에 저장합니다.
 	 */
 	@Override
-	public AccommodationRegisterResponse registerAccommodationCard(AccommodationRegisterRequest request) {
+	public AccommodationRegisterResponse registerAccommodationCard(AccommodationRegisterRequest request, Long userId) {
 		try {
+			log.info("숙소 등록 시작 - 사용자 ID: {}, 보드 ID: {}, URL: {}", userId, request.getBoardId(), request.getUrl());
+
 			// 외부 스크래핑 서버에서 숙소 정보 가져오기
 			ScrapingResponse scrapingResponse = scrapingService.scrapeAccommodationData(request.getUrl());
 
-			// 스크래핑 데이터를 Entity로 매핑
+			// 스크래핑 데이터를 Entity로 매핑 (사용자 ID 포함)
 			AccommodationEntity accommodationEntity = scrapingDataMapper.mapToEntity(
 					scrapingResponse.getData(),
 					request.getUrl(),
 					request.getMemo(),
-					request.getUserId(),
+					userId, // 인증된 사용자 ID를 created_by 필드에 저장
 					request.getBoardId());
 
-			// Save new accommodation to database using repository
+			// 새로운 숙소 카드 등록
 			Accommodation savedAccommodation = accommodationRepository.save(accommodationEntity);
 
-			// Return proper registration response
+			log.info("숙소 등록 완료 - 숙소 ID: {}, 사용자 ID: {}", savedAccommodation.getId(), userId);
+
+			// 응답 객체 생성
 			return AccommodationRegisterResponse.builder()
 					.accommodationId(savedAccommodation.getId())
 					.build();
 		} catch (CustomException e) {
 			// Re-throw custom exceptions (validation errors) as-is
+			log.warn("숙소 등록 실패 - 사용자 ID: {}, 사유: {}", userId, e.getMessage());
 			throw e;
 		} catch (DataIntegrityViolationException e) {
-			log.error("Database constraint violation while registering accommodation", e);
+			log.error("Database constraint violation while registering accommodation - 사용자 ID: {}", userId, e);
 			throw new CustomException(ErrorCode.DATABASE_CONSTRAINT_VIOLATION);
 		} catch (DataAccessException e) {
-			log.error("Database error while registering accommodation", e);
+			log.error("Database error while registering accommodation - 사용자 ID: {}", userId, e);
 			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
 		} catch (Exception e) {
-			log.error("Unexpected error while registering accommodation", e);
+			log.error("Unexpected error while registering accommodation - 사용자 ID: {}", userId, e);
 			throw new CustomException(ErrorCode.ACCOMMODATION_REGISTRATION_FAILED);
 		}
 	}
@@ -175,12 +181,12 @@ public class AccommodationServiceImpl implements AccommodationService {
 
 			// 숙소 정보 업데이트 (도메인 객체 내부에서 부분 업데이트 처리)
 			existingAccommodation.update(request);
-			
+
 			// 업데이트된 숙소를 데이터베이스에 저장
 			accommodationRepository.update(existingAccommodation);
-			
+
 			log.info("Accommodation updated successfully for id: {}", request.getId());
-			
+
 		} catch (CustomException e) {
 			throw e;
 		} catch (DataAccessException e) {

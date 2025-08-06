@@ -16,6 +16,7 @@ public enum ErrorCode {
 
     // Authorization
     INVALID_USER_AUTHORIZATION("사용자 권한 없음", "해당 권한이 없는 유저입니다.", HttpStatus.FORBIDDEN),
+    USER_AUTHORIZATION_FAILED("사용자 권한 없음", "해당 리소스에 접근할 권한이 없습니다.", HttpStatus.FORBIDDEN),
 
     // Accommodation related errors
     INVALID_TABLE_ID("잘못된 테이블 ID", "존재하지 않거나 유효하지 않은 테이블 ID입니다.", HttpStatus.BAD_REQUEST),
@@ -47,7 +48,8 @@ public enum ErrorCode {
     OAUTH_CLIENT_AUTH_ERROR("OAuth 클라이언트 인증 오류", "OAuth 클라이언트 인증에 실패했습니다. 클라이언트 정보를 확인해 주세요.", HttpStatus.UNAUTHORIZED),
     OAUTH_TOKEN_EXCHANGE_FAILED("OAuth 토큰 교환 실패", "OAuth 토큰 교환 과정에서 오류가 발생했습니다.", HttpStatus.BAD_REQUEST),
     INVALID_OAUTH_BASE_URL("허용되지 않은 Base URL", "OAuth 요청에서 허용되지 않은 Base URL입니다.", HttpStatus.FORBIDDEN),
-    UNSUPPORTED_OAUTH_PROVIDER("지원하지 않는 OAuth 공급자", "요청한 OAuth 공급자는 현재 지원되지 않습니다. 지원 가능한 공급자를 확인해 주세요.", HttpStatus.BAD_REQUEST)
+    UNSUPPORTED_OAUTH_PROVIDER("지원하지 않는 OAuth 공급자", "요청한 OAuth 공급자는 현재 지원되지 않습니다. 지원 가능한 공급자를 확인해 주세요.",
+            HttpStatus.BAD_REQUEST)
     // 필요에 따라 추가
     ;
 

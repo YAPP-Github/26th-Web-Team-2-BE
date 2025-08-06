@@ -21,7 +21,4 @@ public class AccommodationRegisterRequest {
 	
 	@NotNull(message = "여행 보드 ID는 필수 입력값입니다.")
 	private Long boardId;
-	
-	@NotNull(message = "사용자 ID는 필수 입력값입니다.")
-	private Long userId;
 }
