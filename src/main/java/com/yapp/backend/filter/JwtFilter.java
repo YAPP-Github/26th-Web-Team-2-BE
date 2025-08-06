@@ -1,5 +1,6 @@
 package com.yapp.backend.filter;
 
+import static com.yapp.backend.common.util.TokenUtil.extractTokenFromHeader;
 import static com.yapp.backend.common.util.CookieUtil.getCookieValue;
 
 import com.yapp.backend.common.util.JwtTokenProvider;
@@ -12,14 +13,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import io.jsonwebtoken.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.http.ResponseCookie;
 
 @Slf4j
 @Component
@@ -52,14 +54,15 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        String accessToken = getCookieValue(request, "ACCESS_TOKEN");
+        // Authorization 헤더에서 Access Token 추출
+        String accessToken = extractTokenFromHeader(request);
         try {
             // CASE 1: Valid Access Token
             jwtTokenProvider.validateAccessTokenOrThrow(accessToken);
             authContextService.createAuthContext(accessToken);
             filterChain.doFilter(request, response);
         } catch (JwtException | IllegalArgumentException bad) {
-            // CASE 2: InValid Access Token
+            // CASE 2: InValid Access Token - Refresh Token은 쿠키에서 추출 (보안상)
             String refreshToken = getCookieValue(request, "REFRESH_TOKEN");
             if (validateRefreshToken(refreshToken)) {
                 Long userId = Long.valueOf(jwtTokenProvider.getRefreshUsername(refreshToken));
@@ -98,11 +101,10 @@ public class JwtFilter extends OncePerRequestFilter {
         // 2) Redis Refresh Token 회전
         refreshTokenService.rotateRefresh(userId, newRefresh);
 
-        // 3) 새로운 쿠키 세팅
-        ResponseCookie accessCookie = jwtTokenProvider.generateAccessTokenCookie(userId);
+        // 3) 새로운 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
+        response.setHeader("Access-Token", newAccess);
         ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(userId);
-        response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
 
         // 4) 인증 객체 세팅
         authContextService.createAuthContext(newAccess);
