@@ -13,8 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -102,7 +100,7 @@ public class JwtFilter extends OncePerRequestFilter {
         refreshTokenService.rotateRefresh(userId, newRefresh);
 
         // 3) 새로운 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
-        response.setHeader("Access-Token", newAccess);
+        response.setHeader("ACCESS_TOKEN", newAccess);
         ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(userId);
         response.addHeader("Set-Cookie", refreshCookie.toString());
 

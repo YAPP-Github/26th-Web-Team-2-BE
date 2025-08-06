@@ -69,7 +69,7 @@ public class OauthController implements OauthDocs {
         refreshTokenService.storeRefresh(oauthResponse.userId(), refreshToken);
         
         // 4. HTTP 응답에 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
-        response.setHeader("Access-Token", accessToken);
+        response.setHeader("ACCESS_TOKEN", accessToken);
         ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(oauthResponse.userId());
         response.addHeader("Set-Cookie", refreshCookie.toString());
         
