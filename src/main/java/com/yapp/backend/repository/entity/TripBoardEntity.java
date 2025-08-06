@@ -67,4 +67,16 @@ public class TripBoardEntity {
     )
     @Builder.Default
     private List<ComparisonTableEntity> comparisonTables = new ArrayList<>();
+
+    /**
+     * 여행보드 정보를 업데이트합니다.
+     */
+    public void updateTripBoard(String boardName, String destination, LocalDate startDate, LocalDate endDate,
+            UserEntity updatedBy) {
+        this.boardName = boardName;
+        this.destination = destination;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.updatedBy = updatedBy;
+    }
 }
