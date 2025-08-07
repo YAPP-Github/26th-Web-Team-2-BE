@@ -10,13 +10,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.common.exception.oauth.KakaoOAuthException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -169,17 +173,112 @@ public class GlobalExceptionHandler {
 				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 
+	@ExceptionHandler(KakaoOAuthException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleKakaoOAuthException(KakaoOAuthException e) {
+		log.warn("Kakao OAuth Exception: {} - Kakao ErrorCode: {}", e.getMessage(), e.getKakaoErrorCode(), e);
+		Sentry.captureException(e);
 
-    @ExceptionHandler(KakaoOAuthException.class)
-    public ResponseEntity<StandardResponse<ProblemDetail>> handleKakaoOAuthException(KakaoOAuthException e) {
-        log.warn("Kakao OAuth Exception: {} - Kakao ErrorCode: {}", e.getMessage(), e.getKakaoErrorCode(), e);
-        Sentry.captureException(e);
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
 
-        ErrorCode errorCode = e.getErrorCode();
-        ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
 
-        return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
-    }
+	@ExceptionHandler(UserAuthorizationException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleUserAuthorizationException(
+			UserAuthorizationException e) {
+
+		// 요청 정보 추출
+		String requestUri;
+		String requestMethod;
+		String clientIp;
+		String userAgent;
+
+		try {
+			ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
+					.getRequestAttributes();
+			if (attributes != null) {
+				HttpServletRequest request = attributes.getRequest();
+				requestUri = request.getRequestURI();
+				requestMethod = request.getMethod();
+				clientIp = getClientIpAddress(request);
+				userAgent = request.getHeader("User-Agent");
+			} else {
+				requestUri = "unknown";
+				requestMethod = "unknown";
+				clientIp = "unknown";
+				userAgent = "unknown";
+			}
+		} catch (Exception ex) {
+			log.debug("요청 정보 추출 중 오류 발생", ex);
+			requestUri = "unknown";
+			requestMethod = "unknown";
+			clientIp = "unknown";
+			userAgent = "unknown";
+		}
+
+		// final 변수로 복사 (람다에서 사용하기 위해)
+		final String finalRequestUri = requestUri;
+		final String finalRequestMethod = requestMethod;
+		final String finalClientIp = clientIp;
+		final String finalUserAgent = userAgent;
+
+		// 상세한 보안 이벤트 로깅
+		log.warn("SECURITY_ALERT - 권한 없는 접근 차단 - URI: {}, 메서드: {}, IP: {}, UserAgent: {}, 오류: {}",
+				finalRequestUri, finalRequestMethod, finalClientIp, finalUserAgent, e.getMessage());
+
+		// 기존 로깅도 유지
+		log.warn("사용자 권한 검증 실패: {}", e.getMessage(), e);
+
+		// Sentry에 추가 컨텍스트와 함께 전송
+		Sentry.withScope(scope -> {
+			scope.setTag("error_type", "authorization_failure");
+			scope.setTag("request_uri", finalRequestUri);
+			scope.setTag("request_method", finalRequestMethod);
+			scope.setTag("client_ip", finalClientIp);
+			scope.setExtra("user_agent", finalUserAgent);
+			Sentry.captureException(e);
+		});
+
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	/**
+	 * 클라이언트 IP 주소 추출
+	 * 프록시나 로드밸런서를 고려하여 실제 클라이언트 IP를 추출합니다.
+	 */
+	private String getClientIpAddress(HttpServletRequest request) {
+		String[] headerNames = {
+				"X-Forwarded-For",
+				"X-Real-IP",
+				"Proxy-Client-IP",
+				"WL-Proxy-Client-IP",
+				"HTTP_X_FORWARDED_FOR",
+				"HTTP_X_FORWARDED",
+				"HTTP_X_CLUSTER_CLIENT_IP",
+				"HTTP_CLIENT_IP",
+				"HTTP_FORWARDED_FOR",
+				"HTTP_FORWARDED",
+				"HTTP_VIA",
+				"REMOTE_ADDR"
+		};
+
+		for (String headerName : headerNames) {
+			String ip = request.getHeader(headerName);
+			if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+				// X-Forwarded-For 헤더는 여러 IP를 포함할 수 있으므로 첫 번째 IP를 사용
+				if (ip.contains(",")) {
+					ip = ip.split(",")[0].trim();
+				}
+				return ip;
+			}
+		}
+
+		return request.getRemoteAddr();
+	}
 
 }

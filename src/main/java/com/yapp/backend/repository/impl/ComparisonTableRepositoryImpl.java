@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @RequiredArgsConstructor
 public class ComparisonTableRepositoryImpl implements ComparisonTableRepository {
-    
+
     private final JpaComparisonTableRepository jpaComparisonTableRepository;
     private final JpaAccommodationRepository jpaAccommodationRepository;
     private final AccommodationRepository accommodationRepository;
@@ -47,7 +47,7 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
                 .orElseThrow(() -> new ComparisonTableNotFoundException(ErrorCode.TABLE_NOT_FOUND));
         return comparisonTableMapper.entityToDomain(comparisonTableEntity);
     }
-    
+
     @Override
     @Transactional
     public void update(ComparisonTable comparisonTable) {
@@ -60,21 +60,20 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
         updateAccommodationMappings(existingEntity, comparisonTable.getAccommodationList());
         jpaComparisonTableRepository.save(existingEntity);
     }
-    
+
     /**
      * 숙소 매핑 정보를 업데이트합니다.
      * 기존 매핑을 삭제/생성하는 대신 position을 업데이트하고 필요한 경우에만 추가/삭제합니다.
      */
     private void updateAccommodationMappings(
             ComparisonTableEntity tableEntity,
-            List<Accommodation> accommodationList
-    ) {
+            List<Accommodation> accommodationList) {
         // 기존 매핑을 Map으로 변환 (accommodationId -> ComparisonAccommodationEntity)
         Map<Long, ComparisonAccommodationEntity> existingMappings = new HashMap<>();
         for (ComparisonAccommodationEntity item : tableEntity.getItems()) {
             existingMappings.put(item.getAccommodationEntity().getId(), item);
         }
-        
+
         // 새로운 매핑 리스트 생성
         List<ComparisonAccommodationEntity> updatedItems = new ArrayList<>();
         for (int i = 0; i < accommodationList.size(); i++) {
@@ -101,13 +100,13 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
                 updatedItems.add(newItem);
             }
         }
-        
+
         // 매핑 리스트 교체
         // 남은 기존 매핑들은 자동으로 삭제됨 (orphanRemoval = true)
         tableEntity.getItems().clear();
         tableEntity.getItems().addAll(updatedItems);
     }
-    
+
     @Override
     @Transactional
     public ComparisonTable addAccommodationsToTable(Long tableId, List<Long> accommodationIds, Long userId) {
@@ -117,39 +116,39 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
 
         // 권한 검증
         if (!tableEntity.getCreatedByEntity().getId().equals(userId)) {
-            throw new UserAuthorizationException(ErrorCode.INVALID_USER_AUTHORIZATION);
+            throw new UserAuthorizationException();
         }
-        
+
         // 기존 숙소 ID 목록 추출 (중복 방지용)
         Set<Long> existingAccommodationIds = tableEntity.getItems().stream()
                 .map(item -> item.getAccommodationEntity().getId())
                 .collect(java.util.stream.Collectors.toSet());
-        
+
         // 중복되지 않는 새로운 숙소 ID들만 필터링
         List<Long> newAccommodationIds = accommodationIds.stream()
                 .filter(id -> !existingAccommodationIds.contains(id))
                 .toList();
-        
+
         // 새로운 숙소 ID들이 실제 DB에 존재하는지 검증
         List<Accommodation> validatedAccommodations = newAccommodationIds.stream()
                 .map(accommodationRepository::findByIdOrThrow) // AccommodationNotFoundException 발생 가능
                 .toList();
-        
+
         // 새로운 매핑 엔티티들 생성 및 추가
         int currentMaxPosition = tableEntity.getItems().size();
         for (int i = 0; i < validatedAccommodations.size(); i++) {
             Long accommodationId = validatedAccommodations.get(i).getId();
             AccommodationEntity accommodationEntity = jpaAccommodationRepository.getReferenceById(accommodationId);
-            
+
             ComparisonAccommodationEntity newMapping = ComparisonAccommodationEntity.builder()
                     .comparisonTableEntity(tableEntity)
                     .accommodationEntity(accommodationEntity)
                     .position(currentMaxPosition + i)
                     .build();
-            
+
             tableEntity.getItems().add(newMapping);
         }
-        
+
         jpaComparisonTableRepository.save(tableEntity);
         return comparisonTableMapper.entityToDomain(tableEntity);
     }

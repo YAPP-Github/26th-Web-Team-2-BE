@@ -12,9 +12,9 @@ public interface AccommodationService {
 
     Long countAccommodationsByBoardId(Long boardId, Long userId);
 
-    AccommodationRegisterResponse registerAccommodationCard(AccommodationRegisterRequest request);
+    AccommodationRegisterResponse registerAccommodationCard(AccommodationRegisterRequest request, Long userId);
 
     AccommodationResponse findAccommodationById(Long accommodationId);
-    
+
     void updateAccommodation(UpdateAccommodationRequest request);
 }
