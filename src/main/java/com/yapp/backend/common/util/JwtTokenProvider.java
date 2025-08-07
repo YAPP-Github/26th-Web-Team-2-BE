@@ -1,5 +1,7 @@
 package com.yapp.backend.common.util;
 
+import static com.yapp.backend.filter.JwtFilter.REFRESH_TOKEN_COOKIE;
+
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.filter.service.RefreshTokenService;
 import io.jsonwebtoken.Claims;
@@ -27,8 +29,6 @@ import java.util.List;
 public class JwtTokenProvider {
 
     private static final long MILLISECONDS_PER_SECOND = 1_000L;
-    private static final String COOKIE_ACCESS_TOKEN = "ACCESS_TOKEN";
-    private static final String COOKIE_REFRESH_TOKEN = "REFRESH_TOKEN";
     private static final String COOKIE_PATH = "/";
     private static final String COOKIE_SAME_SITE = "Lax";
 
@@ -95,25 +95,6 @@ public class JwtTokenProvider {
     // ==================== 쿠키 생성 메서드 ====================
 
     /**
-     * Access Token 쿠키를 생성합니다.
-     *
-     * @param userId 사용자 ID
-     * @return Access Token ResponseCookie
-     */
-    public ResponseCookie generateAccessTokenCookie(Long userId) {
-        String accessToken = createAccessToken(userId);
-        long maxAgeInSeconds = accessTokenValidityInMs / MILLISECONDS_PER_SECOND;
-        
-        return ResponseCookie.from(COOKIE_ACCESS_TOKEN, accessToken)
-                .httpOnly(true)
-                .secure(true)
-                .path(COOKIE_PATH)
-                .maxAge(maxAgeInSeconds)
-                .sameSite(COOKIE_SAME_SITE)
-                .build();
-    }
-
-    /**
      * Refresh Token 쿠키를 생성하고 Redis에 저장합니다.
      *
      * @param userId 사용자 ID
@@ -126,7 +107,7 @@ public class JwtTokenProvider {
         // Redis에 Refresh Token 저장
         refreshTokenService.storeRefresh(userId, refreshToken);
         
-        return ResponseCookie.from(COOKIE_REFRESH_TOKEN, refreshToken)
+        return ResponseCookie.from(REFRESH_TOKEN_COOKIE, refreshToken)
                 .httpOnly(true)
                 .secure(true)
                 .path(COOKIE_PATH)

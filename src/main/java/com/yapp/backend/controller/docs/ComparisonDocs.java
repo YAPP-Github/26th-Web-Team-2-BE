@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,26 +29,30 @@ public interface ComparisonDocs {
     @Operation(summary = "편의 서비스 Enum 리스트", description = "편의 서비스 항목 Enum 리스트를 반환합니다.")
     ResponseEntity<StandardResponse<AmenityFactorList>> getAmenityFactorList();
 
-    @Operation(summary = "비교표 생성", description = "비교표 이름, 숙소 ID 리스트, 비교 기준 항목을 받아서 비교표 메타 데이터를 생성합니다.")
+    @Operation(summary = "비교표 생성", description = "비교표 이름, 숙소 ID 리스트, 비교 기준 항목을 받아서 비교표 메타 데이터를 생성합니다. (Authorization 헤더에 Bearer 토큰 필요)")
+    @SecurityRequirement(name = "JWT")
     ResponseEntity<StandardResponse<CreateComparisonTableResponse>> createComparisonTable(
             @RequestBody CreateComparisonTableRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     );
 
-    @Operation(summary = "비교표 조회", description = "비교표 메타 데이터와 포함된 숙소 정보 리스트를 조회합니다.")
+    @Operation(summary = "비교표 조회", description = "비교표 메타 데이터와 포함된 숙소 정보 리스트를 조회합니다. (Authorization 헤더에 Bearer 토큰 필요)")
+    @SecurityRequirement(name = "JWT")
     ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "숙소가 포함된 테이블의 ID") Long tableId,
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     );
 
-    @Operation(summary = "비교표 수정", description = "비교표 메타 데이터(제목)와 숙소 세부 내용, 비교 기준 정렬 순서, 숙소 정렬 순서를 수정합니다.")
+    @Operation(summary = "비교표 수정", description = "비교표 메타 데이터(제목)와 숙소 세부 내용, 비교 기준 정렬 순서, 숙소 정렬 순서를 수정합니다. (Authorization 헤더에 Bearer 토큰 필요)")
+    @SecurityRequirement(name = "JWT")
     ResponseEntity<StandardResponse<Boolean>> updateComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "수정할 테이블의 ID") Long tableId,
             @RequestBody UpdateComparisonTableRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     );
 
-    @Operation(summary = "비교표 숙소 추가", description = "비교표에 새로운 숙소를 추가합니다.")
+    @Operation(summary = "비교표 숙소 추가", description = "비교표에 새로운 숙소를 추가합니다. (Authorization 헤더에 Bearer 토큰 필요)")
+    @SecurityRequirement(name = "JWT")
     ResponseEntity<StandardResponse<ComparisonTableResponse>> addAccommodationToComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "테이블의 ID") Long tableId,
             @RequestBody AddAccommodationRequest request,
