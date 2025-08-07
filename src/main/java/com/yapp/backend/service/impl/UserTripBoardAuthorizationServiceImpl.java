@@ -23,32 +23,6 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
     private final JpaAccommodationRepository accommodationRepository;
 
     @Override
-    public boolean hasAccessToTripBoard(Long userId, Long boardId) {
-        log.info("권한 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
-
-        if (userId == null || boardId == null) {
-            log.warn("권한 검증 실패 - 사유: null 파라미터, userId={}, boardId={}", userId, boardId);
-            return false;
-        }
-
-        try {
-            boolean hasAccess = userTripBoardRepository.findByUserIdAndTripBoardId(userId, boardId)
-                    .isPresent();
-
-            if (hasAccess) {
-                log.info("권한 검증 성공 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
-            } else {
-                log.warn("권한 검증 실패 - 사용자 ID: {}, 보드 ID: {}, 사유: 보드 멤버가 아님", userId, boardId);
-            }
-
-            return hasAccess;
-
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    @Override
     public void validateTripBoardAccess(Long userId, Long boardId) {
         log.info("여행보드 접근 권한 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
 
@@ -107,6 +81,31 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
             log.error("숙소 접근 권한 검증 중 예외 발생 - 사용자 ID: {}, 숙소 ID: {}, 오류: {}",
                     userId, accommodationId, e.getMessage(), e);
             throw UserAuthorizationException.forAccommodation(userId, accommodationId);
+        }
+    }
+
+    private boolean hasAccessToTripBoard(Long userId, Long boardId) {
+        log.info("권한 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
+
+        if (userId == null || boardId == null) {
+            log.warn("권한 검증 실패 - 사유: null 파라미터, userId={}, boardId={}", userId, boardId);
+            return false;
+        }
+
+        try {
+            boolean hasAccess = userTripBoardRepository.findByUserIdAndTripBoardId(userId, boardId)
+                    .isPresent();
+
+            if (hasAccess) {
+                log.info("권한 검증 성공 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
+            } else {
+                log.warn("권한 검증 실패 - 사용자 ID: {}, 보드 ID: {}, 사유: 보드 멤버가 아님", userId, boardId);
+            }
+
+            return hasAccess;
+
+        } catch (Exception e) {
+            return false;
         }
     }
 }
