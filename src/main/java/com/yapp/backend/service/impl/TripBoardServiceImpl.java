@@ -286,7 +286,7 @@ public class TripBoardServiceImpl implements TripBoardService {
             log.info("여행 보드 삭제 시작 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
 
             // 1. 여행보드 존재 여부 및 소유자 권한 검증
-            TripBoard tripBoard = validateOwnershipAndGetTripBoard(tripBoardId, userId);
+            validateOwnershipAndGetTripBoard(tripBoardId, userId);
 
             // 2. 관련 데이터 cascade 삭제 (순서 중요)
             deleteRelatedData(tripBoardId);
@@ -318,7 +318,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     /**
      * 여행보드 소유자 권한 검증 및 여행보드 조회
      */
-    private TripBoard validateOwnershipAndGetTripBoard(Long tripBoardId, Long userId) {
+    private void validateOwnershipAndGetTripBoard(Long tripBoardId, Long userId) {
         // 여행보드 존재 여부 확인
         TripBoard tripBoard = tripBoardRepository.findById(tripBoardId)
                 .orElseThrow(() -> {
@@ -332,8 +332,6 @@ public class TripBoardServiceImpl implements TripBoardService {
                     tripBoardId, userId, tripBoard.getCreatedBy().getId());
             throw new UserAuthorizationException(userId, tripBoardId);
         }
-
-        return tripBoard;
     }
 
     /**
