@@ -8,5 +8,5 @@ public interface JpaComparisonTableRepository extends JpaRepository<ComparisonTa
     /**
      * 여행보드 ID로 해당 보드의 모든 비교표를 삭제합니다.
      */
-    void deleteByTripBoardId(Long tripBoardId);
+    void deleteByTripBoardEntityId(Long tripBoardId);
 }
