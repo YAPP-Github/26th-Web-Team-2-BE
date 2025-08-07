@@ -57,4 +57,9 @@ public interface JpaUserTripBoardRepository extends JpaRepository<UserTripBoardE
                         "JOIN FETCH utb.user u " +
                         "WHERE utb.tripBoard.id IN :tripBoardIds")
         List<UserTripBoardEntity> findByTripBoardIdsWithUser(@Param("tripBoardIds") List<Long> tripBoardIds);
+
+        /**
+         * 여행보드 ID로 해당 보드의 모든 사용자 매핑을 삭제합니다.
+         */
+        void deleteByTripBoardId(Long tripBoardId);
 }

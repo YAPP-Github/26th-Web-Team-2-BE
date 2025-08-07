@@ -152,4 +152,9 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
         jpaComparisonTableRepository.save(tableEntity);
         return comparisonTableMapper.entityToDomain(tableEntity);
     }
+
+    @Override
+    public void deleteByTripBoardId(Long tripBoardId) {
+        jpaComparisonTableRepository.deleteByTripBoardId(tripBoardId);
+    }
 }
