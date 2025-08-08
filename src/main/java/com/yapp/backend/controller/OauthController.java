@@ -10,6 +10,7 @@ import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.common.util.CookieUtil;
 import com.yapp.backend.controller.docs.OauthDocs;
+import com.yapp.backend.controller.dto.response.LogoutResponse;
 import com.yapp.backend.filter.service.RefreshTokenService;
 import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
 import com.yapp.backend.controller.dto.response.OauthLoginResponse;
@@ -38,6 +39,7 @@ public class OauthController implements OauthDocs {
     private final OauthService oauthService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final CookieUtil cookieUtil;
 
     /**
      * 카카오 OAuth 인가 URL을 반환합니다.
@@ -74,15 +76,15 @@ public class OauthController implements OauthDocs {
 
         // TODO: access, refresh 생성 메서드 재활용 가능하도록 리팩토링
         // 2. 토큰 생성
-        String accessToken = jwtTokenProvider.createAccessToken(oauthResponse.userId());
-        String refreshToken = jwtTokenProvider.createRefreshToken(oauthResponse.userId());
+        String accessToken = jwtTokenProvider.createAccessToken(oauthResponse.getUserId());
+        String refreshToken = jwtTokenProvider.createRefreshToken(oauthResponse.getUserId());
         
         // 3. Redis에 Refresh Token 저장
-        refreshTokenService.storeRefresh(oauthResponse.userId(), refreshToken);
+        refreshTokenService.storeRefresh(oauthResponse.getUserId(), refreshToken);
         
         // 4. HTTP 응답에 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
         response.setHeader(ACCESS_TOKEN_HEADER, accessToken);
-        ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(oauthResponse.userId());
+        ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(oauthResponse.getUserId());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         
         // 5. 사용자 정보만 응답 바디로 반환 (토큰은 헤더로 전달됨)
@@ -101,7 +103,7 @@ public class OauthController implements OauthDocs {
     @Override
     @SecurityRequirement(name = "JWT")
     @PostMapping("/logout")
-    public ResponseEntity<StandardResponse<Boolean>> logout(
+    public ResponseEntity<StandardResponse<LogoutResponse>> logout(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpServletRequest request,
             HttpServletResponse response
@@ -114,10 +116,10 @@ public class OauthController implements OauthDocs {
         refreshTokenService.logoutUser(userId, accessToken);
 
         // 쿠키 무효화
-        ResponseCookie invalidatedCookie = CookieUtil.createInvalidatedCookie(REFRESH_TOKEN_COOKIE);
+        ResponseCookie invalidatedCookie = cookieUtil.createInvalidatedCookie(REFRESH_TOKEN_COOKIE);
         response.addHeader(HttpHeaders.SET_COOKIE, invalidatedCookie.toString());
         
-        return ResponseEntity.ok(new StandardResponse<>(SUCCESS, true));
+        return ResponseEntity.ok(new StandardResponse<>(SUCCESS, new LogoutResponse(true)));
     }
 
 }

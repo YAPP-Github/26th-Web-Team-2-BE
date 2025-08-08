@@ -2,6 +2,7 @@ package com.yapp.backend.controller.docs;
 
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
+import com.yapp.backend.controller.dto.response.LogoutResponse;
 import com.yapp.backend.controller.dto.response.OauthLoginResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,7 +61,7 @@ public interface OauthDocs {
             description = "로그아웃이 성공적으로 완료되었습니다."
     )
     @SecurityRequirement(name = "JWT")
-    ResponseEntity<StandardResponse<Boolean>> logout(
+    ResponseEntity<StandardResponse<LogoutResponse>> logout(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @Parameter(hidden = true) HttpServletRequest request,
             @Parameter(hidden = true) HttpServletResponse response
