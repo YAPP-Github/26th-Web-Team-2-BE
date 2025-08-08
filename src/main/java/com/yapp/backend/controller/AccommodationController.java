@@ -54,10 +54,8 @@ public class AccommodationController implements AccommodationDocs {
             @RequestParam(defaultValue = "saved_at_desc") String sort,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        // 권한 검증은 AOP에서 자동으로 수행됨
-        AccommodationPageResponse response = accommodationService.findAccommodationsByBoardId(boardId, page, size,
-                userId, sort);
-
+        AccommodationPageResponse response = accommodationService
+                .findAccommodationsByBoardId(boardId, page, size, userId, sort);
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 
@@ -74,10 +72,8 @@ public class AccommodationController implements AccommodationDocs {
             @RequestParam(required = false) Long userId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        // 권한 검증은 AOP에서 자동으로 수행됨
         Long count = accommodationService.countAccommodationsByBoardId(boardId, userId);
         AccommodationCountResponse accommodationCountResponse = new AccommodationCountResponse(count);
-
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, accommodationCountResponse));
     }
 
@@ -93,9 +89,7 @@ public class AccommodationController implements AccommodationDocs {
             @RequestBody AccommodationRegisterRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        // 권한 검증은 AOP에서 자동으로 수행됨
         AccommodationRegisterResponse response = accommodationService.registerAccommodationCard(request, userDetails.getUserId());
-
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 
@@ -112,9 +106,7 @@ public class AccommodationController implements AccommodationDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 
-        // 권한 검증은 AOP에서 자동으로 수행됨
         AccommodationResponse response = accommodationService.findAccommodationById(accommodationId);
-
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 }
