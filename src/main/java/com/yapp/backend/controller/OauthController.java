@@ -1,18 +1,26 @@
 package com.yapp.backend.controller;
 
 import static com.yapp.backend.common.response.ResponseType.*;
+import static com.yapp.backend.common.util.CookieUtil.REFRESH_TOKEN_COOKIE;
 import static com.yapp.backend.filter.JwtFilter.ACCESS_TOKEN_HEADER;
+import static com.yapp.backend.common.util.TokenUtil.extractTokenFromHeader;
 
 import com.google.common.net.HttpHeaders;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.common.util.JwtTokenProvider;
+import com.yapp.backend.common.util.CookieUtil;
 import com.yapp.backend.controller.docs.OauthDocs;
 import com.yapp.backend.filter.service.RefreshTokenService;
 import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
 import com.yapp.backend.controller.dto.response.OauthLoginResponse;
 import com.yapp.backend.service.OauthService;
+import com.yapp.backend.filter.dto.CustomUserDetails;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/oauth")
@@ -79,5 +88,36 @@ public class OauthController implements OauthDocs {
         // 5. 사용자 정보만 응답 바디로 반환 (토큰은 헤더로 전달됨)
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, oauthResponse));
     }
-    
+
+    /**
+     * 사용자 로그아웃 API
+     * Redis에서 Refresh Token을 삭제하고 Access Token을 블랙리스트에 추가하며 쿠키를 무효화합니다.
+     *
+     * @param userDetails 현재 인증된 사용자 정보
+     * @param request HTTP 요청 (Access Token 추출용)
+     * @param response HTTP 응답 (쿠키 삭제용)
+     * @return 로그아웃 성공 여부
+     */
+    @Override
+    @SecurityRequirement(name = "JWT")
+    @PostMapping("/logout")
+    public ResponseEntity<StandardResponse<Boolean>> logout(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        
+        Long userId = userDetails.getUserId();
+
+        // 모든 토큰 무효화 (Refresh Token 삭제 + Access Token 블랙리스트)
+        String accessToken = extractTokenFromHeader(request);
+        refreshTokenService.logoutUser(userId, accessToken);
+
+        // 쿠키 무효화
+        ResponseCookie invalidatedCookie = CookieUtil.createInvalidatedCookie(REFRESH_TOKEN_COOKIE);
+        response.addHeader(HttpHeaders.SET_COOKIE, invalidatedCookie.toString());
+        
+        return ResponseEntity.ok(new StandardResponse<>(SUCCESS, true));
+    }
+
 }
