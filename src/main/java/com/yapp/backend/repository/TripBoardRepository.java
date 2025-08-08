@@ -22,7 +22,7 @@ public interface TripBoardRepository {
     /**
      * ID로 여행 보드를 조회합니다.
      */
-    Optional<TripBoard> findById(Long id);
+    TripBoard findByIdOrThrow(Long id);
 
     /**
      * 사용자가 참여한 여행 보드 목록을 페이징하여 조회합니다.

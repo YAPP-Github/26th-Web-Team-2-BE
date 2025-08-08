@@ -1,5 +1,6 @@
 package com.yapp.backend.repository.impl;
 
+import com.yapp.backend.common.exception.TripBoardNotFoundException;
 import com.yapp.backend.repository.TripBoardRepository;
 import com.yapp.backend.repository.JpaTripBoardRepository;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
@@ -12,6 +13,7 @@ import com.yapp.backend.service.dto.ParticipantProfile;
 import com.yapp.backend.service.dto.TripBoardSummary;
 import com.yapp.backend.service.model.TripBoard;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 /**
  * 여행 보드 Repository 구현체
  */
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class TripBoardRepositoryImpl implements TripBoardRepository {
@@ -43,9 +46,11 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
     }
 
     @Override
-    public Optional<TripBoard> findById(Long id) {
-        return jpaTripBoardRepository.findById(id)
-                .map(tripBoardMapper::entityToDomain);
+    public TripBoard findByIdOrThrow(Long id) {
+        TripBoardEntity tripBoardEntity =
+                jpaTripBoardRepository.findById(id)
+                .orElseThrow(TripBoardNotFoundException::new);
+        return tripBoardMapper.entityToDomain(tripBoardEntity);
     }
 
     @Override
