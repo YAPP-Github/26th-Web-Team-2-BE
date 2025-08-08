@@ -14,7 +14,9 @@ import com.yapp.backend.controller.dto.response.LogoutResponse;
 import com.yapp.backend.filter.service.RefreshTokenService;
 import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
 import com.yapp.backend.controller.dto.response.OauthLoginResponse;
+import com.yapp.backend.controller.dto.response.WithdrawResponse;
 import com.yapp.backend.service.OauthService;
+import com.yapp.backend.service.UserService;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +42,7 @@ public class OauthController implements OauthDocs {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final CookieUtil cookieUtil;
+    private final UserService userService;
 
     /**
      * 카카오 OAuth 인가 URL을 반환합니다.
@@ -120,6 +123,39 @@ public class OauthController implements OauthDocs {
         response.addHeader(HttpHeaders.SET_COOKIE, invalidatedCookie.toString());
         
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, new LogoutResponse(true)));
+    }
+    
+    /**
+     * 회원탈퇴 API
+     * 사용자 데이터를 Soft Delete 처리하고 모든 토큰을 무효화합니다.
+     *
+     * @param userDetails 현재 인증된 사용자 정보
+     * @param request HTTP 요청 (Access Token 추출용)
+     * @param response HTTP 응답 (쿠키 삭제용)
+     * @return 회원탈퇴 응답 객체
+     */
+    @Override
+    @SecurityRequirement(name = "JWT")
+    @PostMapping("/withdraw")
+    public ResponseEntity<StandardResponse<WithdrawResponse>> withdrawUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        
+        Long userId = userDetails.getUserId();
+        
+        // 1. 회원탈퇴 처리 (Soft Delete)
+        Boolean isWithdraw = userService.withdrawUser(userId);
+        
+        // 2. 모든 토큰 무효화 (로그아웃과 동일)
+        String accessToken = extractTokenFromHeader(request);
+        refreshTokenService.logoutUser(userId, accessToken);
+
+        // 3. 쿠키 무효화
+        ResponseCookie invalidatedCookie = cookieUtil.createInvalidatedCookie(REFRESH_TOKEN_COOKIE);
+        response.addHeader(HttpHeaders.SET_COOKIE, invalidatedCookie.toString());
+        
+        return ResponseEntity.ok(new StandardResponse<>(SUCCESS, new WithdrawResponse(isWithdraw)));
     }
 
 }
