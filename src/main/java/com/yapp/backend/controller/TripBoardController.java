@@ -4,8 +4,10 @@ import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.docs.TripBoardDocs;
 import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
+import com.yapp.backend.controller.dto.request.TripBoardLeaveRequest;
 import com.yapp.backend.controller.dto.request.TripBoardUpdateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
+import com.yapp.backend.controller.dto.response.TripBoardLeaveResponse;
 import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
@@ -126,6 +128,26 @@ public class TripBoardController implements TripBoardDocs {
 
         // 여행 보드 삭제 (소유자 권한 검증 포함)
         TripBoardDeleteResponse response = tripBoardService.deleteTripBoard(tripBoardId, whoAmI);
+
+        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
+    }
+
+    /**
+     * 여행 보드 나가기 API
+     */
+    @Override
+    @PostMapping("/{tripBoardId}/leave")
+    public ResponseEntity<StandardResponse<TripBoardLeaveResponse>> leaveTripBoard(
+            @PathVariable Long tripBoardId,
+            @RequestBody @Valid TripBoardLeaveRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // JWT 인증을 통한 현재 사용자 정보 추출
+        Long whoAmI = userDetails.getUserId();
+
+        // 여행 보드 나가기
+        TripBoardLeaveResponse response = tripBoardService.leaveTripBoard(
+                tripBoardId, whoAmI, request.getRemoveResources());
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
