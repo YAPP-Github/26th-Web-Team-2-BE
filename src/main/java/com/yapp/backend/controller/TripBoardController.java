@@ -55,10 +55,10 @@ public class TripBoardController implements TripBoardDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         // JWT 인증을 통한 현재 사용자 정보 추출
-        Long userId = userDetails.getUserId();
+        Long whoAmI = userDetails.getUserId();
 
         // 여행 보드 생성
-        TripBoardCreateResponse response = tripBoardService.createTripBoard(request, userId);
+        TripBoardCreateResponse response = tripBoardService.createTripBoard(request, whoAmI);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new StandardResponse<>(ResponseType.SUCCESS, response));
@@ -75,14 +75,14 @@ public class TripBoardController implements TripBoardDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         // JWT 인증을 통한 현재 사용자 정보 추출
-        Long userId = userDetails.getUserId();
+        Long whoAmI = userDetails.getUserId();
 
         // 페이징 객체 생성 (최신순 정렬: 생성일 내림차순)
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // 여행 보드 목록 조회
-        TripBoardPageResponse response = tripBoardService.getTripBoards(userId, pageable);
+        TripBoardPageResponse response = tripBoardService.getTripBoards(whoAmI, pageable);
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
@@ -119,11 +119,13 @@ public class TripBoardController implements TripBoardDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         // JWT 인증을 통한 현재 사용자 정보 추출
-        Long userId = userDetails.getUserId();
+        Long whoAmI = userDetails.getUserId();
 
-        // todo 비즈니스 로직안에서 여행보드 권한을 확인하는 데, 여행 보드 접근 권한 검증을 해야하는 지?
+        // 여행 보드 접근 권한 검증
+        authorizationService.validateTripBoardAccess(whoAmI, tripBoardId);
+
         // 여행 보드 삭제 (소유자 권한 검증 포함)
-        TripBoardDeleteResponse response = tripBoardService.deleteTripBoard(tripBoardId, userId);
+        TripBoardDeleteResponse response = tripBoardService.deleteTripBoard(tripBoardId, whoAmI);
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
