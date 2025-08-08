@@ -13,6 +13,7 @@ public enum ErrorCode {
     USER_NOT_FOUND("사용자 존재하지 않음", "사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     TABLE_NOT_FOUND("비교표 존재하지 않음", "비교표를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ACCOMMODATION_NOT_FOUND("숙소 정보 존재하지 않음", "숙소 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    DELETED_USER_ACCESS("삭제된 유저", "삭제된 유저에 대한 접근", HttpStatus.BAD_REQUEST),
 
     // Authorization
     INVALID_USER_AUTHORIZATION("사용자 권한 없음", "해당 권한이 없는 유저입니다.", HttpStatus.FORBIDDEN),
