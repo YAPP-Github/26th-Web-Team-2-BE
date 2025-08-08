@@ -4,10 +4,16 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class CookieUtil {
-
+    
+    @Value("${cookie.secure:false}")
+    private boolean cookieSecure;
+    
     public static final String REFRESH_TOKEN_COOKIE = "REFRESH_TOKEN";
 
     /**
@@ -33,14 +39,13 @@ public class CookieUtil {
      * @param cookieName 무효화할 쿠키 이름
      * @return 무효화된 ResponseCookie
      */
-    public static ResponseCookie createInvalidatedCookie(String cookieName) {
+    public ResponseCookie createInvalidatedCookie(String cookieName) {
         return ResponseCookie.from(cookieName, "")
                 .path("/")
                 .maxAge(0) // 즉시 만료
                 .httpOnly(true)
-                .secure(false) // 개발환경용, 프로덕션에서는 true로 설정
+                .secure(cookieSecure) // YAML 설정값 사용
                 .sameSite("Lax")
                 .build();
     }
-
 }
