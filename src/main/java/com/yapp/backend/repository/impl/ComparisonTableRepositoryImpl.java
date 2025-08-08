@@ -154,6 +154,12 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
     }
 
     @Override
+    @Transactional
+    public void deleteByTripBoardIdAndCreatedById(Long tripBoardId, Long createdById) {
+        jpaComparisonTableRepository.deleteByTripBoardIdAndCreatedByEntityId(tripBoardId, createdById);
+    }
+
+    @Override
     public void deleteByTripBoardId(Long tripBoardId) {
         jpaComparisonTableRepository.deleteByTripBoardEntityId(tripBoardId);
     }

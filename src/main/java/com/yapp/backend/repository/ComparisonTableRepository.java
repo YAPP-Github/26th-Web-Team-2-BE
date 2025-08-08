@@ -19,3 +19,9 @@ public interface ComparisonTableRepository {
      */
     void deleteByTripBoardId(Long tripBoardId);
 }
+
+    /**
+     * 특정 여행보드에서 특정 사용자가 생성한 비교표들을 삭제합니다.
+     */
+    void deleteByTripBoardIdAndCreatedById(Long tripBoardId, Long createdById);
+}

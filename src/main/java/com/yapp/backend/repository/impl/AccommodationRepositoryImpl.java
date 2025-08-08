@@ -39,14 +39,14 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
         SortType sortType = SortType.fromString(sort);
         boolean isPriceSort = sortType == SortType.PRICE_ASC;
 
-        entityPage = userId != null
-                ? getEntityPageWithUserId(boardId, userId, pageable, isPriceSort)
-                : getEntityPageWithoutUserId(boardId, pageable, isPriceSort);
+		entityPage = userId != null
+				? getEntityPageWithUserId(boardId, userId, pageable, isPriceSort)
+				: getEntityPageWithoutUserId(boardId, pageable, isPriceSort);
 
-        return entityPage.getContent().stream()
-                .map(this::convertToAccommodation)
-                .collect(Collectors.toList());
-    }
+		return entityPage.getContent().stream()
+				.map(this::convertToAccommodation)
+				.collect(Collectors.toList());
+	}
 
     /**
      * 테이블 ID로 숙소 개수를 조회
@@ -77,33 +77,33 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
         return accommodationMapper.entityToDomain(accommodationEntity);
     }
 
-    /**
-     * 숙소 ID로 단건 조회합니다.
-     */
-    @Override
-    public Accommodation findById(Long accommodationId) {
-        AccommodationEntity entity = jpaAccommodationRepository.findByAccommodationId(accommodationId);
-        return entity != null ? convertToAccommodation(entity) : null;
-    }
+	/**
+	 * 숙소 ID로 단건 조회합니다.
+	 */
+	@Override
+	public Accommodation findById(Long accommodationId) {
+		AccommodationEntity entity = jpaAccommodationRepository.findByAccommodationId(accommodationId);
+		return entity != null ? convertToAccommodation(entity) : null;
+	}
 
-    /**
-     * userId가 있는 경우의 엔티티 페이지 조회
-     */
-    private Page<AccommodationEntity> getEntityPageWithUserId(Long boardId, Long userId, Pageable pageable,
-                                                              boolean isPriceSort) {
-        return isPriceSort
-                ? jpaAccommodationRepository.findByBoardIdAndCreatedByOrderByLowestPriceAsc(boardId, userId, pageable)
-                : jpaAccommodationRepository.findByBoardIdAndCreatedByOrderByCreatedAtDesc(boardId, userId, pageable);
-    }
+	/**
+	 * userId가 있는 경우의 엔티티 페이지 조회
+	 */
+	private Page<AccommodationEntity> getEntityPageWithUserId(Long boardId, Long userId, Pageable pageable,
+			boolean isPriceSort) {
+		return isPriceSort
+				? jpaAccommodationRepository.findByBoardIdAndCreatedByOrderByLowestPriceAsc(boardId, userId, pageable)
+				: jpaAccommodationRepository.findByBoardIdAndCreatedByOrderByCreatedAtDesc(boardId, userId, pageable);
+	}
 
-    /**
-     * userId가 없는 경우의 엔티티 페이지 조회
-     */
-    private Page<AccommodationEntity> getEntityPageWithoutUserId(Long boardId, Pageable pageable, boolean isPriceSort) {
-        return isPriceSort
-                ? jpaAccommodationRepository.findByBoardIdOrderByLowestPriceAsc(boardId, pageable)
-                : jpaAccommodationRepository.findByBoardIdOrderByCreatedAtDesc(boardId, pageable);
-    }
+	/**
+	 * userId가 없는 경우의 엔티티 페이지 조회
+	 */
+	private Page<AccommodationEntity> getEntityPageWithoutUserId(Long boardId, Pageable pageable, boolean isPriceSort) {
+		return isPriceSort
+				? jpaAccommodationRepository.findByBoardIdOrderByLowestPriceAsc(boardId, pageable)
+				: jpaAccommodationRepository.findByBoardIdOrderByCreatedAtDesc(boardId, pageable);
+	}
 
     /**
      * Convert AccommodationEntity to Accommodation domain model
@@ -122,5 +122,10 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
     public void deleteByBoardId(Long boardId) {
         jpaAccommodationRepository.deleteByBoardId(boardId);
     }
+
+	@Override
+	public void deleteByBoardIdAndCreatedById(Long boardId, Long createdById) {
+		jpaAccommodationRepository.deleteByBoardIdAndCreatedById(boardId, createdById);
+	}
 
 }

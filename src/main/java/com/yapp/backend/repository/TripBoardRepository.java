@@ -42,6 +42,11 @@ public interface TripBoardRepository {
     TripBoard updateTripBoard(TripBoard tripBoard);
 
     /**
+     * 여행보드를 완전히 삭제합니다 (관련된 모든 데이터 포함).
+     */
+    void deleteTripBoardCompletely(Long tripBoardId);
+
+    /**
      * ID로 여행 보드를 삭제합니다.
      */
     void deleteById(Long id);

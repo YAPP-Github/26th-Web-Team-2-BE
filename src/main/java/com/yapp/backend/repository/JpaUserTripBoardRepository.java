@@ -1,6 +1,7 @@
 package com.yapp.backend.repository;
 
 import com.yapp.backend.repository.entity.UserTripBoardEntity;
+import com.yapp.backend.repository.enums.TripBoardRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -60,6 +61,21 @@ public interface JpaUserTripBoardRepository extends JpaRepository<UserTripBoardE
 
         /**
          * 여행보드 ID로 해당 보드의 모든 사용자 매핑을 삭제합니다.
+         */
+        void deleteByTripBoardId(Long tripBoardId);
+
+        /**
+         * 여행보드의 특정 역할 참여자를 생성일 오름차순으로 조회 (다음 OWNER 후보 조회용)
+         */
+        List<UserTripBoardEntity> findByTripBoardIdAndRoleOrderByCreatedAtAsc(Long tripBoardId, TripBoardRole role);
+
+        /**
+         * 사용자와 여행보드 간의 매핑 삭제
+         */
+        void deleteByUserIdAndTripBoardId(Long userId, Long tripBoardId);
+
+        /**
+         * 특정 여행보드의 모든 사용자-여행보드 매핑을 삭제 (여행보드 완전 삭제용)
          */
         void deleteByTripBoardId(Long tripBoardId);
 }
