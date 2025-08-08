@@ -5,6 +5,10 @@ package com.yapp.backend.common.exception;
  */
 public class TripBoardLeaveException extends CustomException {
 
+    public TripBoardLeaveException() {
+        super(ErrorCode.TRIP_BOARD_LEAVE_FAILED);
+    }
+
     public TripBoardLeaveException(ErrorCode errorCode) {
         super(errorCode);
     }
