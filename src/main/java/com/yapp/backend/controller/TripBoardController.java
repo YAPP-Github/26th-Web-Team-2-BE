@@ -94,13 +94,10 @@ public class TripBoardController implements TripBoardDocs {
      * 권한 : 여행 보드 참여자 - OWNER / MEMBER
      */
     @Override
-    @RequirePermission(
-            value = PermissionType.TRIP_BOARD_MODIFY,
-            paramName = "tripBoardId"
-    )
-    @PutMapping("/{tripBoardId}")
+    @RequirePermission(value = PermissionType.TRIP_BOARD_MODIFY, paramName = "boardId")
+    @PutMapping("/{boardId}")
     public ResponseEntity<StandardResponse<TripBoardUpdateResponse>> updateTripBoard(
-            @PathVariable Long tripBoardId,
+            @PathVariable Long boardId,
             @RequestBody @Valid TripBoardUpdateRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -108,7 +105,7 @@ public class TripBoardController implements TripBoardDocs {
         Long userId = userDetails.getUserId();
 
         // 여행 보드 수정
-        TripBoardUpdateResponse response = tripBoardService.updateTripBoard(tripBoardId, request, userId);
+        TripBoardUpdateResponse response = tripBoardService.updateTripBoard(boardId, request, userId);
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
