@@ -62,6 +62,13 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             // CASE 1: Valid Access Token
             jwtTokenProvider.validateAccessTokenOrThrow(accessToken);
+            
+            // 블랙리스트 확인
+            if (refreshTokenService.isAccessTokenBlacklisted(accessToken)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is blacklisted");
+                return;
+            }
+            
             authContextService.createAuthContext(accessToken);
             filterChain.doFilter(request, response);
         } catch (JwtException | IllegalArgumentException bad) {
