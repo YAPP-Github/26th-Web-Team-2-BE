@@ -4,6 +4,7 @@ import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
 import com.yapp.backend.controller.dto.request.TripBoardUpdateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
+import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
@@ -44,5 +45,11 @@ public interface TripBoardDocs {
         ResponseEntity<StandardResponse<TripBoardUpdateResponse>> updateTripBoard(
                         @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
                         @RequestBody @Valid TripBoardUpdateRequest request,
+                        @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
+
+        @Operation(summary = "여행 보드 삭제", description = "여행 보드와 관련된 모든 데이터를 삭제합니다. 오직 여행 보드의 소유자(OWNER)만이 삭제할 수 있으며, 삭제 시 해당 보드에 연관된 모든 리소스(숙소 정보, 멤버 매핑 관계, 비교표 등)가 함께 제거됩니다.")
+        @SecurityRequirement(name = "JWT")
+        ResponseEntity<StandardResponse<TripBoardDeleteResponse>> deleteTripBoard(
+                        @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 }

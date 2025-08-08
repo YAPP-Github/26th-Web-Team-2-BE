@@ -96,4 +96,15 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
         return tripBoardMapper.entityToDomain(updatedEntity);
     }
 
+    @Override
+    public void deleteById(Long id) {
+        jpaTripBoardRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<TripBoard> findByIdAndCreatedById(Long tripBoardId, Long createdById) {
+        return jpaTripBoardRepository.findByIdAndCreatedById(tripBoardId, createdById)
+                .map(tripBoardMapper::entityToDomain);
+    }
+
 }

@@ -55,4 +55,9 @@ public interface JpaAccommodationRepository extends JpaRepository<AccommodationE
         @Query("SELECT a FROM AccommodationEntity a WHERE a.boardId = :boardId AND a.createdBy.id = :userId ORDER BY a.lowestPrice ASC")
         Page<AccommodationEntity> findByBoardIdAndCreatedByOrderByLowestPriceAsc(@Param("boardId") Long boardId,
                         @Param("userId") Long userId, Pageable pageable);
+
+        /**
+         * 여행보드 ID로 해당 보드의 모든 숙소를 삭제합니다.
+         */
+        void deleteByBoardId(Long boardId);
 }

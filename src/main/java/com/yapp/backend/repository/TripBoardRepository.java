@@ -40,4 +40,14 @@ public interface TripBoardRepository {
      * 여행 보드를 업데이트합니다.
      */
     TripBoard updateTripBoard(TripBoard tripBoard);
+
+    /**
+     * ID로 여행 보드를 삭제합니다.
+     */
+    void deleteById(Long id);
+
+    /**
+     * 여행 보드 ID와 생성자 ID로 여행 보드를 조회합니다. (소유자 검증용)
+     */
+    Optional<TripBoard> findByIdAndCreatedById(Long tripBoardId, Long createdById);
 }
