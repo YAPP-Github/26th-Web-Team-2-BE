@@ -55,7 +55,12 @@ public enum ErrorCode {
     OAUTH_TOKEN_EXCHANGE_FAILED("OAuth 토큰 교환 실패", "OAuth 토큰 교환 과정에서 오류가 발생했습니다.", HttpStatus.BAD_REQUEST),
     INVALID_OAUTH_BASE_URL("허용되지 않은 Base URL", "OAuth 요청에서 허용되지 않은 Base URL입니다.", HttpStatus.FORBIDDEN),
     UNSUPPORTED_OAUTH_PROVIDER("지원하지 않는 OAuth 공급자", "요청한 OAuth 공급자는 현재 지원되지 않습니다. 지원 가능한 공급자를 확인해 주세요.",
-            HttpStatus.BAD_REQUEST)
+            HttpStatus.BAD_REQUEST),
+
+    // Trip Board Join related errors
+    INVALID_INVITATION_URL("유효하지 않은 초대링크", "존재하지 않는 초대링크입니다.", HttpStatus.NOT_FOUND),
+    INACTIVE_INVITATION_URL("비활성화된 초대링크", "비활성화된 초대링크입니다.", HttpStatus.BAD_REQUEST),
+    DUPLICATE_TRIP_BOARD_PARTICIPATION("중복 참여", "이미 참여한 여행 보드입니다.", HttpStatus.CONFLICT)
     // 필요에 따라 추가
     ;
 
