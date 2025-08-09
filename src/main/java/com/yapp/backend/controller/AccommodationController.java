@@ -13,6 +13,7 @@ import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.service.AccommodationService;
 
 import com.yapp.backend.service.authorization.UserTripBoardAuthorizationService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ public class AccommodationController implements AccommodationDocs {
 	 * 권한 : 여행 보드 참여자 - OWNER / MEMBER
      */
     @Override
+    @SecurityRequirement(name = "JWT")
     @RequirePermission(value = RequirePermission.PermissionType.TRIP_BOARD_ACCESS, paramName = "boardId")
     @GetMapping("/search")
     public ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationByBoardIdAndUserId(
@@ -74,6 +76,7 @@ public class AccommodationController implements AccommodationDocs {
 	 * 권한 : 여행 보드 참여자 - OWNER / MEMBER
      */
     @Override
+    @SecurityRequirement(name = "JWT")
     @RequirePermission(value = RequirePermission.PermissionType.TRIP_BOARD_ACCESS, paramName = "boardId")
     @GetMapping("/count")
     public ResponseEntity<StandardResponse<AccommodationCountResponse>> getAccommodationCountByBoardId(
@@ -92,6 +95,7 @@ public class AccommodationController implements AccommodationDocs {
 	 * 권한 : 여행 보드 참여자 - OWNER / MEMBER
      */
     @Override
+    @SecurityRequirement(name = "JWT")
     @RequirePermission(value = RequirePermission.PermissionType.TRIP_BOARD_ACCESS, requestBodyField = "boardId")
     @PostMapping("/register")
     public ResponseEntity<StandardResponse<AccommodationRegisterResponse>> registerAccommodationCard(
@@ -108,6 +112,7 @@ public class AccommodationController implements AccommodationDocs {
      * 권한 : 숙소가 등록된 여행 보드 참여자 - OWNER / MEMBER
      */
     @Override
+    @SecurityRequirement(name = "JWT")
     @RequirePermission(value = RequirePermission.PermissionType.ACCOMMODATION_ACCESS, paramName = "accommodationId")
     @GetMapping("/{accommodationId}")
     public ResponseEntity<StandardResponse<AccommodationResponse>> getAccommodationById(
