@@ -1,28 +1,21 @@
 package com.yapp.backend.service.impl;
 
-import static com.yapp.backend.service.model.Attraction.*;
-
 import com.yapp.backend.common.exception.CustomException;
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
-import com.yapp.backend.controller.dto.request.update.AmenityUpdate;
-import com.yapp.backend.controller.dto.request.update.AttractionUpdate;
-import com.yapp.backend.controller.dto.request.update.CheckTimeUpdate;
-import com.yapp.backend.controller.dto.request.update.TransportationUpdate;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
+import com.yapp.backend.controller.dto.response.UserProfileResponse;
 import com.yapp.backend.repository.entity.AccommodationEntity;
 import com.yapp.backend.repository.mapper.ScrapingDataMapper;
 import com.yapp.backend.service.model.Accommodation;
+import com.yapp.backend.service.model.UserTripBoard;
 import com.yapp.backend.repository.AccommodationRepository;
+import com.yapp.backend.repository.UserTripBoardRepository;
 import com.yapp.backend.service.AccommodationService;
 import com.yapp.backend.service.ScrapingService;
 import com.yapp.backend.service.dto.ScrapingResponse;
 
-import com.yapp.backend.service.model.Amenity;
-import com.yapp.backend.service.model.Attraction;
-import com.yapp.backend.service.model.CheckTime;
-import com.yapp.backend.service.model.Transportation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +28,7 @@ import com.yapp.backend.controller.dto.response.AccommodationPageResponse;
 import com.yapp.backend.controller.dto.response.AccommodationResponse;
 
 import java.util.List;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +40,7 @@ import java.util.stream.Collectors;
 public class AccommodationServiceImpl implements AccommodationService {
 
 	private final AccommodationRepository accommodationRepository;
+	private final UserTripBoardRepository userTripBoardRepository;
 	private final ScrapingService scrapingService;
 	private final ScrapingDataMapper scrapingDataMapper;
 
@@ -73,8 +68,12 @@ public class AccommodationServiceImpl implements AccommodationService {
 					.map(AccommodationResponse::from)
 					.collect(Collectors.toList());
 
+			// 여행보드 참여자 프로필 정보 조회
+			List<UserProfileResponse> userProfiles = getUserProfilesByBoardId(boardId);
+
 			return AccommodationPageResponse.builder()
 					.accommodations(accommodationResponses)
+					.userProfiles(userProfiles)
 					.hasNext(hasNext)
 					.build();
 		} catch (DataAccessException e) {
@@ -198,6 +197,34 @@ public class AccommodationServiceImpl implements AccommodationService {
 		}
 	}
 
-	// Helper methods for mapping updates
+	/**
+	 * 여행보드 참여자 프로필 정보 조회
+	 * 여행보드 ID로 해당 보드의 모든 참여자 정보를 조회하여 UserProfileResponse로 변환
+	 */
+	private List<UserProfileResponse> getUserProfilesByBoardId(Long boardId) {
+		try {
+			List<UserTripBoard> userTripBoards = userTripBoardRepository.findByTripBoardIdWithUser(boardId);
+
+			return userTripBoards.stream()
+					.map(this::mapToUserProfileResponse)
+					.collect(Collectors.toList());
+		} catch (DataAccessException e) {
+			log.warn("Failed to fetch user profiles for boardId: {}, returning empty list", boardId, e);
+			return Collections.emptyList();
+		} catch (Exception e) {
+			log.warn("Unexpected error while fetching user profiles for boardId: {}, returning empty list", boardId, e);
+			return Collections.emptyList();
+		}
+	}
+
+	/**
+	 * UserTripBoard를 UserProfileResponse로 변환
+	 */
+	private UserProfileResponse mapToUserProfileResponse(UserTripBoard userTripBoard) {
+		return UserProfileResponse.builder()
+				.userId(userTripBoard.getUser().getId())
+				.nickname(userTripBoard.getUser().getNickname())
+				.build();
+	}
 
 }
