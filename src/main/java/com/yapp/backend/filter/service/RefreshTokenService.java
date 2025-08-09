@@ -62,6 +62,10 @@ public class RefreshTokenService {
      * 로그아웃 시 호출됩니다.
      */
     public void blacklistAccessToken(String accessToken) {
+        if (accessToken == null || accessToken.isBlank()) {
+            log.warn("Skip blacklisting: empty access token");
+            return;
+        }
         String blacklistKey = blacklistKeyFor(accessToken);
         // Access Token의 남은 유효시간만큼 블랙리스트에 저장
         redisTemplate.opsForValue()

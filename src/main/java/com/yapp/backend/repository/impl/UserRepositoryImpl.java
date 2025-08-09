@@ -43,8 +43,9 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void saveUser(User findUser) {
-        jpaUserRepository.save(userMapper.domainToEntity(findUser));
+    public User save(User user) {
+        jpaUserRepository.save(userMapper.domainToEntity(user));
+        return user;
     }
 
 }

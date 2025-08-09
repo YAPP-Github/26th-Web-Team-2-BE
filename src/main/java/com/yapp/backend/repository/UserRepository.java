@@ -6,5 +6,5 @@ public interface UserRepository {
     User findByIdOrThrow(Long id);
     User getUserBySocialUserInfoOrCreateUser(User socialUserInfo);
     void deleteById(Long userId);
-    void saveUser(User findUser);
+    User save(User user);
 }

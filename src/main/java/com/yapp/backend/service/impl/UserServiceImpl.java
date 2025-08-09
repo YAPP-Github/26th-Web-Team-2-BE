@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
         }
         // Soft Delete 처리
         findUser.withDraw(LocalDateTime.now());
-        userRepository.saveUser(findUser);
+        userRepository.save(findUser);
         return true;
     }
 }
