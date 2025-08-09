@@ -30,6 +30,7 @@ public class UserTripBoardEntity {
     @JoinColumn(name = "trip_board_id", nullable = false)
     private TripBoardEntity tripBoard;
 
+    // todo 초대링크가 아니라 코드로 변경 필
     @Column(name = "invitation_url", unique = true, nullable = false)
     private String invitationUrl;
 
