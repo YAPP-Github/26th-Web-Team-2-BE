@@ -40,4 +40,9 @@ public interface UserTripBoardRepository {
      * 사용자-여행보드 매핑 정보 저장/업데이트
      */
     UserTripBoard save(UserTripBoard userTripBoard);
+
+    /**
+     * 특정 여행보드의 모든 참여자를 사용자 정보와 함께 조회
+     */
+    List<UserTripBoard> findByTripBoardIdWithUser(Long tripBoardId);
 }

@@ -60,6 +60,14 @@ public interface JpaUserTripBoardRepository extends JpaRepository<UserTripBoardE
     List<UserTripBoardEntity> findByTripBoardIdsWithUser(@Param("tripBoardIds") List<Long> tripBoardIds);
 
     /**
+     * 특정 여행보드의 모든 참여자를 사용자 정보와 함께 조회
+     */
+    @Query("SELECT utb FROM UserTripBoardEntity utb " +
+            "JOIN FETCH utb.user u " +
+            "WHERE utb.tripBoard.id = :tripBoardId")
+    List<UserTripBoardEntity> findByTripBoardIdWithUser(@Param("tripBoardId") Long tripBoardId);
+
+    /**
      * 여행보드의 특정 역할 참여자를 생성일 오름차순으로 조회 (다음 OWNER 후보 조회용)
      */
     List<UserTripBoardEntity> findByTripBoardIdAndRoleOrderByCreatedAtAsc(Long tripBoardId, TripBoardRole role);
