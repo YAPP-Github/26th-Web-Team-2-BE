@@ -18,14 +18,14 @@ public @interface RequirePermission {
     PermissionType value();
     
     /**
-     * 권한 검증에 사용할 파라미터 이름 (기본값: "id")
+     * 권한 검증에 사용할 파라미터 이름
      */
     String paramName() default "id";
     
     /**
-     * RequestBody에서 ID를 추출할 필드명 (기본값: "id")
+     * RequestBody에서 ID를 추출할 필드명
      */
-    String requestBodyField() default "id";
+    String requestBodyField() default "";
 
     /**
      * 권한 타입 enum

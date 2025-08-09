@@ -24,7 +24,7 @@ public class PermissionService {
     /**
      * 권한 검증 분기 메소드
      * 리소스에 따라 권한 검증 메소드를 호출합니다.
-     * @param permissionType    검증할 권한 타입
+     * @param annotation        검증 리소스 정보
      * @param resourceIds       검증할 리소스 ID들
      * @param userId            현재 사용자 ID
      */
@@ -34,25 +34,28 @@ public class PermissionService {
             Long userId
     ) {
         PermissionType permissionType = annotation.value();
-        String paramName = annotation.paramName();
+        Long resourceId = resourceIds.get(annotation.paramName());
+        if(resourceId == null)
+            resourceId = resourceIds.get(annotation.requestBodyField());
+
         log.info("권한 검증 시작: type={}, resourceIds={}, userId={}", permissionType, resourceIds, userId);
         switch (permissionType) {
             case TRIP_BOARD_ACCESS:
             case TRIP_BOARD_MODIFY:
             case TRIP_BOARD_DELETE:
-                validateTripBoardPermission(permissionType, resourceIds.get(paramName), userId);
+                validateTripBoardPermission(permissionType, resourceId, userId);
                 break;
 
             case COMPARISON_TABLE_ACCESS:
             case COMPARISON_TABLE_MODIFY:
             case COMPARISON_TABLE_DELETE:
-                validateComparisonTablePermission(permissionType, resourceIds.get(paramName), userId);
+                validateComparisonTablePermission(permissionType, resourceId, userId);
                 break;
 
             case ACCOMMODATION_ACCESS:
             case ACCOMMODATION_MODIFY:
             case ACCOMMODATION_DELETE:
-                validateAccommodationPermission(permissionType, resourceIds.get(paramName), userId);
+                validateAccommodationPermission(permissionType, resourceId, userId);
                 break;
 
             default:
