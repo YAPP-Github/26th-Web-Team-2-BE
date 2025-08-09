@@ -15,7 +15,12 @@ public interface ComparisonTableRepository {
     ComparisonTable addAccommodationsToTable(Long tableId, java.util.List<Long> accommodationIds, Long userId);
 
     /**
-     * 여행보드 ID로 해당 보드의 모든 비교표를 삭제합니다.
+     * 특정 여행보드에서 특정 사용자가 생성한 비교표들을 삭제합니다.
+     */
+    void deleteByTripBoardIdAndCreatedById(Long tripBoardId, Long createdById);
+
+    /**
+     * 특정 여행보드의 모든 비교표를 삭제합니다 (여행보드 완전 삭제용).
      */
     void deleteByTripBoardId(Long tripBoardId);
 }

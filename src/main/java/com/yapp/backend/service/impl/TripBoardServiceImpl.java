@@ -4,6 +4,7 @@ import com.yapp.backend.common.exception.InvalidDestinationException;
 import com.yapp.backend.common.exception.InvalidPagingParameterException;
 import com.yapp.backend.common.exception.InvalidTravelPeriodException;
 import com.yapp.backend.common.exception.TripBoardCreationException;
+import com.yapp.backend.common.exception.TripBoardLeaveException;
 import com.yapp.backend.common.exception.TripBoardDeleteException;
 import com.yapp.backend.common.exception.TripBoardNotFoundException;
 import com.yapp.backend.common.exception.TripBoardParticipantLimitExceededException;
@@ -14,6 +15,7 @@ import com.yapp.backend.common.util.PageUtil;
 import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
 import com.yapp.backend.controller.dto.request.TripBoardUpdateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
+import com.yapp.backend.controller.dto.response.TripBoardLeaveResponse;
 import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
@@ -49,7 +51,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -66,9 +70,9 @@ public class TripBoardServiceImpl implements TripBoardService {
     private final JpaUserTripBoardRepository jpaUserTripBoardRepository;
     private final TripBoardRepository tripBoardRepository;
     private final UserRepository userRepository;
+    private final UserTripBoardRepository userTripBoardRepository;
     private final AccommodationRepository accommodationRepository;
     private final ComparisonTableRepository comparisonTableRepository;
-    private final UserTripBoardRepository userTripBoardRepository;
 
     private final UserMapper userMapper;
     private final TripBoardMapper tripBoardMapper;
@@ -359,6 +363,139 @@ public class TripBoardServiceImpl implements TripBoardService {
             log.error("관련 데이터 삭제 중 오류 발생 - 보드 ID: {}", tripBoardId, e);
             throw e;
         }
+    }
+
+    /**
+     * 여행보드 나가기
+     * OWNER가 나가는 경우 다음 MEMBER에게 권한을 이양하고, 마지막 참여자인 경우 여행보드를 완전 삭제합니다.
+     * todo 치명적: 마지막 두 명이 동시에 나가면 ‘참여자 0명 보드’가 남을 수 있음 + removeResources NPE 위험
+     */
+    @Override
+    @Transactional
+    public TripBoardLeaveResponse leaveTripBoard(Long tripBoardId, Long userId, Boolean removeResources) {
+        try {
+            log.info("여행보드 나가기 시작 - 보드 ID: {}, 사용자 ID: {}, 리소스 제거: {}",
+                    tripBoardId, userId, removeResources);
+
+            // 1. 여행보드 존재 여부 확인
+            if (!tripBoardRepository.existsById(tripBoardId)) {
+                log.warn("존재하지 않는 여행보드 나가기 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+                throw new TripBoardNotFoundException();
+            }
+
+            // 2. 사용자가 해당 여행보드의 참여자인지 확인
+            Optional<UserTripBoard> userTripBoardOpt = userTripBoardRepository
+                    .findByUserIdAndTripBoardId(userId, tripBoardId);
+
+            if (userTripBoardOpt.isEmpty()) {
+                log.warn("참여하지 않은 여행보드 나가기 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+                throw new UserAuthorizationException();
+            }
+
+            UserTripBoard currentUserTripBoard = userTripBoardOpt.get();
+            TripBoardRole currentUserRole = currentUserTripBoard.getRole();
+
+            log.debug("사용자 역할 확인 - 사용자 ID: {}, 역할: {}", userId, currentUserRole);
+
+            // 3. 전체 참여자 수 확인
+            long totalParticipants = userTripBoardRepository.countByTripBoardId(tripBoardId);
+            boolean isLastParticipant = totalParticipants == 1;
+
+            log.debug("참여자 수 확인 - 전체 참여자: {}, 마지막 참여자 여부: {}", totalParticipants, isLastParticipant);
+
+            // 4. 응답 객체 초기화
+            TripBoardLeaveResponse.TripBoardLeaveResponseBuilder responseBuilder = TripBoardLeaveResponse.builder()
+                    .tripBoardId(tripBoardId)
+                    .leftAt(LocalDateTime.now());
+
+            // 5. 마지막 참여자인 경우 여행보드 완전 삭제
+            if (isLastParticipant) {
+                log.info("마지막 참여자 나가기 - 여행보드 완전 삭제 시작: 보드 ID: {}", tripBoardId);
+                tripBoardRepository.deleteTripBoardCompletely(tripBoardId);
+                log.info("여행보드 완전 삭제 완료 - 보드 ID: {}", tripBoardId);
+            } else {
+                // 6. OWNER 권한 이양 처리 (OWNER인 경우)
+                Long newOwnerId = null;
+                if (currentUserRole == TripBoardRole.OWNER) {
+                    newOwnerId = transferOwnership(tripBoardId, userId);
+                    log.info("OWNER 권한 이양 완료 - 이전 OWNER: {}, 새 OWNER: {}", userId, newOwnerId);
+                }
+
+                // 7. 리소스 처리 (removeResources가 true인 경우)
+                if (Boolean.TRUE.equals(removeResources)) {
+                    deleteUserResources(tripBoardId, userId);
+                    log.info("사용자 리소스 삭제 완료 - 사용자 ID: {}", userId);
+                }
+
+                // 8. 사용자-여행보드 매핑 삭제
+                userTripBoardRepository.deleteByUserIdAndTripBoardId(userId, tripBoardId);
+                log.debug("사용자-여행보드 매핑 삭제 완료 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
+            }
+
+            TripBoardLeaveResponse response = responseBuilder.build();
+            log.info("여행보드 나가기 완료 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+            return response;
+
+        } catch (TripBoardNotFoundException | UserAuthorizationException e) {
+            log.error("여행보드 나가기 실패 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("여행보드 나가기 중 데이터베이스 오류 발생 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
+            throw new TripBoardLeaveException();
+        } catch (Exception e) {
+            log.error("여행보드 나가기 중 예상치 못한 오류 발생 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
+            throw new TripBoardLeaveException();
+        }
+    }
+
+    /**
+     * OWNER 권한을 다음 MEMBER에게 이양합니다.
+     * 가장 먼저 입장한 MEMBER를 찾아 OWNER로 변경합니다.
+     */
+    private Long transferOwnership(Long tripBoardId, Long currentOwnerId) {
+        log.debug("OWNER 권한 이양 시작 - 보드 ID: {}, 현재 OWNER: {}", tripBoardId, currentOwnerId);
+
+        // 가장 먼저 입장한 MEMBER 조회
+        List<UserTripBoard> members = userTripBoardRepository
+                .findByTripBoardIdAndRoleOrderByCreatedAtAsc(tripBoardId, TripBoardRole.MEMBER);
+
+        if (members.isEmpty()) {
+            log.error("OWNER 권한 이양 실패 - 다음 MEMBER가 없음: 보드 ID: {}", tripBoardId);
+            throw new TripBoardLeaveException();
+        }
+
+        // 첫 번째 MEMBER를 OWNER로 변경
+        UserTripBoard nextOwner = members.get(0);
+        UserTripBoard updatedNextOwner = UserTripBoard.builder()
+                .id(nextOwner.getId())
+                .user(nextOwner.getUser())
+                .tripBoard(nextOwner.getTripBoard())
+                .invitationUrl(nextOwner.getInvitationUrl())
+                .invitationActive(nextOwner.getInvitationActive())
+                .role(TripBoardRole.OWNER)
+                .createdAt(nextOwner.getCreatedAt())
+                .build();
+
+        userTripBoardRepository.save(updatedNextOwner);
+
+        Long newOwnerId = nextOwner.getUser().getId();
+        log.debug("OWNER 권한 이양 완료 - 새 OWNER: {}", newOwnerId);
+        return newOwnerId;
+    }
+
+    /**
+     * 사용자가 생성한 리소스(비교표, 숙소)를 삭제합니다.
+     */
+    private void deleteUserResources(Long tripBoardId, Long userId) {
+        log.debug("사용자 리소스 삭제 시작 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+
+        // 사용자가 생성한 비교표 삭제
+        comparisonTableRepository.deleteByTripBoardIdAndCreatedById(tripBoardId, userId);
+        log.debug("사용자 비교표 삭제 완료 - 사용자 ID: {}", userId);
+
+        // 사용자가 등록한 숙소 삭제
+        accommodationRepository.deleteByBoardIdAndCreatedById(tripBoardId, userId);
+        log.debug("사용자 숙소 삭제 완료 - 사용자 ID: {}", userId);
     }
 
 }

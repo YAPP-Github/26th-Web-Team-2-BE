@@ -57,7 +57,12 @@ public interface JpaAccommodationRepository extends JpaRepository<AccommodationE
                         @Param("userId") Long userId, Pageable pageable);
 
         /**
-         * 여행보드 ID로 해당 보드의 모든 숙소를 삭제합니다.
+         * 특정 여행보드에서 특정 사용자가 생성한 숙소들을 삭제
+         */
+        void deleteByBoardIdAndCreatedById(Long boardId, Long createdById);
+
+        /**
+         * 특정 여행보드의 모든 숙소를 삭제 (여행보드 완전 삭제용)
          */
         void deleteByBoardId(Long boardId);
 }

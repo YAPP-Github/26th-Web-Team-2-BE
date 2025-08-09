@@ -16,4 +16,15 @@ public class CustomException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+
+    // 원인 체이닝 지원 생성자 추가
+    public CustomException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode.getMessage(), cause);
+        this.errorCode = errorCode;
+    }
+
+    public CustomException(ErrorCode errorCode, String message, Throwable cause) {
+        super(message, cause);
+        this.errorCode = errorCode;
+    }
 }

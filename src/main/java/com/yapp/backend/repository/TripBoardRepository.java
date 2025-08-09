@@ -42,6 +42,11 @@ public interface TripBoardRepository {
     TripBoard updateTripBoard(TripBoard tripBoard);
 
     /**
+     * 여행보드를 완전히 삭제합니다 (관련된 모든 데이터 포함).
+     */
+    void deleteTripBoardCompletely(Long tripBoardId);
+
+    /**
      * ID로 여행 보드를 삭제합니다.
      */
     void deleteById(Long id);
@@ -50,4 +55,9 @@ public interface TripBoardRepository {
      * 여행 보드 ID와 생성자 ID로 여행 보드를 조회합니다. (소유자 검증용)
      */
     Optional<TripBoard> findByIdAndCreatedById(Long tripBoardId, Long createdById);
+
+    /**
+     * 여행보드 존재 여부 확인
+     */
+    boolean existsById(Long tripBoardId);
 }

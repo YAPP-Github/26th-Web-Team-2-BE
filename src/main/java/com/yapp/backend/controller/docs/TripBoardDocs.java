@@ -2,8 +2,10 @@ package com.yapp.backend.controller.docs;
 
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
+import com.yapp.backend.controller.dto.request.TripBoardLeaveRequest;
 import com.yapp.backend.controller.dto.request.TripBoardUpdateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
+import com.yapp.backend.controller.dto.response.TripBoardLeaveResponse;
 import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
@@ -51,5 +53,12 @@ public interface TripBoardDocs {
         @SecurityRequirement(name = "JWT")
         ResponseEntity<StandardResponse<TripBoardDeleteResponse>> deleteTripBoard(
                         @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
+                        @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
+
+        @Operation(summary = "여행 보드 나가기", description = "여행 보드에서 나갑니다. OWNER인 경우 가장 먼저 입장한 MEMBER에게 권한이 이양되며, 마지막 참여자인 경우 여행보드가 삭제됩니다. 나가는 사용자는 자신이 생성한 리소스(비교표, 숙소)를 유지하거나 제거할 수 있습니다.")
+        @SecurityRequirement(name = "JWT")
+        ResponseEntity<StandardResponse<TripBoardLeaveResponse>> leaveTripBoard(
+                        @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
+                        @RequestBody @Valid TripBoardLeaveRequest request,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 }
