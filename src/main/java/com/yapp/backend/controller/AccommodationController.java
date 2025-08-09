@@ -12,6 +12,7 @@ import com.yapp.backend.common.annotation.RequirePermission;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.service.AccommodationService;
 
+import com.yapp.backend.service.authorization.UserTripBoardAuthorizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccommodationController implements AccommodationDocs {
 
     private final AccommodationService accommodationService;
+    private final UserTripBoardAuthorizationService authorizationService;
 
     /**
      * 숙소 목록 조회 API
@@ -53,6 +55,12 @@ public class AccommodationController implements AccommodationDocs {
             @RequestParam(required = false) Long userId,
             @RequestParam(defaultValue = "saved_at_desc") String sort,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // userId 파라미터가 있는 경우 해당 사용자의 권한도 확인
+        if (userId != null) {
+            log.debug("대상 사용자 권한 검증 시작 - 대상사용자: {}, 보드ID: {}", userId, boardId);
+            authorizationService.validateTripBoardAccessOrThrow(userId, boardId);
+        }
 
         AccommodationPageResponse response = accommodationService
                 .findAccommodationsByBoardId(boardId, page, size, userId, sort);
