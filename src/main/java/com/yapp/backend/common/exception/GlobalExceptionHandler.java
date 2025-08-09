@@ -7,6 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -307,6 +308,20 @@ public class GlobalExceptionHandler {
 		ErrorCode errorCode = ErrorCode.ACCESS_DENIED;
 		ProblemDetail problemDetail = createProblemDetail(errorCode);
 		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+	/**
+	 * 외부 인증 서비스 연동 실패 시 처리
+	 */
+	@ExceptionHandler(AuthenticationServiceException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleAuthenticationServiceException(
+			AuthenticationServiceException e) {
+		log.error("AuthenticationServiceException occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = ErrorCode.AUTHENTICATION_SERVICE_ERROR;
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity
+				.status(errorCode.getHttpStatus())
 				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 
