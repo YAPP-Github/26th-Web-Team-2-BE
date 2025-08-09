@@ -60,7 +60,7 @@ public class UserTripBoardRepositoryImpl implements UserTripBoardRepository {
 
     @Override
     public Optional<UserTripBoard> findByInvitationUrl(String invitationUrl) {
-        return jpaUserTripBoardRepository.findByInvitationUrlAndInvitationActiveTrue(invitationUrl)
+        return jpaUserTripBoardRepository.findByInvitationUrl(invitationUrl)
                 .map(userTripBoardMapper::entityToDomain);
     }
 }

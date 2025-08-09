@@ -2,9 +2,11 @@ package com.yapp.backend.controller.docs;
 
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
+import com.yapp.backend.controller.dto.request.TripBoardJoinRequest;
 import com.yapp.backend.controller.dto.request.TripBoardLeaveRequest;
 import com.yapp.backend.controller.dto.request.TripBoardUpdateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
+import com.yapp.backend.controller.dto.response.TripBoardJoinResponse;
 import com.yapp.backend.controller.dto.response.TripBoardLeaveResponse;
 import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
@@ -40,6 +42,12 @@ public interface TripBoardDocs {
         ResponseEntity<StandardResponse<TripBoardPageResponse>> getTripBoards(
                         @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 번호") @NotNull(message = "페이지 번호는 필수입니다.") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
                         @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 크기") @NotNull(message = "페이지 크기는 필수입니다.") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size,
+                        @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
+
+        @Operation(summary = "여행 보드 참여", description = "초대링크를 통해 기존 여행 보드에 참여합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 초대링크의 유효성을 검증한 후 보드에 참여자로 등록합니다.")
+        @SecurityRequirement(name = "JWT")
+        ResponseEntity<StandardResponse<TripBoardJoinResponse>> joinTripBoard(
+                        @RequestBody @Valid TripBoardJoinRequest request,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 
         @Operation(summary = "여행 보드 수정", description = "기존 여행 보드의 기본 정보(보드 이름, 목적지, 여행 기간)를 수정합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 수정된 보드 정보를 반환합니다.")

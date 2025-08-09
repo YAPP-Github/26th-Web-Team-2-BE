@@ -30,6 +30,11 @@ public interface JpaUserTripBoardRepository extends JpaRepository<UserTripBoardE
     Optional<UserTripBoardEntity> findByInvitationUrlAndInvitationActiveTrue(String invitationUrl);
 
     /**
+     * 초대 링크로 매핑 정보 조회
+     */
+    Optional<UserTripBoardEntity> findByInvitationUrl(String invitationUrl);
+
+    /**
      * 여행 보드의 참여자 수 조회
      */
     long countByTripBoardId(Long tripBoardId);

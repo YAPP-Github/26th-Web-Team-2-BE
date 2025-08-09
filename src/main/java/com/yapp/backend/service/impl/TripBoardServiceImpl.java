@@ -559,7 +559,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     private UserTripBoard validateInvitationUrl(String invitationUrl) {
         log.debug("초대링크 유효성 검증 시작 - 초대링크: {}", invitationUrl);
 
-        // 초대링크로 UserTripBoard 조회 (활성화된 것만)
+        // 초대링크로 UserTripBoard 조회
         Optional<UserTripBoard> userTripBoardOpt = userTripBoardRepository.findByInvitationUrl(invitationUrl);
 
         if (userTripBoardOpt.isEmpty()) {
@@ -569,7 +569,7 @@ public class TripBoardServiceImpl implements TripBoardService {
 
         UserTripBoard userTripBoard = userTripBoardOpt.get();
 
-        // 초대링크 활성화 상태 확인 (이미 findByInvitationUrl에서 활성화된 것만 조회하지만 추가 검증)
+        // 초대링크 활성화 상태 확인
         if (!userTripBoard.getInvitationActive()) {
             log.warn("비활성화된 초대링크 - 초대링크: {}", invitationUrl);
             throw new InactiveInvitationUrlException();
