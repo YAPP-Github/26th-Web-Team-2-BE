@@ -5,14 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccommodationPageResponse {
-    private List<AccommodationResponse> accommodations;
-    private List<UserProfileResponse> userProfiles;
-    private boolean hasNext;
+public class UserProfileResponse {
+    private Long userId;
+    private String nickname;
 }

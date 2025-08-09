@@ -10,6 +10,7 @@ import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 import com.yapp.backend.controller.dto.response.AccommodationResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.service.AccommodationService;
+import com.yapp.backend.service.TripBoardService;
 import com.yapp.backend.service.UserTripBoardAuthorizationService;
 
 import lombok.RequiredArgsConstructor;
