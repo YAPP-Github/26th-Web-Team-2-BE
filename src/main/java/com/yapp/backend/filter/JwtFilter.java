@@ -3,7 +3,6 @@ package com.yapp.backend.filter;
 import static com.yapp.backend.common.util.TokenUtil.extractTokenFromHeader;
 import static com.yapp.backend.common.util.CookieUtil.getCookieValue;
 
-import com.google.common.net.HttpHeaders;
 import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.filter.service.AuthContextService;
 import com.yapp.backend.filter.service.RefreshTokenService;
@@ -20,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import io.jsonwebtoken.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.http.ResponseCookie;
 
 @Slf4j
 @Component
@@ -47,6 +45,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 || uri.startsWith("/swagger")
                 || uri.startsWith("/v3/api-docs")
                 || uri.startsWith("/api/comparison/factors")
+                || uri.startsWith("/api/comparison/amenity")
                 || uri.startsWith("/api/oauth/kakao")
                 ;
     }
@@ -62,13 +61,12 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             // CASE 1: Valid Access Token
             jwtTokenProvider.validateAccessTokenOrThrow(accessToken);
-            
+
             // 블랙리스트 확인
             if (refreshTokenService.isAccessTokenBlacklisted(accessToken)) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is blacklisted");
                 return;
             }
-            
             authContextService.createAuthContext(accessToken);
             filterChain.doFilter(request, response);
         } catch (JwtException | IllegalArgumentException bad) {
@@ -111,12 +109,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // 2) Redis Refresh Token 회전
         refreshTokenService.rotateRefresh(userId, newRefresh);
 
-        // 3) 새로운 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
-        response.setHeader(ACCESS_TOKEN_HEADER, newAccess);
-        ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(userId);
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-
-        // 4) 인증 객체 세팅
+        // 3) 인증 객체 세팅
         authContextService.createAuthContext(newAccess);
     }
 }

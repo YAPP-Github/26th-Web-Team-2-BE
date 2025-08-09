@@ -14,13 +14,13 @@ public class RefreshTokenService {
 
     private static final String REFRESH_TOKEN_PREFIX = "refresh_token ";
     private static final String ACCESS_TOKEN_BLACKLIST_PREFIX = "access_token_blacklist ";
-    
+
     @Value("${spring.security.jwt.refresh-token-validity-in-ms}")
     private long refreshTtlMs;
-    
+
     @Value("${spring.security.jwt.access-token-validity-in-ms}")
     private long accessTtlMs;
-    
+
     private final StringRedisTemplate redisTemplate;
 
     private String keyFor(Long userId) {
@@ -42,7 +42,7 @@ public class RefreshTokenService {
         String saved = redisTemplate.opsForValue().get(keyFor(userId));
         return refreshToken.equals(saved);
     }
-    
+
     // 토큰 회전: old→new 교체
     public void rotateRefresh(Long userId, String newRefreshToken) {
         redisTemplate.opsForValue()
@@ -56,22 +56,18 @@ public class RefreshTokenService {
 
 
     // ==================== Access Token 블랙리스트 ====================
-    
+
     /**
      * Access Token을 블랙리스트에 추가합니다.
      * 로그아웃 시 호출됩니다.
      */
     public void blacklistAccessToken(String accessToken) {
-        if (accessToken == null || accessToken.isBlank()) {
-            log.warn("Skip blacklisting: empty access token");
-            return;
-        }
         String blacklistKey = blacklistKeyFor(accessToken);
         // Access Token의 남은 유효시간만큼 블랙리스트에 저장
         redisTemplate.opsForValue()
                 .set(blacklistKey, "blacklisted", Duration.ofMillis(accessTtlMs));
     }
-    
+
     /**
      * Access Token이 블랙리스트에 있는지 확인합니다.
      * JWT 필터에서 호출됩니다.
@@ -81,14 +77,14 @@ public class RefreshTokenService {
         String blacklisted = redisTemplate.opsForValue().get(blacklistKey);
         return blacklisted != null;
     }
-    
+
     /**
      * 모든 토큰을 삭제합니다 (로그아웃 시).
      */
     public void logoutUser(Long userId, String accessToken) {
         // 1. Refresh Token 삭제
         deleteRefresh(userId);
-        
+
         // 2. Access Token 블랙리스트 추가
         blacklistAccessToken(accessToken);
     }

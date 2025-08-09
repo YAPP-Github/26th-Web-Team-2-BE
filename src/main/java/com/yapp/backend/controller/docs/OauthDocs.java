@@ -4,7 +4,6 @@ import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
 import com.yapp.backend.controller.dto.response.LogoutResponse;
 import com.yapp.backend.controller.dto.response.OauthLoginResponse;
-import com.yapp.backend.controller.dto.response.WithdrawResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -67,22 +66,5 @@ public interface OauthDocs {
             @Parameter(hidden = true) HttpServletRequest request,
             @Parameter(hidden = true) HttpServletResponse response
     );
-    
-    @Operation(
-            summary = "회원탈퇴",
-            description = "현재 로그인된 사용자의 계정을 탈퇴 처리합니다. " +
-                         "사용자 데이터는 Soft Delete로 처리되어 deleted_at 필드에 탈퇴 날짜가 기록됩니다. " +
-                         "모든 토큰이 무효화되고 세션이 종료됩니다. " +
-                         "이미 탈퇴된 사용자의 경우 success=false로 반환됩니다."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "회원탈퇴 처리가 완료되었습니다."
-    )
-    @SecurityRequirement(name = "JWT")
-    ResponseEntity<StandardResponse<WithdrawResponse>> withdrawUser(
-            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Parameter(hidden = true) HttpServletRequest request,
-            @Parameter(hidden = true) HttpServletResponse response
-    );
+
 }

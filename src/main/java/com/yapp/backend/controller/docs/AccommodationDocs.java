@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -43,7 +44,7 @@ public interface AccommodationDocs {
 
 	@Operation(summary = "숙소 카드 등록", description = "링크를 첨부하여 숙소 카드를 등록합니다.", method = "POST")
 	ResponseEntity<StandardResponse<AccommodationRegisterResponse>> registerAccommodationCard(
-			@RequestBody(description = "숙소 등록 요청 데이터", content = @Content(schema = @Schema(implementation = AccommodationRegisterRequest.class))) AccommodationRegisterRequest request,
+			@RequestBody(description = "숙소 등록 요청 데이터", content = @Content(schema = @Schema(implementation = AccommodationRegisterRequest.class))) @Valid AccommodationRegisterRequest request,
 			@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 
 	@Operation(summary = "숙소 단건 조회", description = "특정 숙소 ID로 숙소 정보를 조회합니다.")

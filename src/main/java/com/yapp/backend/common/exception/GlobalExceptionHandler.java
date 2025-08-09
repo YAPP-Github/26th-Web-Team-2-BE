@@ -7,6 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,6 +21,8 @@ import com.yapp.backend.common.exception.oauth.KakaoOAuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 import java.util.stream.Collectors;
 
@@ -122,6 +125,17 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<StandardResponse<ProblemDetail>> handleTripBoardParticipantLimitExceededException(
 			TripBoardParticipantLimitExceededException e) {
 		log.warn("Trip board participant limit exceeded exception occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	@ExceptionHandler(TripBoardDeleteException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleTripBoardDeleteException(
+			TripBoardDeleteException e) {
+		log.error("Trip board delete exception occurred: {}", e.getMessage(), e);
 		Sentry.captureException(e);
 		ErrorCode errorCode = e.getErrorCode();
 		ProblemDetail problemDetail = createProblemDetail(errorCode);
@@ -279,6 +293,47 @@ public class GlobalExceptionHandler {
 		}
 
 		return request.getRemoteAddr();
+	}
+
+	/**
+	 * AOP에서 발생하는 Spring Security 인증 정보 누락 예외 처리
+	 */
+	@ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleAuthenticationCredentialsNotFoundException(
+			AuthenticationCredentialsNotFoundException e) {
+		log.warn("Authentication credentials not found in AOP: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = ErrorCode.AUTHENTICATION_CREDENTIALS_NOT_FOUND;
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	/**
+	 * AOP에서 발생하는 Spring Security 접근 권한 부족 예외 처리
+	 */
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleAccessDeniedException(AccessDeniedException e) {
+		log.warn("Access denied in AOP: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = ErrorCode.ACCESS_DENIED;
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+	/**
+	 * 외부 인증 서비스 연동 실패 시 처리
+	 */
+	@ExceptionHandler(AuthenticationServiceException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleAuthenticationServiceException(
+			AuthenticationServiceException e) {
+		log.error("AuthenticationServiceException occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = ErrorCode.AUTHENTICATION_SERVICE_ERROR;
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity
+				.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 
 }

@@ -12,8 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,23 +21,27 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response,
-            AuthenticationException authException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
-        log.warn("Authentication failed for request {}: {}", request.getRequestURI(), authException.getMessage());
-        Sentry.captureException(authException);
+        log.warn("Access denied for request {}: {}", request.getRequestURI(), accessDeniedException.getMessage());
+        Sentry.captureException(accessDeniedException);
 
         // ErrorCode 사용하여 일관된 응답 생성
-        ErrorCode errorCode = ErrorCode.AUTHENTICATION_CREDENTIALS_NOT_FOUND;
+        ErrorCode errorCode = ErrorCode.ACCESS_DENIED;
         ProblemDetail problemDetail = createProblemDetail(errorCode);
         StandardResponse<ProblemDetail> standardResponse = new StandardResponse<>(ResponseType.ERROR, problemDetail);
 
         // HTTP 응답 설정
+        if (response.isCommitted()) {
+            log.debug("Response already committed. Skipping CustomAccessDeniedHandler write.");
+            return;
+        }
         response.setStatus(errorCode.getHttpStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");

@@ -15,9 +15,12 @@ public enum ErrorCode {
     ACCOMMODATION_NOT_FOUND("숙소 정보 존재하지 않음", "숙소 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     DELETED_USER_ACCESS("삭제된 유저", "삭제된 유저에 대한 접근", HttpStatus.NOT_FOUND),
 
-    // Authorization
+    // Authorization & Authentication
     INVALID_USER_AUTHORIZATION("사용자 권한 없음", "해당 권한이 없는 유저입니다.", HttpStatus.FORBIDDEN),
     USER_AUTHORIZATION_FAILED("사용자 권한 없음", "해당 리소스에 접근할 권한이 없습니다.", HttpStatus.FORBIDDEN),
+    AUTHENTICATION_CREDENTIALS_NOT_FOUND("인증 정보 누락", "인증 정보가 필요합니다.", HttpStatus.UNAUTHORIZED),
+    ACCESS_DENIED("접근 권한 부족", "접근 권한이 부족합니다.", HttpStatus.FORBIDDEN),
+    AUTHENTICATION_SERVICE_ERROR("인증 서비스 오류", "인증 처리 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // Accommodation related errors
     INVALID_TABLE_ID("잘못된 테이블 ID", "존재하지 않거나 유효하지 않은 테이블 ID입니다.", HttpStatus.BAD_REQUEST),
@@ -42,6 +45,8 @@ public enum ErrorCode {
     INVALID_TRAVEL_PERIOD("유효하지 않은 여행 기간", "유효하지 않은 여행 기간입니다.", HttpStatus.BAD_REQUEST),
     TRIP_BOARD_NOT_FOUND("여행보드 존재하지 않음", "여행보드를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     TRIP_BOARD_UPDATE_FAILED("여행보드 수정 실패", "여행보드 수정에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    TRIP_BOARD_LEAVE_FAILED("여행보드 나가기 실패", "여행보드 나가기 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    TRIP_BOARD_DELETE_FAILED("여행보드 삭제 실패", "여행보드 삭제 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // OAuth related errors
     INVALID_AUTHORIZATION_CODE("인가 코드 오류", "인가 코드가 유효하지 않거나 이미 사용되었습니다. 새로운 인가 코드를 발급받아 주세요.", HttpStatus.BAD_REQUEST),

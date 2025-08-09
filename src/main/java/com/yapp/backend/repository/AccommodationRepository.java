@@ -39,4 +39,14 @@ public interface AccommodationRepository {
 
     void update(Accommodation updatedAccommodation);
 
+    /**
+     * 특정 여행보드에서 특정 사용자가 생성한 숙소들을 삭제합니다.
+     */
+    void deleteByBoardIdAndCreatedById(Long boardId, Long createdById);
+
+    /**
+     * 여행보드 ID로 해당 보드의 모든 숙소를 삭제합니다.
+     */
+    void deleteByBoardId(Long boardId);
+
 }

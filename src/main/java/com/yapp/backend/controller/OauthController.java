@@ -16,6 +16,9 @@ import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
 import com.yapp.backend.controller.dto.response.OauthLoginResponse;
 import com.yapp.backend.controller.dto.response.WithdrawResponse;
 import com.yapp.backend.service.OauthService;
+import com.yapp.backend.filter.dto.CustomUserDetails;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import com.yapp.backend.service.UserService;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -84,13 +87,9 @@ public class OauthController implements OauthDocs {
         
         // 3. Redis에 Refresh Token 저장
         refreshTokenService.storeRefresh(oauthResponse.getUserId(), refreshToken);
-        
-        // 4. HTTP 응답에 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
-        response.setHeader(ACCESS_TOKEN_HEADER, accessToken);
-        ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(oauthResponse.getUserId());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-        
-        // 5. 사용자 정보만 응답 바디로 반환 (토큰은 헤더로 전달됨)
+
+        // 4. 사용자 정보만 응답 바디로 반환 (토큰은 헤더로 전달됨)
+        oauthResponse.deliverToken(accessToken, refreshToken);
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, oauthResponse));
     }
 
@@ -111,7 +110,7 @@ public class OauthController implements OauthDocs {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        
+
         Long userId = userDetails.getUserId();
 
         // 모든 토큰 무효화 (Refresh Token 삭제 + Access Token 블랙리스트)
@@ -121,10 +120,10 @@ public class OauthController implements OauthDocs {
         // 쿠키 무효화
         ResponseCookie invalidatedCookie = cookieUtil.createInvalidatedCookie(REFRESH_TOKEN_COOKIE);
         response.addHeader(HttpHeaders.SET_COOKIE, invalidatedCookie.toString());
-        
+
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, new LogoutResponse(true)));
     }
-    
+
     /**
      * 회원탈퇴 API
      * 사용자 데이터를 Soft Delete 처리하고 모든 토큰을 무효화합니다.
@@ -141,12 +140,12 @@ public class OauthController implements OauthDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpServletRequest request,
             HttpServletResponse response) {
-        
+
         Long userId = userDetails.getUserId();
-        
+
         // 1. 회원탈퇴 처리 (Soft Delete)
         Boolean isWithdraw = userService.withdrawUser(userId);
-        
+
         // 2. 모든 토큰 무효화 (로그아웃과 동일)
         String accessToken = extractTokenFromHeader(request);
         refreshTokenService.logoutUser(userId, accessToken);
@@ -154,7 +153,7 @@ public class OauthController implements OauthDocs {
         // 3. 쿠키 무효화
         ResponseCookie invalidatedCookie = cookieUtil.createInvalidatedCookie(REFRESH_TOKEN_COOKIE);
         response.addHeader(HttpHeaders.SET_COOKIE, invalidatedCookie.toString());
-        
+
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, new WithdrawResponse(isWithdraw)));
     }
 

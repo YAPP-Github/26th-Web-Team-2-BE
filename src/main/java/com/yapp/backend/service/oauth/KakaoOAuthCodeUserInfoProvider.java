@@ -9,6 +9,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -78,7 +79,7 @@ public class KakaoOAuthCodeUserInfoProvider implements OAuthCodeUserInfoProvider
         } catch (FeignException feignException) {
             throw errorParser.parseAndThrow(feignException, getProviderKey());
         } catch (Exception e) {
-            throw new RuntimeException("카카오 사용자 정보 조회에 실패했습니다.", e);
+            throw new AuthenticationServiceException("카카오 사용자 정보 조회에 실패했습니다.", e);
         }
     }
 }
