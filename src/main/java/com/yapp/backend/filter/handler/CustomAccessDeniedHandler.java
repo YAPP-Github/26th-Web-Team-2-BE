@@ -38,6 +38,10 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         StandardResponse<ProblemDetail> standardResponse = new StandardResponse<>(ResponseType.ERROR, problemDetail);
 
         // HTTP 응답 설정
+        if (response.isCommitted()) {
+            log.debug("Response already committed. Skipping CustomAccessDeniedHandler write.");
+            return;
+        }
         response.setStatus(errorCode.getHttpStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
