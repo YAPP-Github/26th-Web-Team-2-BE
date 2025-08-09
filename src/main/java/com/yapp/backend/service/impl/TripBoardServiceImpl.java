@@ -1,6 +1,9 @@
 package com.yapp.backend.service.impl;
 
+import com.yapp.backend.common.exception.DuplicateTripBoardParticipationException;
+import com.yapp.backend.common.exception.InactiveInvitationUrlException;
 import com.yapp.backend.common.exception.InvalidDestinationException;
+import com.yapp.backend.common.exception.InvalidInvitationUrlException;
 import com.yapp.backend.common.exception.InvalidPagingParameterException;
 import com.yapp.backend.common.exception.InvalidTravelPeriodException;
 import com.yapp.backend.common.exception.TripBoardCreationException;
@@ -15,6 +18,7 @@ import com.yapp.backend.common.util.PageUtil;
 import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
 import com.yapp.backend.controller.dto.request.TripBoardUpdateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
+import com.yapp.backend.controller.dto.response.TripBoardJoinResponse;
 import com.yapp.backend.controller.dto.response.TripBoardLeaveResponse;
 import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
@@ -488,6 +492,149 @@ public class TripBoardServiceImpl implements TripBoardService {
         // 사용자가 등록한 숙소 삭제
         accommodationRepository.deleteByBoardIdAndCreatedById(tripBoardId, userId);
         log.debug("사용자 숙소 삭제 완료 - 사용자 ID: {}", userId);
+    }
+
+    /**
+     * 초대링크를 통해 여행 보드에 참여합니다.
+     * 초대링크 유효성 검증, 활성화 상태 확인, 중복 참여 검증을 수행한 후 새로운 참여자를 추가합니다.
+     */
+    @Override
+    @Transactional
+    public TripBoardJoinResponse joinTripBoard(String invitationUrl, Long userId) {
+        try {
+            log.info("여행 보드 참여 시작 - 사용자 ID: {}, 초대링크: {}", userId, invitationUrl);
+
+            // 1. 초대링크 유효성 검증 및 활성화 상태 확인
+            UserTripBoard invitationUserTripBoard = validateInvitationUrl(invitationUrl);
+            TripBoard tripBoard = invitationUserTripBoard.getTripBoard();
+            Long tripBoardId = tripBoard.getId();
+
+            log.debug("초대링크 검증 완료 - 보드 ID: {}, 보드명: {}", tripBoardId, tripBoard.getBoardName());
+
+            // 2. 중복 참여 검증
+            validateDuplicateParticipation(userId, tripBoardId);
+
+            // 3. 참여자 수 제한 확인 (선택적)
+            validateParticipantLimit(tripBoardId);
+
+            // 4. 사용자 조회
+            User user = userRepository.findByIdOrThrow(userId);
+
+            // 5. 새로운 UserTripBoard 엔티티 생성
+            UserTripBoard newUserTripBoard = createNewUserTripBoard(user, tripBoard);
+
+            // 6. 사용자-보드 매핑 저장
+            UserTripBoard savedUserTripBoard = userTripBoardRepository.save(newUserTripBoard);
+            log.debug("사용자-여행보드 매핑 저장 완료 - 매핑 ID: {}", savedUserTripBoard.getId());
+
+            // 7. 현재 참여자 수 조회
+            int participantCount = (int) userTripBoardRepository.countByTripBoardId(tripBoardId);
+
+            // 8. 응답 생성
+            TripBoardJoinResponse response = TripBoardJoinResponse.from(
+                    tripBoard,
+                    participantCount,
+                    savedUserTripBoard.getCreatedAt());
+
+            log.info("여행 보드 참여 완료 - 사용자 ID: {}, 보드 ID: {}, 참여자 수: {}",
+                    userId, tripBoardId, participantCount);
+            return response;
+
+        } catch (InvalidInvitationUrlException | InactiveInvitationUrlException
+                | DuplicateTripBoardParticipationException | TripBoardParticipantLimitExceededException e) {
+            log.error("여행 보드 참여 실패 - 사용자 ID: {}, 초대링크: {}", userId, invitationUrl, e);
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("여행 보드 참여 중 데이터베이스 오류 발생 - 사용자 ID: {}, 초대링크: {}", userId, invitationUrl, e);
+            throw new RuntimeException("여행 보드 참여에 실패했습니다.", e);
+        } catch (Exception e) {
+            log.error("여행 보드 참여 중 예상치 못한 오류 발생 - 사용자 ID: {}, 초대링크: {}", userId, invitationUrl, e);
+            throw new RuntimeException("여행 보드 참여에 실패했습니다.", e);
+        }
+    }
+
+    /**
+     * 초대링크 유효성 검증 및 활성화 상태 확인
+     */
+    private UserTripBoard validateInvitationUrl(String invitationUrl) {
+        log.debug("초대링크 유효성 검증 시작 - 초대링크: {}", invitationUrl);
+
+        // 초대링크로 UserTripBoard 조회 (활성화된 것만)
+        Optional<UserTripBoard> userTripBoardOpt = userTripBoardRepository.findByInvitationUrl(invitationUrl);
+
+        if (userTripBoardOpt.isEmpty()) {
+            log.warn("유효하지 않은 초대링크 - 초대링크: {}", invitationUrl);
+            throw new InvalidInvitationUrlException();
+        }
+
+        UserTripBoard userTripBoard = userTripBoardOpt.get();
+
+        // 초대링크 활성화 상태 확인 (이미 findByInvitationUrl에서 활성화된 것만 조회하지만 추가 검증)
+        if (!userTripBoard.getInvitationActive()) {
+            log.warn("비활성화된 초대링크 - 초대링크: {}", invitationUrl);
+            throw new InactiveInvitationUrlException();
+        }
+
+        log.debug("초대링크 유효성 검증 완료 - 보드 ID: {}", userTripBoard.getTripBoard().getId());
+        return userTripBoard;
+    }
+
+    /**
+     * 중복 참여 검증
+     */
+    private void validateDuplicateParticipation(Long userId, Long tripBoardId) {
+        log.debug("중복 참여 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
+
+        Optional<UserTripBoard> existingParticipation = userTripBoardRepository
+                .findByUserIdAndTripBoardId(userId, tripBoardId);
+
+        if (existingParticipation.isPresent()) {
+            log.warn("중복 참여 시도 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
+            throw new DuplicateTripBoardParticipationException();
+        }
+
+        log.debug("중복 참여 검증 완료 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
+    }
+
+    /**
+     * 참여자 수 제한 확인
+     */
+    private void validateParticipantLimit(Long tripBoardId) {
+        log.debug("참여자 수 제한 확인 시작 - 보드 ID: {}", tripBoardId);
+
+        long currentParticipantCount = userTripBoardRepository.countByTripBoardId(tripBoardId);
+
+        if (currentParticipantCount >= MAX_PARTICIPANTS) {
+            log.warn("참여자 수 한계 초과 - 보드 ID: {}, 현재 참여자 수: {}, 최대 참여자 수: {}",
+                    tripBoardId, currentParticipantCount, MAX_PARTICIPANTS);
+            throw new TripBoardParticipantLimitExceededException();
+        }
+
+        log.debug("참여자 수 제한 확인 완료 - 보드 ID: {}, 현재 참여자 수: {}/{}",
+                tripBoardId, currentParticipantCount, MAX_PARTICIPANTS);
+    }
+
+    /**
+     * 새로운 UserTripBoard 엔티티 생성
+     */
+    private UserTripBoard createNewUserTripBoard(User user, TripBoard tripBoard) {
+        log.debug("새로운 UserTripBoard 생성 시작 - 사용자 ID: {}, 보드 ID: {}", user.getId(), tripBoard.getId());
+
+        // 새로운 참여자용 고유 초대링크 생성
+        String newInvitationUrl = InvitationLinkGeneratorUtil.generateUniqueInvitationUrl();
+        log.debug("새로운 초대링크 생성 완료: {}", newInvitationUrl);
+
+        UserTripBoard newUserTripBoard = UserTripBoard.builder()
+                .user(user)
+                .tripBoard(tripBoard)
+                .invitationUrl(newInvitationUrl)
+                .invitationActive(true)
+                .role(TripBoardRole.MEMBER)
+                .build();
+
+        log.debug("새로운 UserTripBoard 생성 완료 - 사용자 ID: {}, 보드 ID: {}, 역할: {}",
+                user.getId(), tripBoard.getId(), TripBoardRole.MEMBER);
+        return newUserTripBoard;
     }
 
 }
