@@ -23,6 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.core.MethodParameter;
+import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
+import java.util.Objects;
 
 /**
  * 권한 검증을 위한 AOP 어드바이스
@@ -35,6 +39,7 @@ public class PermissionAspect {
     
     private final PermissionService permissionService;
     private final ObjectMapper objectMapper;
+    private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
     
     /**
      * @RequirePermission 어노테이션이 붙은 메서드 실행 전 권한 검증
@@ -85,7 +90,7 @@ public class PermissionAspect {
         // 1. PathVariable에서 기본 파라미터 추출
         String mainParamName = annotation.paramName();
         try {
-            Long mainResourceId = extractSingleResourceId(args, parameters, mainParamName);
+            Long mainResourceId = extractSingleResourceId(args, parameters, mainParamName, method);
             resourceIds.put(mainParamName, mainResourceId);
         } catch (IllegalArgumentException e) {
             // PathVariable에서 찾을 수 없는 경우, RequestBody에서 찾기
@@ -103,35 +108,93 @@ public class PermissionAspect {
     
     /**
      * 단일 리소스 ID를 추출합니다.
+     * 안전한 매개변수명 추출을 위해 어노테이션의 value/name 속성과 ParameterNameDiscoverer를 사용합니다.
      */
-    private Long extractSingleResourceId(Object[] args, Parameter[] parameters, String paramName) {
+    private Long extractSingleResourceId(Object[] args, Parameter[] parameters, String paramName, Method method) {
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
+            String actualParamName = getParameterName(method, i);
             
             // 1. PathVariable에서 찾기
-            if (parameter.getName().equals(paramName) && 
-                parameter.isAnnotationPresent(PathVariable.class)) {
-                Object arg = args[i];
-                if (arg instanceof Long) {
-                    return (Long) arg;
-                } else {
-                    throw new IllegalArgumentException("리소스 ID 파라미터가 올바른 타입이 아닙니다: " + arg);
+            PathVariable pathVariable = parameter.getAnnotation(PathVariable.class);
+            if (pathVariable != null) {
+                String pathVarName = getPathVariableName(pathVariable, actualParamName);
+                if (paramName.equals(pathVarName)) {
+                    Object arg = args[i];
+                    if (arg instanceof Long) {
+                        return (Long) arg;
+                    } else {
+                        throw new IllegalArgumentException("리소스 ID 파라미터가 올바른 타입이 아닙니다: " + arg);
+                    }
                 }
             }
             
             // 2. RequestParam에서 찾기
-            if (parameter.getName().equals(paramName) && 
-                parameter.isAnnotationPresent(RequestParam.class)) {
-                Object arg = args[i];
-                if (arg instanceof Long) {
-                    return (Long) arg;
-                } else {
-                    throw new IllegalArgumentException("리소스 ID 파라미터가 올바른 타입이 아닙니다: " + arg);
+            RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
+            if (requestParam != null) {
+                String requestParamName = getRequestParamName(requestParam, actualParamName);
+                if (paramName.equals(requestParamName)) {
+                    Object arg = args[i];
+                    if (arg instanceof Long) {
+                        return (Long) arg;
+                    } else {
+                        throw new IllegalArgumentException("리소스 ID 파라미터가 올바른 타입이 아닙니다: " + arg);
+                    }
                 }
             }
         }
         
         throw new IllegalArgumentException("리소스 ID 파라미터를 찾을 수 없습니다: " + paramName);
+    }
+    
+    /**
+     * 안전한 매개변수명 추출
+     */
+    private String getParameterName(Method method, int parameterIndex) {
+        // ParameterNameDiscoverer를 사용하여 매개변수명 추출 시도
+        try {
+            String[] parameterNames = parameterNameDiscoverer.getParameterNames(method);
+            if (parameterNames != null && parameterIndex < parameterNames.length) {
+                return parameterNames[parameterIndex];
+            }
+        } catch (Exception e) {
+            log.debug("ParameterNameDiscoverer 사용 실패: {}", e.getMessage());
+        }
+        
+        Parameter parameter = method.getParameters()[parameterIndex];
+        return parameter.getName();
+    }
+    
+    /**
+     * PathVariable의 실제 이름 추출 (value 또는 name 속성 우선)
+     */
+    private String getPathVariableName(PathVariable pathVariable, String parameterName) {
+        // value가 설정되어 있으면 사용
+        if (!pathVariable.value().isEmpty()) {
+            return pathVariable.value();
+        }
+        // name이 설정되어 있으면 사용  
+        if (!pathVariable.name().isEmpty()) {
+            return pathVariable.name();
+        }
+        // 둘 다 없으면 매개변수명 사용
+        return parameterName;
+    }
+    
+    /**
+     * RequestParam의 실제 이름 추출 (value 또는 name 속성 우선)
+     */
+    private String getRequestParamName(RequestParam requestParam, String parameterName) {
+        // value가 설정되어 있으면 사용
+        if (!requestParam.value().isEmpty()) {
+            return requestParam.value();
+        }
+        // name이 설정되어 있으면 사용
+        if (!requestParam.name().isEmpty()) {
+            return requestParam.name();
+        }
+        // 둘 다 없으면 매개변수명 사용
+        return parameterName;
     }
     
     /**
