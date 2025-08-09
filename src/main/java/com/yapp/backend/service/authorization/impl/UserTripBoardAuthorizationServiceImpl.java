@@ -42,7 +42,6 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
 
             log.info("여행보드 접근 권한 검증 통과 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
         } catch (UserAuthorizationException e) {
-            // 이미 로깅된 예외를 다시 던짐
             throw e;
         } catch (Exception e) {
             log.error("여행보드 접근 권한 검증 중 예외 발생 - 사용자 ID: {}, 보드 ID: {}, 오류: {}",

@@ -63,6 +63,12 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             // CASE 1: Valid Access Token
             jwtTokenProvider.validateAccessTokenOrThrow(accessToken);
+            
+            // 블랙리스트 확인
+            if (refreshTokenService.isAccessTokenBlacklisted(accessToken)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is blacklisted");
+                return;
+            }
             authContextService.createAuthContext(accessToken);
             filterChain.doFilter(request, response);
         } catch (JwtException | IllegalArgumentException bad) {
@@ -105,12 +111,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // 2) Redis Refresh Token 회전
         refreshTokenService.rotateRefresh(userId, newRefresh);
 
-        // 3) 새로운 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
-        response.setHeader(ACCESS_TOKEN_HEADER, newAccess);
-        ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(userId);
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-
-        // 4) 인증 객체 세팅
+        // 3) 인증 객체 세팅
         authContextService.createAuthContext(newAccess);
     }
 }

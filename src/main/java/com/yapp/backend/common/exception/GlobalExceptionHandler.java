@@ -132,6 +132,17 @@ public class GlobalExceptionHandler {
 				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 
+	@ExceptionHandler(TripBoardDeleteException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleTripBoardDeleteException(
+			TripBoardDeleteException e) {
+		log.error("Trip board delete exception occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
 	@ExceptionHandler(DuplicateInvitationUrlException.class)
 	public ResponseEntity<StandardResponse<ProblemDetail>> handleDuplicateInvitationUrlException(
 			DuplicateInvitationUrlException e) {

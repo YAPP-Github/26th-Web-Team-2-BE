@@ -4,6 +4,8 @@ import com.yapp.backend.common.exception.TripBoardNotFoundException;
 import com.yapp.backend.repository.TripBoardRepository;
 import com.yapp.backend.repository.JpaTripBoardRepository;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
+import com.yapp.backend.repository.JpaAccommodationRepository;
+import com.yapp.backend.repository.JpaComparisonTableRepository;
 import com.yapp.backend.repository.entity.TripBoardEntity;
 import com.yapp.backend.repository.entity.UserTripBoardEntity;
 import com.yapp.backend.repository.mapper.TripBoardMapper;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +36,8 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
 
     private final JpaTripBoardRepository jpaTripBoardRepository;
     private final JpaUserTripBoardRepository jpaUserTripBoardRepository;
+    private final JpaAccommodationRepository jpaAccommodationRepository;
+    private final JpaComparisonTableRepository jpaComparisonTableRepository;
 
     private final TripBoardMapper tripBoardMapper;
     private final UserTripBoardMapper userTripBoardMapper;
@@ -99,6 +104,39 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
         // 변경된 엔티티를 저장합니다 (더티 체킹에 의해 자동으로 UPDATE 쿼리 실행)
         TripBoardEntity updatedEntity = jpaTripBoardRepository.save(existingEntity);
         return tripBoardMapper.entityToDomain(updatedEntity);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        jpaTripBoardRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<TripBoard> findByIdAndCreatedById(Long tripBoardId, Long createdById) {
+        return jpaTripBoardRepository.findByIdAndCreatedById(tripBoardId, createdById)
+                .map(tripBoardMapper::entityToDomain);
+    }
+
+    @Override
+    public boolean existsById(Long tripBoardId) {
+        return jpaTripBoardRepository.existsById(tripBoardId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTripBoardCompletely(Long tripBoardId) {
+        // 여행보드와 관련된 모든 데이터를 순서대로 삭제합니다.
+        // 1. 비교표 삭제 (ComparisonAccommodation 매핑도 cascade로 함께 삭제됨)
+        jpaComparisonTableRepository.deleteByTripBoardEntityId(tripBoardId);
+
+        // 2. 숙소 삭제
+        jpaAccommodationRepository.deleteByBoardId(tripBoardId);
+
+        // 3. 사용자-여행보드 매핑 삭제
+        jpaUserTripBoardRepository.deleteByTripBoardId(tripBoardId);
+
+        // 4. 여행보드 삭제
+        jpaTripBoardRepository.deleteById(tripBoardId);
     }
 
 }
