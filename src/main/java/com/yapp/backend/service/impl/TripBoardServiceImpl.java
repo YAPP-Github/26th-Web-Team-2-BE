@@ -242,11 +242,7 @@ public class TripBoardServiceImpl implements TripBoardService {
             validateDestination(request.getDestination());
 
             // 2. 여행보드 존재 여부 확인
-            tripBoardRepository.findById(tripBoardId)
-                    .orElseThrow(() -> {
-                        log.warn("존재하지 않는 여행보드 수정 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
-                        return new TripBoardNotFoundException();
-                    });
+            tripBoardRepository.findByIdOrThrow(tripBoardId);
 
             // 3. 수정을 수행하는 사용자 조회
             User updatedByUser = userRepository.findByIdOrThrow(userId);
@@ -324,11 +320,7 @@ public class TripBoardServiceImpl implements TripBoardService {
      */
     private void validateOwnershipAndGetTripBoard(Long tripBoardId, Long userId) {
         // 여행보드 존재 여부 확인
-        TripBoard tripBoard = tripBoardRepository.findById(tripBoardId)
-                .orElseThrow(() -> {
-                    log.warn("존재하지 않는 여행보드 삭제 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
-                    return new TripBoardNotFoundException();
-                });
+        TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(tripBoardId);
 
         // 소유자 권한 검증 (createdBy 필드와 사용자 ID 비교)
         if (!tripBoard.getCreatedBy().getId().equals(userId)) {

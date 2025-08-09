@@ -1,10 +1,13 @@
-package com.yapp.backend.service.impl;
+package com.yapp.backend.service.authorization.impl;
 
+import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.exception.UserAuthorizationException;
 import com.yapp.backend.repository.JpaAccommodationRepository;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
+import com.yapp.backend.repository.TripBoardRepository;
 import com.yapp.backend.repository.entity.AccommodationEntity;
-import com.yapp.backend.service.UserTripBoardAuthorizationService;
+import com.yapp.backend.service.authorization.UserTripBoardAuthorizationService;
+import com.yapp.backend.service.model.TripBoard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,12 +22,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAuthorizationService {
 
+    private final TripBoardRepository tripBoardRepository;
     private final JpaUserTripBoardRepository userTripBoardRepository;
     private final JpaAccommodationRepository accommodationRepository;
 
     @Override
-    public void validateTripBoardAccess(Long userId, Long boardId) {
+    public void validateTripBoardAccessOrThrow(Long userId, Long boardId) {
         log.info("여행보드 접근 권한 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
+
+
+        // 리소스 유효 검사
+        TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(boardId);
 
         try {
             if (!hasAccessToTripBoard(userId, boardId)) {
@@ -43,7 +51,7 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
     }
 
     @Override
-    public void validateAccommodationAccess(Long userId, Long accommodationId) {
+    public void validateAccommodationAccessOrThrow(Long userId, Long accommodationId) {
         log.info("숙소 접근 권한 검증 시작 - 사용자 ID: {}, 숙소 ID: {}", userId, accommodationId);
 
         if (userId == null || accommodationId == null) {
@@ -80,6 +88,17 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
             log.error("숙소 접근 권한 검증 중 예외 발생 - 사용자 ID: {}, 숙소 ID: {}, 오류: {}",
                     userId, accommodationId, e.getMessage(), e);
             throw UserAuthorizationException.forAccommodation(userId, accommodationId);
+        }
+    }
+
+    @Override
+    public void validateTripBoardDeleteOrThrow(Long userId, Long boardId) {
+        // 리소스 유효 검사
+        TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(boardId);
+        // 여행 보드의 생성자 확인
+        Long ownerId = tripBoard.getCreatedBy() != null ? tripBoard.getCreatedBy().getId() : null;
+        if (ownerId == null || !ownerId.equals(userId)) {
+            throw new UserAuthorizationException(userId, boardId);
         }
     }
 
