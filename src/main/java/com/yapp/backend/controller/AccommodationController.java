@@ -13,6 +13,7 @@ import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.service.AccommodationService;
 
 import com.yapp.backend.service.authorization.UserTripBoardAuthorizationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,7 +95,7 @@ public class AccommodationController implements AccommodationDocs {
     @RequirePermission(value = RequirePermission.PermissionType.TRIP_BOARD_ACCESS, requestBodyField = "boardId")
     @PostMapping("/register")
     public ResponseEntity<StandardResponse<AccommodationRegisterResponse>> registerAccommodationCard(
-            @RequestBody AccommodationRegisterRequest request,
+            @RequestBody @Valid AccommodationRegisterRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         AccommodationRegisterResponse response = accommodationService.registerAccommodationCard(request, userDetails.getUserId());
