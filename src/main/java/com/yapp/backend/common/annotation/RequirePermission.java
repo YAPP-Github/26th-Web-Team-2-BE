@@ -33,7 +33,7 @@ public @interface RequirePermission {
     enum PermissionType {
         // 여행보드 관련 권한
         TRIP_BOARD_ACCESS,      // 여행보드 접근 권한 (OWNER, MEMBER)
-        TRIP_BOARD_MODIFY,      // 여행보드 수정 권한 (OWNER)
+        TRIP_BOARD_MODIFY,      // 여행보드 수정 권한 (OWNER, MEMBER)
         TRIP_BOARD_DELETE,      // 여행보드 삭제 권한 (OWNER)
 
         // 숙소 관련 권한
