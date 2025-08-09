@@ -41,3 +41,6 @@ loki:
   url: ${LOKI_URL}
   username: ${LOKI_USERNAME}
   password: ${LOKI_PASSWORD}
+
+cookie:
+  secure: true  # HTTPS 환경
