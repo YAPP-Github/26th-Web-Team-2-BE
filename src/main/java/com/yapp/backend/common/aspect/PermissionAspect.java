@@ -95,8 +95,6 @@ public class PermissionAspect {
         } catch (IllegalArgumentException e) {
             // PathVariable에서 찾을 수 없는 경우, RequestBody에서 찾기
             log.debug("PathVariable에서 {}를 찾을 수 없어 RequestBody에서 찾습니다.", mainParamName);
-            Long fallbackId = extractIdFromRequestBody(args, parameters, mainParamName);
-            resourceIds.put(mainParamName, fallbackId);
         }
         
         // 3. RequestBody에서 ID 추출
