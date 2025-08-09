@@ -57,7 +57,7 @@ public class PermissionAspect {
             Map<String, Long> resourceIds = extractResourceIds(joinPoint, method, annotation);
 
             // 4. 기본 권한 검증 수행
-            permissionService.validatePermission(annotation.value(), resourceIds, userId);
+            permissionService.validatePermission(annotation, resourceIds, userId);
             
             log.debug("권한 검증 성공: method={}, userId={}, resourceIds={}", 
                     method.getName(), userId, resourceIds);

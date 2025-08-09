@@ -1,5 +1,6 @@
 package com.yapp.backend.service.authorization;
 
+import com.yapp.backend.common.annotation.RequirePermission;
 import com.yapp.backend.common.annotation.RequirePermission.PermissionType;
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.exception.UserAuthorizationException;
@@ -28,29 +29,30 @@ public class PermissionService {
      * @param userId            현재 사용자 ID
      */
     public void validatePermission(
-            PermissionType permissionType,
+            RequirePermission annotation,
             Map<String, Long> resourceIds,
             Long userId
     ) {
+        PermissionType permissionType = annotation.value();
+        String paramName = annotation.paramName();
         log.info("권한 검증 시작: type={}, resourceIds={}, userId={}", permissionType, resourceIds, userId);
-
         switch (permissionType) {
             case TRIP_BOARD_ACCESS:
             case TRIP_BOARD_MODIFY:
             case TRIP_BOARD_DELETE:
-                validateTripBoardPermission(permissionType, resourceIds.get("boardId"), userId);
+                validateTripBoardPermission(permissionType, resourceIds.get(paramName), userId);
                 break;
 
             case COMPARISON_TABLE_ACCESS:
             case COMPARISON_TABLE_MODIFY:
             case COMPARISON_TABLE_DELETE:
-                validateComparisonTablePermission(permissionType, resourceIds.get("tableId"), userId);
+                validateComparisonTablePermission(permissionType, resourceIds.get(paramName), userId);
                 break;
 
             case ACCOMMODATION_ACCESS:
             case ACCOMMODATION_MODIFY:
             case ACCOMMODATION_DELETE:
-                validateAccommodationPermission(permissionType, resourceIds.get("accommodationId"), userId);
+                validateAccommodationPermission(permissionType, resourceIds.get(paramName), userId);
                 break;
 
             default:
@@ -102,6 +104,8 @@ public class PermissionService {
             Long comparisonTableId,
             Long userId
     ) {
+        log.info("validateComparisonTablePermission: {}", comparisonTableId);
+
         /**
          * 비교 테이블 조회 및 수정은 여행 보드 참여한 사용자 모두 가능합니다.
          * TODO : 비교 테이블 삭제 권한은 비교 테이블을 생성한 사용자에게 있습니다. (기획 확인 필요)
@@ -132,6 +136,8 @@ public class PermissionService {
             Long accommodationId,
             Long userId
     ) {
+        log.info("validateAccommodationPermission: {}", accommodationId);
+
         /**
          * 숙소 조회는 해당 숙소가 등록된 여행 보드의 참여자 모두가 가능합니다.
          * 숙소 유효성 검사는 권한 검증 메소드 내부에서 진행됩니다.
