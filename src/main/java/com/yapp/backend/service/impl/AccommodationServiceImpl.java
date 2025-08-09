@@ -68,8 +68,14 @@ public class AccommodationServiceImpl implements AccommodationService {
 					.map(AccommodationResponse::from)
 					.collect(Collectors.toList());
 
-			// 여행보드 참여자 프로필 정보 조회
-			List<UserProfileResponse> userProfiles = getUserProfilesByBoardId(boardId);
+			// 여행보드 참여자 프로필 정보 조회 (실패해도 숙소 목록 조회는 정상 진행)
+			List<UserProfileResponse> userProfiles;
+			try {
+				userProfiles = getUserProfilesByBoardId(boardId);
+			} catch (Exception e) {
+				log.warn("Failed to fetch user profiles for boardId: {}, proceeding with empty list", boardId, e);
+				userProfiles = Collections.emptyList();
+			}
 
 			return AccommodationPageResponse.builder()
 					.accommodations(accommodationResponses)
@@ -200,31 +206,58 @@ public class AccommodationServiceImpl implements AccommodationService {
 	/**
 	 * 여행보드 참여자 프로필 정보 조회
 	 * 여행보드 ID로 해당 보드의 모든 참여자 정보를 조회하여 UserProfileResponse로 변환
+	 * 조회 실패 시 빈 리스트를 반환하여 숙소 목록 조회는 정상 진행되도록 함
 	 */
 	private List<UserProfileResponse> getUserProfilesByBoardId(Long boardId) {
 		try {
+			log.debug("Fetching user profiles for boardId: {}", boardId);
+
 			List<UserTripBoard> userTripBoards = userTripBoardRepository.findByTripBoardIdWithUser(boardId);
 
-			return userTripBoards.stream()
+			if (userTripBoards == null || userTripBoards.isEmpty()) {
+				log.debug("No participants found for boardId: {}", boardId);
+				return Collections.emptyList();
+			}
+
+			List<UserProfileResponse> userProfiles = userTripBoards.stream()
+					.filter(userTripBoard -> userTripBoard != null && userTripBoard.getUser() != null)
 					.map(this::mapToUserProfileResponse)
+					.filter(userProfile -> userProfile != null)
 					.collect(Collectors.toList());
+
+			log.debug("Successfully fetched {} user profiles for boardId: {}", userProfiles.size(), boardId);
+			return userProfiles;
+
 		} catch (DataAccessException e) {
-			log.warn("Failed to fetch user profiles for boardId: {}, returning empty list", boardId, e);
+			log.warn("Database error while fetching user profiles for boardId: {}, returning empty list. Error: {}",
+					boardId, e.getMessage(), e);
 			return Collections.emptyList();
 		} catch (Exception e) {
-			log.warn("Unexpected error while fetching user profiles for boardId: {}, returning empty list", boardId, e);
+			log.warn("Unexpected error while fetching user profiles for boardId: {}, returning empty list. Error: {}",
+					boardId, e.getMessage(), e);
 			return Collections.emptyList();
 		}
 	}
 
 	/**
 	 * UserTripBoard를 UserProfileResponse로 변환
+	 * null 체크를 통해 안전한 변환 수행
 	 */
 	private UserProfileResponse mapToUserProfileResponse(UserTripBoard userTripBoard) {
-		return UserProfileResponse.builder()
-				.userId(userTripBoard.getUser().getId())
-				.nickname(userTripBoard.getUser().getNickname())
-				.build();
+		try {
+			if (userTripBoard == null || userTripBoard.getUser() == null) {
+				log.warn("Invalid UserTripBoard or User data found during mapping, skipping");
+				return null;
+			}
+
+			return UserProfileResponse.builder()
+					.userId(userTripBoard.getUser().getId())
+					.nickname(userTripBoard.getUser().getNickname())
+					.build();
+		} catch (Exception e) {
+			log.warn("Error while mapping UserTripBoard to UserProfileResponse: {}", e.getMessage(), e);
+			return null;
+		}
 	}
 
 }
