@@ -60,11 +60,6 @@ public interface JpaUserTripBoardRepository extends JpaRepository<UserTripBoardE
         List<UserTripBoardEntity> findByTripBoardIdsWithUser(@Param("tripBoardIds") List<Long> tripBoardIds);
 
         /**
-         * 여행보드 ID로 해당 보드의 모든 사용자 매핑을 삭제합니다.
-         */
-        void deleteByTripBoardId(Long tripBoardId);
-
-        /**
          * 여행보드의 특정 역할 참여자를 생성일 오름차순으로 조회 (다음 OWNER 후보 조회용)
          */
         List<UserTripBoardEntity> findByTripBoardIdAndRoleOrderByCreatedAtAsc(Long tripBoardId, TripBoardRole role);

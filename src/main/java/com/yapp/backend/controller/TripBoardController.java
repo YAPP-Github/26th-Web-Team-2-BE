@@ -136,7 +136,7 @@ public class TripBoardController implements TripBoardDocs {
      * 여행 보드 나가기 API
      */
     @Override
-    @PostMapping("/{tripBoardId}/leave")
+    @PostMapping("/leave/{tripBoardId}")
     public ResponseEntity<StandardResponse<TripBoardLeaveResponse>> leaveTripBoard(
             @PathVariable Long tripBoardId,
             @RequestBody @Valid TripBoardLeaveRequest request,
@@ -144,6 +144,9 @@ public class TripBoardController implements TripBoardDocs {
 
         // JWT 인증을 통한 현재 사용자 정보 추출
         Long whoAmI = userDetails.getUserId();
+
+        // 여행 보드 접근 권한 검증
+        authorizationService.validateTripBoardAccess(whoAmI, tripBoardId);
 
         // 여행 보드 나가기
         TripBoardLeaveResponse response = tripBoardService.leaveTripBoard(

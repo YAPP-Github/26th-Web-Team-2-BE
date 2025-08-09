@@ -24,10 +24,6 @@ import com.yapp.backend.controller.mapper.TripBoardSummaryMapper;
 import com.yapp.backend.controller.mapper.TripBoardUpdateMapper;
 import com.yapp.backend.repository.AccommodationRepository;
 import com.yapp.backend.repository.ComparisonTableRepository;
-import com.yapp.backend.repository.JpaAccommodationRepository;
-import com.yapp.backend.repository.JpaComparisonTableRepository;
-import com.yapp.backend.repository.AccommodationRepository;
-import com.yapp.backend.repository.ComparisonTableRepository;
 import com.yapp.backend.repository.JpaTripBoardRepository;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
 import com.yapp.backend.repository.TripBoardRepository;
@@ -71,17 +67,12 @@ public class TripBoardServiceImpl implements TripBoardService {
     private static final int MAX_PARTICIPANTS = 10;
 
     private final JpaTripBoardRepository jpaTripBoardRepository;
-    private final JpaUserTripBoardRepository userTripBoardRepository;
-    private final JpaAccommodationRepository jpaAccommodationRepository;
-    private final JpaComparisonTableRepository jpaComparisonTableRepository;
     private final JpaUserTripBoardRepository jpaUserTripBoardRepository;
     private final TripBoardRepository tripBoardRepository;
     private final UserRepository userRepository;
-    private final AccommodationRepository accommodationRepository;
-    private final ComparisonTableRepository comparisonTableRepository;
-    private final AccommodationRepository accommodationRepository;
-    private final ComparisonTableRepository comparisonTableRepository;
     private final UserTripBoardRepository userTripBoardRepository;
+    private final AccommodationRepository accommodationRepository;
+    private final ComparisonTableRepository comparisonTableRepository;
 
     private final UserMapper userMapper;
     private final TripBoardMapper tripBoardMapper;
@@ -386,13 +377,13 @@ public class TripBoardServiceImpl implements TripBoardService {
                     tripBoardId, userId, removeResources);
 
             // 1. 여행보드 존재 여부 확인
-            if (!jpaTripBoardRepository.existsById(tripBoardId)) {
+            if (!tripBoardRepository.existsById(tripBoardId)) {
                 log.warn("존재하지 않는 여행보드 나가기 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
                 throw new TripBoardNotFoundException();
             }
 
             // 2. 사용자가 해당 여행보드의 참여자인지 확인
-            Optional<UserTripBoardEntity> userTripBoardOpt = userTripBoardRepository
+            Optional<UserTripBoard> userTripBoardOpt = userTripBoardRepository
                     .findByUserIdAndTripBoardId(userId, tripBoardId);
 
             if (userTripBoardOpt.isEmpty()) {
@@ -400,7 +391,7 @@ public class TripBoardServiceImpl implements TripBoardService {
                 throw new UserAuthorizationException();
             }
 
-            UserTripBoardEntity currentUserTripBoard = userTripBoardOpt.get();
+            UserTripBoard currentUserTripBoard = userTripBoardOpt.get();
             TripBoardRole currentUserRole = currentUserTripBoard.getRole();
 
             log.debug("사용자 역할 확인 - 사용자 ID: {}, 역할: {}", userId, currentUserRole);
@@ -412,20 +403,20 @@ public class TripBoardServiceImpl implements TripBoardService {
             log.debug("참여자 수 확인 - 전체 참여자: {}, 마지막 참여자 여부: {}", totalParticipants, isLastParticipant);
 
             // 4. 응답 객체 초기화
-            TripBoardLeaveResponse tripBoardLeaveResponse = TripBoardLeaveResponse.builder()
+            TripBoardLeaveResponse.TripBoardLeaveResponseBuilder responseBuilder = TripBoardLeaveResponse.builder()
                     .tripBoardId(tripBoardId)
-                    .leftAt(LocalDateTime.now())
-                    .build();
+                    .leftAt(LocalDateTime.now());
 
             // 5. 마지막 참여자인 경우 여행보드 완전 삭제
             if (isLastParticipant) {
                 log.info("마지막 참여자 나가기 - 여행보드 완전 삭제 시작: 보드 ID: {}", tripBoardId);
-                deleteTripBoardCompletely(tripBoardId);
+                tripBoardRepository.deleteTripBoardCompletely(tripBoardId);
                 log.info("여행보드 완전 삭제 완료 - 보드 ID: {}", tripBoardId);
             } else {
                 // 6. OWNER 권한 이양 처리 (OWNER인 경우)
+                Long newOwnerId = null;
                 if (currentUserRole == TripBoardRole.OWNER) {
-                    Long newOwnerId = transferOwnership(tripBoardId, userId);
+                    newOwnerId = transferOwnership(tripBoardId, userId);
                     log.info("OWNER 권한 이양 완료 - 이전 OWNER: {}, 새 OWNER: {}", userId, newOwnerId);
                 }
 
@@ -438,15 +429,11 @@ public class TripBoardServiceImpl implements TripBoardService {
                 // 8. 사용자-여행보드 매핑 삭제
                 userTripBoardRepository.deleteByUserIdAndTripBoardId(userId, tripBoardId);
                 log.debug("사용자-여행보드 매핑 삭제 완료 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
-
-                String message = currentUserRole == TripBoardRole.OWNER
-                        ? "여행보드에서 성공적으로 나갔습니다. 소유자 권한이 이양되었습니다."
-                        : "여행보드에서 성공적으로 나갔습니다.";
             }
 
-            // 9. 응답 객체 반환
+            TripBoardLeaveResponse response = responseBuilder.build();
             log.info("여행보드 나가기 완료 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
-            return tripBoardLeaveResponse;
+            return response;
 
         } catch (TripBoardNotFoundException | UserAuthorizationException e) {
             log.error("여행보드 나가기 실패 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
@@ -468,7 +455,7 @@ public class TripBoardServiceImpl implements TripBoardService {
         log.debug("OWNER 권한 이양 시작 - 보드 ID: {}, 현재 OWNER: {}", tripBoardId, currentOwnerId);
 
         // 가장 먼저 입장한 MEMBER 조회
-        List<UserTripBoardEntity> members = userTripBoardRepository
+        List<UserTripBoard> members = userTripBoardRepository
                 .findByTripBoardIdAndRoleOrderByCreatedAtAsc(tripBoardId, TripBoardRole.MEMBER);
 
         if (members.isEmpty()) {
@@ -477,8 +464,8 @@ public class TripBoardServiceImpl implements TripBoardService {
         }
 
         // 첫 번째 MEMBER를 OWNER로 변경
-        UserTripBoardEntity nextOwner = members.get(0);
-        UserTripBoardEntity updatedNextOwner = UserTripBoardEntity.builder()
+        UserTripBoard nextOwner = members.get(0);
+        UserTripBoard updatedNextOwner = UserTripBoard.builder()
                 .id(nextOwner.getId())
                 .user(nextOwner.getUser())
                 .tripBoard(nextOwner.getTripBoard())
@@ -508,30 +495,6 @@ public class TripBoardServiceImpl implements TripBoardService {
         // 사용자가 등록한 숙소 삭제
         accommodationRepository.deleteByBoardIdAndCreatedById(tripBoardId, userId);
         log.debug("사용자 숙소 삭제 완료 - 사용자 ID: {}", userId);
-    }
-
-    /**
-     * 여행보드를 완전히 삭제합니다.
-     * 관련된 모든 데이터(비교표, 숙소, 사용자 매핑)를 함께 삭제합니다.
-     */
-    private void deleteTripBoardCompletely(Long tripBoardId) {
-        log.debug("여행보드 완전 삭제 시작 - 보드 ID: {}", tripBoardId);
-
-        // 1. 비교표 삭제 (ComparisonAccommodation 매핑도 CASCADE로 함께 삭제됨)
-        jpaComparisonTableRepository.deleteByTripBoardId(tripBoardId);
-        log.debug("비교표 삭제 완료 - 보드 ID: {}", tripBoardId);
-
-        // 2. 숙소 삭제
-        jpaAccommodationRepository.deleteByBoardId(tripBoardId);
-        log.debug("숙소 삭제 완료 - 보드 ID: {}", tripBoardId);
-
-        // 3. 사용자-여행보드 매핑 삭제
-        userTripBoardRepository.deleteByTripBoardId(tripBoardId);
-        log.debug("사용자-여행보드 매핑 삭제 완료 - 보드 ID: {}", tripBoardId);
-
-        // 4. 여행보드 삭제
-        jpaTripBoardRepository.deleteById(tripBoardId);
-        log.debug("여행보드 삭제 완료 - 보드 ID: {}", tripBoardId);
     }
 
 }

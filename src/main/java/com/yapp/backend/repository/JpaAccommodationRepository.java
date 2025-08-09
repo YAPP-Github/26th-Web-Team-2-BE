@@ -65,9 +65,4 @@ public interface JpaAccommodationRepository extends JpaRepository<AccommodationE
          * 특정 여행보드의 모든 숙소를 삭제 (여행보드 완전 삭제용)
          */
         void deleteByBoardId(Long boardId);
-
-        /**
-         * 여행보드 ID로 해당 보드의 모든 숙소를 삭제합니다.
-         */
-        void deleteByBoardId(Long boardId);
 }
