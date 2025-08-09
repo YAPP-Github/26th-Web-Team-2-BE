@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface UserTripBoardRepository {
 
     /**
-     * 사용자 ID와 여행보드 ID로 매핑 정보 조회
+     * 사용자 ID와 여행보드 ID로 매핑 정보 조회 (중복 참여 검증에도 활용)
      */
     Optional<UserTripBoard> findByUserIdAndTripBoardId(Long userId, Long tripBoardId);
 
@@ -40,4 +40,9 @@ public interface UserTripBoardRepository {
      * 사용자-여행보드 매핑 정보 저장/업데이트
      */
     UserTripBoard save(UserTripBoard userTripBoard);
+
+    /**
+     * 초대링크로 사용자-여행보드 매핑 정보 조회
+     */
+    Optional<UserTripBoard> findByInvitationUrl(String invitationUrl);
 }
