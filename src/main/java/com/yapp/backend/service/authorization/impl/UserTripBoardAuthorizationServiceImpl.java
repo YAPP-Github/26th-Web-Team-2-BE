@@ -97,8 +97,9 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
         // 리소스 유효 검사
         TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(boardId);
         // 여행 보드의 생성자 확인
-        if (!tripBoard.getCreatedBy().getId().equals(userId)) {
-            throw new UserAuthorizationException(ErrorCode.INVALID_USER_AUTHORIZATION);
+        Long ownerId = tripBoard.getCreatedBy() != null ? tripBoard.getCreatedBy().getId() : null;
+        if (ownerId == null || !ownerId.equals(userId)) {
+            throw new UserAuthorizationException(userId, boardId);
         }
     }
 
