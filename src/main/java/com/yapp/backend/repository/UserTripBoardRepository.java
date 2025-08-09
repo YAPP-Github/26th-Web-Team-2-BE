@@ -40,9 +40,4 @@ public interface UserTripBoardRepository {
      * 사용자-여행보드 매핑 정보 저장/업데이트
      */
     UserTripBoard save(UserTripBoard userTripBoard);
-
-    /**
-     * 여행보드 존재 여부 확인
-     */
-    boolean existsByTripBoardId(Long tripBoardId);
 }

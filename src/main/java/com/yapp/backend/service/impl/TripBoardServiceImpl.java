@@ -368,6 +368,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     /**
      * 여행보드 나가기
      * OWNER가 나가는 경우 다음 MEMBER에게 권한을 이양하고, 마지막 참여자인 경우 여행보드를 완전 삭제합니다.
+     * todo 치명적: 마지막 두 명이 동시에 나가면 ‘참여자 0명 보드’가 남을 수 있음 + removeResources NPE 위험
      */
     @Override
     @Transactional
@@ -421,7 +422,7 @@ public class TripBoardServiceImpl implements TripBoardService {
                 }
 
                 // 7. 리소스 처리 (removeResources가 true인 경우)
-                if (removeResources) {
+                if (Boolean.TRUE.equals(removeResources)) {
                     deleteUserResources(tripBoardId, userId);
                     log.info("사용자 리소스 삭제 완료 - 사용자 ID: {}", userId);
                 }

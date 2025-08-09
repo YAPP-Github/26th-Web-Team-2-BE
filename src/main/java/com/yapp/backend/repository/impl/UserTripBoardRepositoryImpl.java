@@ -39,7 +39,7 @@ public class UserTripBoardRepositoryImpl implements UserTripBoardRepository {
         return jpaUserTripBoardRepository.findByTripBoardIdAndRoleOrderByCreatedAtAsc(tripBoardId, role)
                 .stream()
                 .map(userTripBoardMapper::entityToDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -57,10 +57,5 @@ public class UserTripBoardRepositoryImpl implements UserTripBoardRepository {
         UserTripBoardEntity entity = userTripBoardMapper.domainToEntity(userTripBoard);
         UserTripBoardEntity savedEntity = jpaUserTripBoardRepository.save(entity);
         return userTripBoardMapper.entityToDomain(savedEntity);
-    }
-
-    @Override
-    public boolean existsByTripBoardId(Long tripBoardId) {
-        return jpaUserTripBoardRepository.countByTripBoardId(tripBoardId) > 0;
     }
 }
