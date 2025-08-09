@@ -27,11 +27,10 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User getUserBySocialUserInfoOrCreateUser(User socialUserInfo) {
+        // 삭제되지 않은 활성 사용자만 조회하고, 없으면 새로운 사용자 생성
         return jpaUserRepository
-                .findByProviderAndSocialId(socialUserInfo.getProvider(), socialUserInfo.getSocialId())
-                .filter(u -> u.getDeletedAt() != null)
-                .orElseGet(() ->
-                        jpaUserRepository.save(UserEntity.from(socialUserInfo)))
+                .findByProviderAndSocialIdAndDeletedAtIsNull(socialUserInfo.getProvider(), socialUserInfo.getSocialId())
+                .orElseGet(() -> jpaUserRepository.save(UserEntity.from(socialUserInfo)))
                 .toModel();
     }
 

@@ -126,7 +126,7 @@ public class OauthController implements OauthDocs {
 
     /**
      * 회원탈퇴 API
-     * 사용자 데이터를 Soft Delete 처리하고 모든 토큰을 무효화합니다.
+     * 사용자 데이터를 Soft Delete 처리합니다.
      *
      * @param userDetails 현재 인증된 사용자 정보
      * @param request HTTP 요청 (Access Token 추출용)
@@ -149,10 +149,6 @@ public class OauthController implements OauthDocs {
         // 2. 모든 토큰 무효화 (로그아웃과 동일)
         String accessToken = extractTokenFromHeader(request);
         refreshTokenService.logoutUser(userId, accessToken);
-
-        // 3. 쿠키 무효화
-        ResponseCookie invalidatedCookie = cookieUtil.createInvalidatedCookie(REFRESH_TOKEN_COOKIE);
-        response.addHeader(HttpHeaders.SET_COOKIE, invalidatedCookie.toString());
 
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, new WithdrawResponse(isWithdraw)));
     }
