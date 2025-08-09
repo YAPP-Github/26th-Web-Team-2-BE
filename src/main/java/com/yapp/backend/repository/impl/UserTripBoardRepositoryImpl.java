@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * 사용자-여행보드 매핑 Repository 구현체
@@ -57,5 +56,11 @@ public class UserTripBoardRepositoryImpl implements UserTripBoardRepository {
         UserTripBoardEntity entity = userTripBoardMapper.domainToEntity(userTripBoard);
         UserTripBoardEntity savedEntity = jpaUserTripBoardRepository.save(entity);
         return userTripBoardMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public Optional<UserTripBoard> findByInvitationUrl(String invitationUrl) {
+        return jpaUserTripBoardRepository.findByInvitationUrlAndInvitationActiveTrue(invitationUrl)
+                .map(userTripBoardMapper::entityToDomain);
     }
 }
