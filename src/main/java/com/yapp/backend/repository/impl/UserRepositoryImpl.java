@@ -21,7 +21,6 @@ public class UserRepositoryImpl implements UserRepository {
     public User findByIdOrThrow(Long id) {
         // TODO : 여행 보드 참여자 리스트를 조회할 때, 문제가 생길 여지가 있는지 확인
         return jpaUserRepository.findById(id)
-                .filter(u -> u.getDeletedAt() != null)
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND))
                 .toModel();
     }
