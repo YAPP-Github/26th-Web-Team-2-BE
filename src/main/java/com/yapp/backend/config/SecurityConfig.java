@@ -2,6 +2,7 @@ package com.yapp.backend.config;
 
 import com.yapp.backend.filter.JwtFilter;
 import com.yapp.backend.filter.handler.CustomAuthenticationEntryPoint;
+import com.yapp.backend.filter.handler.CustomAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 public class SecurityConfig {
 
         private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+        private final CustomAccessDeniedHandler customAccessDeniedHandler;
         private final JwtFilter jwtFilter;
 
         @Value("${swagger.auth.username}")
@@ -76,7 +78,8 @@ public class SecurityConfig {
                                                 ).permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(exception -> exception
-                                                .authenticationEntryPoint(customAuthenticationEntryPoint))
+                                                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                                                .accessDeniedHandler(customAccessDeniedHandler))
                                 .build();
         }
 

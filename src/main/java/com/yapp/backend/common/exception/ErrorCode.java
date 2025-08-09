@@ -14,9 +14,12 @@ public enum ErrorCode {
     TABLE_NOT_FOUND("비교표 존재하지 않음", "비교표를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ACCOMMODATION_NOT_FOUND("숙소 정보 존재하지 않음", "숙소 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
-    // Authorization
+    // Authorization & Authentication
     INVALID_USER_AUTHORIZATION("사용자 권한 없음", "해당 권한이 없는 유저입니다.", HttpStatus.FORBIDDEN),
     USER_AUTHORIZATION_FAILED("사용자 권한 없음", "해당 리소스에 접근할 권한이 없습니다.", HttpStatus.FORBIDDEN),
+    AUTHENTICATION_CREDENTIALS_NOT_FOUND("인증 정보 누락", "인증 정보가 필요합니다.", HttpStatus.UNAUTHORIZED),
+    ACCESS_DENIED("접근 권한 부족", "접근 권한이 부족합니다.", HttpStatus.FORBIDDEN),
+    AUTHENTICATION_SERVICE_ERROR("인증 서비스 오류", "인증 처리 중 오류가 발생했습니다.", HttpStatus.UNAUTHORIZED),
 
     // Accommodation related errors
     INVALID_TABLE_ID("잘못된 테이블 ID", "존재하지 않거나 유효하지 않은 테이블 ID입니다.", HttpStatus.BAD_REQUEST),

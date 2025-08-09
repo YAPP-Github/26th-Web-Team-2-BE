@@ -20,6 +20,8 @@ import com.yapp.backend.common.exception.oauth.KakaoOAuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 import java.util.stream.Collectors;
 
@@ -279,6 +281,33 @@ public class GlobalExceptionHandler {
 		}
 
 		return request.getRemoteAddr();
+	}
+
+	/**
+	 * AOP에서 발생하는 Spring Security 인증 정보 누락 예외 처리
+	 */
+	@ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleAuthenticationCredentialsNotFoundException(
+			AuthenticationCredentialsNotFoundException e) {
+		log.warn("Authentication credentials not found in AOP: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = ErrorCode.AUTHENTICATION_CREDENTIALS_NOT_FOUND;
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	/**
+	 * AOP에서 발생하는 Spring Security 접근 권한 부족 예외 처리
+	 */
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleAccessDeniedException(AccessDeniedException e) {
+		log.warn("Access denied in AOP: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = ErrorCode.ACCESS_DENIED;
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 
 }

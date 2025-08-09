@@ -12,6 +12,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -49,7 +50,7 @@ public class PermissionAspect {
             // 2. 현재 사용자 정보 추출
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
-                throw new RuntimeException("인증 정보를 찾을 수 없습니다.");
+                throw new AuthenticationCredentialsNotFoundException("인증 정보를 찾을 수 없습니다.");
             }
             Long userId = userDetails.getUserId();
 
@@ -83,11 +84,10 @@ public class PermissionAspect {
         
         // 1. PathVariable에서 기본 파라미터 추출
         String mainParamName = annotation.paramName();
-
         try {
             Long mainResourceId = extractSingleResourceId(args, parameters, mainParamName);
             resourceIds.put(mainParamName, mainResourceId);
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             // PathVariable에서 찾을 수 없는 경우, RequestBody에서 찾기
             log.debug("PathVariable에서 {}를 찾을 수 없어 RequestBody에서 찾습니다.", mainParamName);
         }
@@ -115,7 +115,7 @@ public class PermissionAspect {
                 if (arg instanceof Long) {
                     return (Long) arg;
                 } else {
-                    throw new RuntimeException("리소스 ID 파라미터가 올바른 타입이 아닙니다: " + arg);
+                    throw new IllegalArgumentException("리소스 ID 파라미터가 올바른 타입이 아닙니다: " + arg);
                 }
             }
             
@@ -126,12 +126,12 @@ public class PermissionAspect {
                 if (arg instanceof Long) {
                     return (Long) arg;
                 } else {
-                    throw new RuntimeException("리소스 ID 파라미터가 올바른 타입이 아닙니다: " + arg);
+                    throw new IllegalArgumentException("리소스 ID 파라미터가 올바른 타입이 아닙니다: " + arg);
                 }
             }
         }
         
-        throw new RuntimeException("리소스 ID 파라미터를 찾을 수 없습니다: " + paramName);
+        throw new IllegalArgumentException("리소스 ID 파라미터를 찾을 수 없습니다: " + paramName);
     }
     
     /**
@@ -154,10 +154,10 @@ public class PermissionAspect {
                         return ((Number) fieldValue).longValue();
                     }
                 } catch (JsonProcessingException e) {
-                    throw new RuntimeException("RequestBody에서 ID를 추출할 수 없습니다: " + fieldName, e);
+                    throw new IllegalArgumentException("RequestBody에서 ID를 추출할 수 없습니다: " + fieldName, e);
                 }
             }
         }
-        throw new RuntimeException("RequestBody에서 ID를 찾을 수 없습니다: " + fieldName);
+        throw new IllegalArgumentException("RequestBody에서 ID를 찾을 수 없습니다: " + fieldName);
     }
 }
