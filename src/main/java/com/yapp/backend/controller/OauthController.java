@@ -81,13 +81,9 @@ public class OauthController implements OauthDocs {
         
         // 3. Redis에 Refresh Token 저장
         refreshTokenService.storeRefresh(oauthResponse.getUserId(), refreshToken);
-        
-        // 4. HTTP 응답에 토큰 설정 (Access Token은 헤더, Refresh Token은 쿠키)
-        response.setHeader(ACCESS_TOKEN_HEADER, accessToken);
-        ResponseCookie refreshCookie = jwtTokenProvider.generateRefreshTokenCookie(oauthResponse.getUserId());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-        
-        // 5. 사용자 정보만 응답 바디로 반환 (토큰은 헤더로 전달됨)
+
+        // 4. 사용자 정보만 응답 바디로 반환 (토큰은 헤더로 전달됨)
+        oauthResponse.deliverToken(accessToken, refreshToken);
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, oauthResponse));
     }
 
