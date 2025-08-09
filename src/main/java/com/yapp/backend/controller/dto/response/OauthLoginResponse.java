@@ -10,4 +10,14 @@ import lombok.Getter;
 public class OauthLoginResponse {
         private Long userId;
         private String nickname;
+        private TokenSuccessResponse token;
+
+        public OauthLoginResponse(Long userId, String nickname) {
+                this.userId = userId;
+                this.nickname = nickname;
+        }
+
+        public void deliverToken(String accessToken, String refreshToken) {
+                this.token = new TokenSuccessResponse(accessToken, refreshToken);
+        }
 }
