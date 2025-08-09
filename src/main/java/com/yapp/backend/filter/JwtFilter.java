@@ -3,7 +3,6 @@ package com.yapp.backend.filter;
 import static com.yapp.backend.common.util.TokenUtil.extractTokenFromHeader;
 import static com.yapp.backend.common.util.CookieUtil.getCookieValue;
 
-import com.google.common.net.HttpHeaders;
 import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.filter.service.AuthContextService;
 import com.yapp.backend.filter.service.RefreshTokenService;
@@ -20,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import io.jsonwebtoken.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.http.ResponseCookie;
 
 @Slf4j
 @Component
@@ -63,7 +61,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             // CASE 1: Valid Access Token
             jwtTokenProvider.validateAccessTokenOrThrow(accessToken);
-            
+
             // 블랙리스트 확인
             if (refreshTokenService.isAccessTokenBlacklisted(accessToken)) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is blacklisted");
