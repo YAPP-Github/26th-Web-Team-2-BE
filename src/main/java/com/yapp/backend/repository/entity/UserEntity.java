@@ -19,11 +19,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Getter
 @Builder
-@Table(
-        name = "users",
-        uniqueConstraints = @UniqueConstraint(
-                columnNames = { "provider", "socialId" }
-        ))
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity {

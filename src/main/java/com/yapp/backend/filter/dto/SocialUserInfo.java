@@ -23,6 +23,7 @@ public class SocialUserInfo {
                 .nickname(nickname)
                 .profileImage(profileImage)
                 .createdAt(null)
+                .deletedAt(null)
                 .build();
     }
 }

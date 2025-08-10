@@ -4,6 +4,7 @@ import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
 import com.yapp.backend.controller.dto.response.LogoutResponse;
 import com.yapp.backend.controller.dto.response.OauthLoginResponse;
+import com.yapp.backend.controller.dto.response.WithdrawResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "OAUTH API", description = "소셜 로그인 API")
@@ -52,8 +54,8 @@ public interface OauthDocs {
     @Operation(
             summary = "사용자 로그아웃",
             description = "현재 로그인된 사용자의 세션을 종료합니다. " +
-                         "헤더에 있는 access-token 토큰을 블랙리스트에 추가합니다. " +
-                         "Redis에서 Refresh Token을 삭제하고 브라우저의 REFRESH_TOKEN 쿠키를 무효화합니다. " +
+                         "헤더에 있는 access-token 토큰을 블랙리스트에 추가하고, " +
+                         "Redis에서 Refresh Token을 삭제합니다." +
                          "로그아웃 후에는 새로운 인증이 필요합니다."
     )
     @ApiResponse(
@@ -66,5 +68,20 @@ public interface OauthDocs {
             @Parameter(hidden = true) HttpServletRequest request,
             @Parameter(hidden = true) HttpServletResponse response
     );
+    @Operation(
+            summary = "사용자 회원탈퇴",
+            description = ""
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "."
+    )
+
+    @SecurityRequirement(name = "JWT")
+    @PostMapping("/withdraw")
+    ResponseEntity<StandardResponse<WithdrawResponse>> withdrawUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request,
+            HttpServletResponse response);
 
 }
