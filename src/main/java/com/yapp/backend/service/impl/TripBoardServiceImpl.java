@@ -565,26 +565,7 @@ public class TripBoardServiceImpl implements TripBoardService {
      * 초대 코드 유효성 검증 및 활성화 상태 확인
      */
     private UserTripBoard validateInvitationCode(String invitationCode) {
-        log.debug("초대 코드 유효성 검증 시작 - 초대 코드: {}", invitationCode);
-
-        // 초대 코드로 UserTripBoard 조회
-        Optional<UserTripBoard> userTripBoardOpt = userTripBoardRepository.findByInvitationCode(invitationCode);
-
-        if (userTripBoardOpt.isEmpty()) {
-            log.warn("유효하지 않은 초대 코드 - 초대 코드: {}", invitationCode);
-            throw new InvalidInvitationUrlException();
-        }
-
-        UserTripBoard userTripBoard = userTripBoardOpt.get();
-
-        // 초대 코드 활성화 상태 확인
-        if (!userTripBoard.getInvitationActive()) {
-            log.warn("비활성화된 초대 코드 - 초대 코드: {}", invitationCode);
-            throw new InactiveInvitationUrlException();
-        }
-
-        log.debug("초대 코드 유효성 검증 완료 - 보드 ID: {}", userTripBoard.getTripBoard().getId());
-        return userTripBoard;
+        return userTripBoardRepository.findByInvitationCodeOrThrow(invitationCode);
     }
 
     /**

@@ -42,7 +42,8 @@ public interface UserTripBoardRepository {
     UserTripBoard save(UserTripBoard userTripBoard);
 
     /**
-     * 초대 코드로 사용자-여행보드 매핑 정보 조회
+     * 초대 코드로 사용자-여행보드 매핑 정보 조회 (예외 발생)
+     * 초대 코드가 유효하지 않거나 비활성화된 경우 예외를 발생시킵니다.
      */
-    Optional<UserTripBoard> findByInvitationCode(String invitationCode);
+    UserTripBoard findByInvitationCodeOrThrow(String invitationCode);
 }
