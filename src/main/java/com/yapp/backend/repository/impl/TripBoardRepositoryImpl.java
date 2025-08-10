@@ -63,9 +63,13 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
         Page<UserTripBoardEntity> userTripBoardPage = jpaUserTripBoardRepository
                 .findByUserIdOrderByTripBoardCreatedAtDescIdDesc(userId, pageable);
 
-        // UserTripBoardEntity를 TripBoardSummary로 변환
+        // 각 여행보드의 숙소 개수를 조회하여 TripBoardSummary로 변환
         List<TripBoardSummary> content = userTripBoardPage.getContent().stream()
-                .map(userTripBoardMapper::entityToTripBoardSummary)
+                .map(userTripBoard -> {
+                    Long boardId = userTripBoard.getTripBoard().getId();
+                    Long accommodationCount = jpaAccommodationRepository.countByBoardId(boardId);
+                    return userTripBoardMapper.entityToTripBoardSummary(userTripBoard, accommodationCount.intValue());
+                })
                 .collect(Collectors.toList());
 
         return new PageImpl<>(content, pageable, userTripBoardPage.getTotalElements());

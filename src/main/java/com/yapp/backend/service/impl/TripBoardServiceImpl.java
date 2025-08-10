@@ -668,7 +668,10 @@ public class TripBoardServiceImpl implements TripBoardService {
 
             log.debug("참여자 정보 조회 완료 - 보드 ID: {}, 참여자 수: {}", boardId, participantProfiles.size());
 
-            // 5. TripBoardSummary 객체 생성
+            // 5. 해당 여행보드의 전체 숙소 개수 조회
+            Long accommodationCount = accommodationRepository.countByBoardId(boardId, null);
+
+            // 6. TripBoardSummary 객체 생성
             TripBoardSummary tripBoardSummary = TripBoardSummary.builder()
                     .boardId(tripBoard.getId())
                     .boardName(tripBoard.getBoardName())
@@ -677,11 +680,12 @@ public class TripBoardServiceImpl implements TripBoardService {
                     .endDate(tripBoard.getEndDate())
                     .travelPeriod(formatTravelPeriod(tripBoard.getStartDate(), tripBoard.getEndDate()))
                     .userRole(userRole)
+                    .accommodationCount(accommodationCount.intValue())
                     .createdAt(tripBoard.getCreatedAt())
                     .updatedAt(tripBoard.getUpdatedAt())
                     .build();
 
-            // 6. TripBoardSummaryResponse 객체 생성 및 반환
+            // 7. TripBoardSummaryResponse 객체 생성 및 반환
             TripBoardSummaryResponse response = tripBoardSummaryMapper
                     .toResponse(tripBoardSummary, participantProfiles);
 

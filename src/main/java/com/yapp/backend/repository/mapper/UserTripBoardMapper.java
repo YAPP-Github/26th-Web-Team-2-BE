@@ -64,7 +64,7 @@ public class UserTripBoardMapper {
      * UserTripBoardEntity -> TripBoardSummary 변환
      * Repository 계층에서 Service 계층으로 데이터 전달 시 사용
      */
-    public TripBoardSummary entityToTripBoardSummary(UserTripBoardEntity userTripBoard) {
+    public TripBoardSummary entityToTripBoardSummary(UserTripBoardEntity userTripBoard, int accommodationCount) {
         if (userTripBoard == null) {
             return null;
         }
@@ -82,6 +82,7 @@ public class UserTripBoardMapper {
                 .endDate(tripBoard.getEndDate())
                 .travelPeriod(DateUtil.formatTravelPeriod(tripBoard.getStartDate(), tripBoard.getEndDate()))
                 .userRole(userTripBoard.getRole())
+                .accommodationCount(accommodationCount)
                 .createdAt(tripBoard.getCreatedAt())
                 .updatedAt(tripBoard.getUpdatedAt())
                 .build();
