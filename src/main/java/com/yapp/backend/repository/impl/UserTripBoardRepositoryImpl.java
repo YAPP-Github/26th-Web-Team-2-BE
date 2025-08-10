@@ -90,6 +90,6 @@ public class UserTripBoardRepositoryImpl implements UserTripBoardRepository {
         return jpaUserTripBoardRepository.findByTripBoardIdWithUser(tripBoardId)
                 .stream()
                 .map(userTripBoardMapper::entityToParticipantProfile)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
