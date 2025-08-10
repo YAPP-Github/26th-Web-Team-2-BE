@@ -6,9 +6,11 @@ import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.docs.TripBoardDocs;
 import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
+import com.yapp.backend.controller.dto.request.TripBoardJoinRequest;
 import com.yapp.backend.controller.dto.request.TripBoardLeaveRequest;
 import com.yapp.backend.controller.dto.request.TripBoardUpdateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
+import com.yapp.backend.controller.dto.response.TripBoardJoinResponse;
 import com.yapp.backend.controller.dto.response.TripBoardLeaveResponse;
 import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
@@ -57,8 +59,7 @@ public class TripBoardController implements TripBoardDocs {
     @PostMapping("/register")
     public ResponseEntity<StandardResponse<TripBoardCreateResponse>> createTripBoard(
             @RequestBody @Valid TripBoardCreateRequest request,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         // JWT 인증을 통한 현재 사용자 정보 추출
         Long whoAmI = userDetails.getUserId();
@@ -79,8 +80,7 @@ public class TripBoardController implements TripBoardDocs {
     public ResponseEntity<StandardResponse<TripBoardPageResponse>> getTripBoards(
             @RequestParam Integer page,
             @RequestParam Integer size,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         // JWT 인증을 통한 현재 사용자 정보 추출
         Long whoAmI = userDetails.getUserId();
@@ -93,6 +93,25 @@ public class TripBoardController implements TripBoardDocs {
         TripBoardPageResponse response = tripBoardService.getTripBoards(whoAmI, pageable);
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
+    }
+
+    /**
+     * 여행 보드 참여 API
+     */
+    @Override
+    @PostMapping("/join")
+    public ResponseEntity<StandardResponse<TripBoardJoinResponse>> joinTripBoard(
+            @RequestBody @Valid TripBoardJoinRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // JWT 인증을 통한 현재 사용자 정보 추출
+        Long whoAmI = userDetails.getUserId();
+
+        // 여행 보드 참여
+        TripBoardJoinResponse response = tripBoardService.joinTripBoard(request.getInvitationCode(), whoAmI);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 
     /**

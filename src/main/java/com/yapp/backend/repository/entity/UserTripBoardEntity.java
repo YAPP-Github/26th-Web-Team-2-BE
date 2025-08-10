@@ -16,7 +16,8 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "user_trip_board")
+@Table(name = "user_trip_board", uniqueConstraints = @UniqueConstraint(name = "uq_user_trip_board", columnNames = {
+        "user_id", "trip_board_id" }))
 public class UserTripBoardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +31,8 @@ public class UserTripBoardEntity {
     @JoinColumn(name = "trip_board_id", nullable = false)
     private TripBoardEntity tripBoard;
 
-    @Column(name = "invitation_url", unique = true, nullable = false)
-    private String invitationUrl;
+    @Column(name = "invitation_code", unique = true, nullable = false)
+    private String invitationCode;
 
     @Column(name = "invitation_active", nullable = false)
     @Builder.Default

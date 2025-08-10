@@ -1,5 +1,7 @@
 package com.yapp.backend.repository.impl;
 
+import com.yapp.backend.common.exception.InactiveInvitationUrlException;
+import com.yapp.backend.common.exception.InvalidInvitationUrlException;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
 import com.yapp.backend.repository.UserTripBoardRepository;
 import com.yapp.backend.repository.entity.UserTripBoardEntity;
@@ -7,15 +9,16 @@ import com.yapp.backend.repository.enums.TripBoardRole;
 import com.yapp.backend.repository.mapper.UserTripBoardMapper;
 import com.yapp.backend.service.model.UserTripBoard;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * 사용자-여행보드 매핑 Repository 구현체
  */
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class UserTripBoardRepositoryImpl implements UserTripBoardRepository {
@@ -57,5 +60,27 @@ public class UserTripBoardRepositoryImpl implements UserTripBoardRepository {
         UserTripBoardEntity entity = userTripBoardMapper.domainToEntity(userTripBoard);
         UserTripBoardEntity savedEntity = jpaUserTripBoardRepository.save(entity);
         return userTripBoardMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public UserTripBoard findByInvitationCodeOrThrow(String invitationCode) {
+        log.debug("초대 코드 유효성 검증 시작 - 초대 코드: {}", invitationCode);
+
+        // 초대 코드로 UserTripBoard 조회
+        UserTripBoard userTripBoard = jpaUserTripBoardRepository.findByInvitationCode(invitationCode)
+                .map(userTripBoardMapper::entityToDomain)
+                .orElseThrow(() -> {
+                    log.warn("유효하지 않은 초대 코드 - 초대 코드: {}", invitationCode);
+                    return new InvalidInvitationUrlException();
+                });
+
+        // 초대 코드 활성화 상태 확인
+        if (!userTripBoard.getInvitationActive()) {
+            log.warn("비활성화된 초대 코드 - 초대 코드: {}", invitationCode);
+            throw new InactiveInvitationUrlException();
+        }
+
+        log.debug("초대 코드 유효성 검증 완료 - 보드 ID: {}", userTripBoard.getTripBoard().getId());
+        return userTripBoard;
     }
 }

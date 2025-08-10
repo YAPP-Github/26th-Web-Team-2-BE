@@ -4,6 +4,7 @@ import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
 import com.yapp.backend.controller.dto.request.TripBoardUpdateRequest;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
 import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
+import com.yapp.backend.controller.dto.response.TripBoardJoinResponse;
 import com.yapp.backend.controller.dto.response.TripBoardLeaveResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
@@ -19,4 +20,9 @@ public interface TripBoardService {
     TripBoardLeaveResponse leaveTripBoard(Long tripBoardId, Long userId, Boolean removeResources);
 
     TripBoardDeleteResponse deleteTripBoard(Long tripBoardId, Long userId);
+
+    /**
+     * 초대 코드를 통해 여행 보드에 참여합니다.
+     */
+    TripBoardJoinResponse joinTripBoard(String invitationCode, Long userId);
 }
