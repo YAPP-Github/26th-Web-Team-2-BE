@@ -52,8 +52,7 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
 
     @Override
     public TripBoard findByIdOrThrow(Long id) {
-        TripBoardEntity tripBoardEntity =
-                jpaTripBoardRepository.findById(id)
+        TripBoardEntity tripBoardEntity = jpaTripBoardRepository.findById(id)
                 .orElseThrow(TripBoardNotFoundException::new);
         return tripBoardMapper.entityToDomain(tripBoardEntity);
     }
@@ -137,6 +136,12 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
 
         // 4. 여행보드 삭제
         jpaTripBoardRepository.deleteById(tripBoardId);
+    }
+
+    @Override
+    public Optional<TripBoard> findById(Long id) {
+        return jpaTripBoardRepository.findById(id)
+                .map(tripBoardMapper::entityToDomain);
     }
 
 }
