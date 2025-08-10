@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "여행 보드 API", description = "여행 보드 관련 API")
 public interface TripBoardDocs {
 
-        @Operation(summary = "여행 보드 생성", description = "새로운 여행 보드를 생성합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 생성자는 자동으로 OWNER 역할로 등록되며 고유한 초대 링크가 생성됩니다.")
+        @Operation(summary = "여행 보드 생성", description = "새로운 여행 보드를 생성합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 생성자는 자동으로 OWNER 역할로 등록되며 고유한 초대 코드가 생성됩니다.")
         @SecurityRequirement(name = "JWT")
         ResponseEntity<StandardResponse<TripBoardCreateResponse>> createTripBoard(
                         @RequestBody @Valid TripBoardCreateRequest request,
@@ -44,7 +44,7 @@ public interface TripBoardDocs {
                         @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 크기") @NotNull(message = "페이지 크기는 필수입니다.") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 
-        @Operation(summary = "여행 보드 참여", description = "초대링크를 통해 기존 여행 보드에 참여합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 초대링크의 유효성을 검증한 후 보드에 참여자로 등록합니다.")
+        @Operation(summary = "여행 보드 참여", description = "초대 코드를 통해 기존 여행 보드에 참여합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 초대 코드의 유효성을 검증한 후 보드에 참여자로 등록합니다.")
         @SecurityRequirement(name = "JWT")
         ResponseEntity<StandardResponse<TripBoardJoinResponse>> joinTripBoard(
                         @RequestBody @Valid TripBoardJoinRequest request,

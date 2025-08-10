@@ -59,8 +59,8 @@ public class UserTripBoardRepositoryImpl implements UserTripBoardRepository {
     }
 
     @Override
-    public Optional<UserTripBoard> findByInvitationUrl(String invitationUrl) {
-        return jpaUserTripBoardRepository.findByInvitationUrl(invitationUrl)
+    public Optional<UserTripBoard> findByInvitationCode(String invitationCode) {
+        return jpaUserTripBoardRepository.findByInvitationCode(invitationCode)
                 .map(userTripBoardMapper::entityToDomain);
     }
 }

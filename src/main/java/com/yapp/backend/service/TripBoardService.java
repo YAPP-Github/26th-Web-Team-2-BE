@@ -22,7 +22,7 @@ public interface TripBoardService {
     TripBoardDeleteResponse deleteTripBoard(Long tripBoardId, Long userId);
 
     /**
-     * 초대링크를 통해 여행 보드에 참여합니다.
+     * 초대 코드를 통해 여행 보드에 참여합니다.
      */
-    TripBoardJoinResponse joinTripBoard(String invitationUrl, Long userId);
+    TripBoardJoinResponse joinTripBoard(String invitationCode, Long userId);
 }

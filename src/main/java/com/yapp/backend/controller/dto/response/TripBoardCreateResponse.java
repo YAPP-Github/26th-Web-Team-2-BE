@@ -21,7 +21,7 @@ public class TripBoardCreateResponse {
     private String travelPeriod; // "25.08.14~08.16" 형식
     private String startDate; // "2025.08.02" 형식
     private String endDate; // "2025.08.02" 형식
-    private String invitationUrl;
+    private String invitationCode;
     private Boolean invitationActive;
     private UserInfo creator;
     private LocalDateTime createdAt;
@@ -48,7 +48,7 @@ public class TripBoardCreateResponse {
                 .travelPeriod(DateUtil.formatTravelPeriod(tripBoard.getStartDate(), tripBoard.getEndDate()))
                 .startDate(DateUtil.formatFullDate(tripBoard.getStartDate()))
                 .endDate(DateUtil.formatFullDate(tripBoard.getEndDate()))
-                .invitationUrl(userTripBoard.getInvitationUrl())
+                .invitationCode(userTripBoard.getInvitationCode())
                 .invitationActive(userTripBoard.getInvitationActive())
                 .creator(UserInfo.builder()
                         .id(tripBoard.getCreatedBy().getId())

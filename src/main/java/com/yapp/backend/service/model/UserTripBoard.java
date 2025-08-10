@@ -15,7 +15,7 @@ public class UserTripBoard {
     private Long id;
     private User user;
     private TripBoard tripBoard;
-    private String invitationUrl;
+    private String invitationCode;
     private Boolean invitationActive;
     private TripBoardRole role;
     private LocalDateTime createdAt;

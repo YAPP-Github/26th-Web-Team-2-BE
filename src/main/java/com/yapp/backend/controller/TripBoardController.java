@@ -59,8 +59,7 @@ public class TripBoardController implements TripBoardDocs {
     @PostMapping("/register")
     public ResponseEntity<StandardResponse<TripBoardCreateResponse>> createTripBoard(
             @RequestBody @Valid TripBoardCreateRequest request,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         // JWT 인증을 통한 현재 사용자 정보 추출
         Long whoAmI = userDetails.getUserId();
@@ -81,8 +80,7 @@ public class TripBoardController implements TripBoardDocs {
     public ResponseEntity<StandardResponse<TripBoardPageResponse>> getTripBoards(
             @RequestParam Integer page,
             @RequestParam Integer size,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         // JWT 인증을 통한 현재 사용자 정보 추출
         Long whoAmI = userDetails.getUserId();
@@ -110,7 +108,7 @@ public class TripBoardController implements TripBoardDocs {
         Long whoAmI = userDetails.getUserId();
 
         // 여행 보드 참여
-        TripBoardJoinResponse response = tripBoardService.joinTripBoard(request.getInvitationUrl(), whoAmI);
+        TripBoardJoinResponse response = tripBoardService.joinTripBoard(request.getInvitationCode(), whoAmI);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new StandardResponse<>(ResponseType.SUCCESS, response));

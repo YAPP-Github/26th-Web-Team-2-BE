@@ -15,9 +15,9 @@ import java.util.Optional;
 @Repository
 public interface JpaUserTripBoardRepository extends JpaRepository<UserTripBoardEntity, Long> {
     /**
-     * 초대 링크 존재 여부 확인
+     * 초대 코드 존재 여부 확인
      */
-    boolean existsByInvitationUrl(String invitationUrl);
+    boolean existsByInvitationCode(String invitationCode);
 
     /**
      * 사용자 ID와 여행 보드 ID로 매핑 정보 조회
@@ -25,14 +25,14 @@ public interface JpaUserTripBoardRepository extends JpaRepository<UserTripBoardE
     Optional<UserTripBoardEntity> findByUserIdAndTripBoardId(Long userId, Long tripBoardId);
 
     /**
-     * 활성화된 초대 링크로 매핑 정보 조회
+     * 활성화된 초대 코드로 매핑 정보 조회
      */
-    Optional<UserTripBoardEntity> findByInvitationUrlAndInvitationActiveTrue(String invitationUrl);
+    Optional<UserTripBoardEntity> findByInvitationCodeAndInvitationActiveTrue(String invitationCode);
 
     /**
-     * 초대 링크로 매핑 정보 조회
+     * 초대 코드로 매핑 정보 조회
      */
-    Optional<UserTripBoardEntity> findByInvitationUrl(String invitationUrl);
+    Optional<UserTripBoardEntity> findByInvitationCode(String invitationCode);
 
     /**
      * 여행 보드의 참여자 수 조회

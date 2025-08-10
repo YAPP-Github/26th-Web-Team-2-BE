@@ -42,7 +42,7 @@ public interface UserTripBoardRepository {
     UserTripBoard save(UserTripBoard userTripBoard);
 
     /**
-     * 초대링크로 사용자-여행보드 매핑 정보 조회
+     * 초대 코드로 사용자-여행보드 매핑 정보 조회
      */
-    Optional<UserTripBoard> findByInvitationUrl(String invitationUrl);
+    Optional<UserTripBoard> findByInvitationCode(String invitationCode);
 }
