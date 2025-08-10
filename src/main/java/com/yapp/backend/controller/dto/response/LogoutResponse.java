@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class LogoutResponse {
-    private final boolean logout;
+    private final boolean logoutSuccess;
 }
