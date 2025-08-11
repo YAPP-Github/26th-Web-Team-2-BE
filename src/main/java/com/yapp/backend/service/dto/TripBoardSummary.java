@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * 여행 보드 요약 정보를 담는 DTO
@@ -19,13 +18,14 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TripBoardSummary {
-    private Long boardId;
+    private Long tripBoardId;
     private String boardName;
     private String destination;
     private LocalDate startDate;
     private LocalDate endDate;
     private String travelPeriod; // "25.08.14~08.16" 형식
     private TripBoardRole userRole;
+    private int accommodationCount; // 숙소 개수
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

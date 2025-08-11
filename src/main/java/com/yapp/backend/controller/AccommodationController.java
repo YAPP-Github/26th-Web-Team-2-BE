@@ -49,10 +49,10 @@ public class AccommodationController implements AccommodationDocs {
      */
     @Override
     @SecurityRequirement(name = "JWT")
-    @RequirePermission(value = RequirePermission.PermissionType.TRIP_BOARD_ACCESS, paramName = "boardId")
+    @RequirePermission(value = RequirePermission.PermissionType.TRIP_BOARD_ACCESS, paramName = "tripBoardId")
     @GetMapping("/search")
-    public ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationByBoardIdAndUserId(
-            @RequestParam Long boardId,
+    public ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationByTripBoardIdAndUserId(
+            @RequestParam Long tripBoardId,
             @RequestParam Integer page,
             @RequestParam Integer size,
             @RequestParam(required = false) Long userId,
@@ -61,12 +61,12 @@ public class AccommodationController implements AccommodationDocs {
 
         // userId 파라미터가 있는 경우 해당 사용자의 권한도 확인
         if (userId != null) {
-            log.debug("대상 사용자 권한 검증 시작 - 대상사용자: {}, 보드ID: {}", userId, boardId);
-            authorizationService.validateTripBoardAccessOrThrow(userId, boardId);
+            log.debug("대상 사용자 권한 검증 시작 - 대상사용자: {}, 보드ID: {}", userId, tripBoardId);
+            authorizationService.validateTripBoardAccessOrThrow(userId, tripBoardId);
         }
 
         AccommodationPageResponse response = accommodationService
-                .findAccommodationsByBoardId(boardId, page, size, userId, sort);
+                .findAccommodationsByTripBoardId(tripBoardId, page, size, userId, sort);
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 
@@ -77,14 +77,14 @@ public class AccommodationController implements AccommodationDocs {
      */
     @Override
     @SecurityRequirement(name = "JWT")
-    @RequirePermission(value = RequirePermission.PermissionType.TRIP_BOARD_ACCESS, paramName = "boardId")
+    @RequirePermission(value = RequirePermission.PermissionType.TRIP_BOARD_ACCESS, paramName = "tripBoardId")
     @GetMapping("/count")
-    public ResponseEntity<StandardResponse<AccommodationCountResponse>> getAccommodationCountByBoardId(
-            @RequestParam Long boardId,
+    public ResponseEntity<StandardResponse<AccommodationCountResponse>> getAccommodationCountByTripBoardId(
+            @RequestParam Long tripBoardId,
             @RequestParam(required = false) Long userId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        Long count = accommodationService.countAccommodationsByBoardId(boardId, userId);
+        Long count = accommodationService.countAccommodationsByTripBoardId(tripBoardId, userId);
         AccommodationCountResponse accommodationCountResponse = new AccommodationCountResponse(count);
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, accommodationCountResponse));
     }
@@ -96,7 +96,7 @@ public class AccommodationController implements AccommodationDocs {
      */
     @Override
     @SecurityRequirement(name = "JWT")
-    @RequirePermission(value = RequirePermission.PermissionType.TRIP_BOARD_ACCESS, requestBodyField = "boardId")
+    @RequirePermission(value = RequirePermission.PermissionType.TRIP_BOARD_ACCESS, requestBodyField = "tripBoardId")
     @PostMapping("/register")
     public ResponseEntity<StandardResponse<AccommodationRegisterResponse>> registerAccommodationCard(
             @RequestBody @Valid AccommodationRegisterRequest request,

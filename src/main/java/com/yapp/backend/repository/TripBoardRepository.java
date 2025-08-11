@@ -60,4 +60,10 @@ public interface TripBoardRepository {
      * 여행보드 존재 여부 확인
      */
     boolean existsById(Long tripBoardId);
+
+    /**
+     * ID로 여행보드를 조회합니다 (상세조회용)
+     * 존재하지 않는 경우 Optional.empty() 반환
+     */
+    Optional<TripBoard> findById(Long id);
 }

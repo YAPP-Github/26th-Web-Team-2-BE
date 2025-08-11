@@ -28,7 +28,7 @@ public class Accommodation {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long createdBy;
-    private Long boardId;
+    private Long tripBoardId;
     private String accommodationName;
     private List<String> images;
     private String address;

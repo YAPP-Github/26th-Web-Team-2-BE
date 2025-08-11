@@ -31,7 +31,7 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
      * sort 파라미터에 따라 정렬 방식 결정 (saved_at_desc: 최근 등록순, price_asc: 가격 낮은 순)
      */
     @Override
-    public List<Accommodation> findByBoardIdWithPagination(Long boardId, int page, int size, Long userId, String sort) {
+    public List<Accommodation> findByTripBoardIdWithPagination(Long tripBoardId, int page, int size, Long userId, String sort) {
         Pageable pageable = PageRequest.of(page, size);
         Page<AccommodationEntity> entityPage;
 
@@ -40,8 +40,8 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
         boolean isPriceSort = sortType == SortType.PRICE_ASC;
 
 		entityPage = userId != null
-				? getEntityPageWithUserId(boardId, userId, pageable, isPriceSort)
-				: getEntityPageWithoutUserId(boardId, pageable, isPriceSort);
+				? getEntityPageWithUserId(tripBoardId, userId, pageable, isPriceSort)
+				: getEntityPageWithoutUserId(tripBoardId, pageable, isPriceSort);
 
 		return entityPage.getContent().stream()
 				.map(this::convertToAccommodation)
@@ -53,11 +53,11 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
      * userId가 null이 아닌 경우 해당 사용자가 생성한 숙소 개수만 조회
      */
     @Override
-    public Long countByBoardId(Long boardId, Long userId) {
+    public Long countByTripBoardId(Long tripBoardId, Long userId) {
         if (userId != null) {
-            return jpaAccommodationRepository.countByBoardIdAndCreatedBy(boardId, userId);
+            return jpaAccommodationRepository.countByTripBoardIdAndCreatedBy(tripBoardId, userId);
         } else {
-            return jpaAccommodationRepository.countByBoardId(boardId);
+            return jpaAccommodationRepository.countByTripBoardId(tripBoardId);
         }
     }
 
@@ -89,20 +89,20 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	/**
 	 * userId가 있는 경우의 엔티티 페이지 조회
 	 */
-	private Page<AccommodationEntity> getEntityPageWithUserId(Long boardId, Long userId, Pageable pageable,
+	private Page<AccommodationEntity> getEntityPageWithUserId(Long tripBoardId, Long userId, Pageable pageable,
 			boolean isPriceSort) {
 		return isPriceSort
-				? jpaAccommodationRepository.findByBoardIdAndCreatedByOrderByLowestPriceAsc(boardId, userId, pageable)
-				: jpaAccommodationRepository.findByBoardIdAndCreatedByOrderByCreatedAtDesc(boardId, userId, pageable);
+				? jpaAccommodationRepository.findByTripBoardIdAndCreatedByOrderByLowestPriceAsc(tripBoardId, userId, pageable)
+				: jpaAccommodationRepository.findByTripBoardIdAndCreatedByOrderByCreatedAtDesc(tripBoardId, userId, pageable);
 	}
 
 	/**
 	 * userId가 없는 경우의 엔티티 페이지 조회
 	 */
-	private Page<AccommodationEntity> getEntityPageWithoutUserId(Long boardId, Pageable pageable, boolean isPriceSort) {
+	private Page<AccommodationEntity> getEntityPageWithoutUserId(Long tripBoardId, Pageable pageable, boolean isPriceSort) {
 		return isPriceSort
-				? jpaAccommodationRepository.findByBoardIdOrderByLowestPriceAsc(boardId, pageable)
-				: jpaAccommodationRepository.findByBoardIdOrderByCreatedAtDesc(boardId, pageable);
+				? jpaAccommodationRepository.findByTripBoardIdOrderByLowestPriceAsc(tripBoardId, pageable)
+				: jpaAccommodationRepository.findByTripBoardIdOrderByCreatedAtDesc(tripBoardId, pageable);
 	}
 
     /**
@@ -119,13 +119,13 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
     }
 
     @Override
-    public void deleteByBoardId(Long boardId) {
-        jpaAccommodationRepository.deleteByBoardId(boardId);
+    public void deleteByTripBoardId(Long tripBoardId) {
+        jpaAccommodationRepository.deleteByTripBoardId(tripBoardId);
     }
 
 	@Override
-	public void deleteByBoardIdAndCreatedById(Long boardId, Long createdById) {
-		jpaAccommodationRepository.deleteByBoardIdAndCreatedById(boardId, createdById);
+	public void deleteByTripBoardIdAndCreatedById(Long tripBoardId, Long createdById) {
+		jpaAccommodationRepository.deleteByTripBoardIdAndCreatedById(tripBoardId, createdById);
 	}
 
 }

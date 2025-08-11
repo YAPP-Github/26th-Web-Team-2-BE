@@ -28,7 +28,7 @@ public class AccommodationResponse {
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private Long createdBy;
-	private Long boardId;
+	private Long tripBoardId;
 	private String accommodationName;
 	private List<String> images;
 	private String address;
@@ -57,7 +57,7 @@ public class AccommodationResponse {
 				.createdAt(accommodation.getCreatedAt())
 				.updatedAt(accommodation.getUpdatedAt())
 				.createdBy(accommodation.getCreatedBy())
-				.boardId(accommodation.getBoardId())
+				.tripBoardId(accommodation.getTripBoardId())
 				.accommodationName(accommodation.getAccommodationName())
 				.images(accommodation.getImages())
 				.address(accommodation.getAddress())

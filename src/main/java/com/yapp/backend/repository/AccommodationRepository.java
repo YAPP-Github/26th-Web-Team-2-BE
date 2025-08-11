@@ -12,13 +12,13 @@ public interface AccommodationRepository {
      * userId가 null이 아닌 경우 해당 사용자가 생성한 숙소만 조회
      * sort 파라미터에 따라 정렬 방식 결정 (saved_at_desc: 최근 등록순, price_asc: 가격 낮은 순)
      */
-    List<Accommodation> findByBoardIdWithPagination(Long boardId, int page, int size, Long userId, String sort);
+    List<Accommodation> findByTripBoardIdWithPagination(Long tripBoardId, int page, int size, Long userId, String sort);
 
     /**
      * 여행보드 ID로 숙소 개수를 조회
      * userId가 null이 아닌 경우 해당 사용자가 생성한 숙소 개수만 조회
      */
-    Long countByBoardId(Long boardId, Long userId);
+    Long countByTripBoardId(Long tripBoardId, Long userId);
 
     /**
      * 숙소를 저장합니다.
@@ -42,11 +42,11 @@ public interface AccommodationRepository {
     /**
      * 특정 여행보드에서 특정 사용자가 생성한 숙소들을 삭제합니다.
      */
-    void deleteByBoardIdAndCreatedById(Long boardId, Long createdById);
+    void deleteByTripBoardIdAndCreatedById(Long tripBoardId, Long createdById);
 
     /**
      * 여행보드 ID로 해당 보드의 모든 숙소를 삭제합니다.
      */
-    void deleteByBoardId(Long boardId);
+    void deleteByTripBoardId(Long tripBoardId);
 
 }

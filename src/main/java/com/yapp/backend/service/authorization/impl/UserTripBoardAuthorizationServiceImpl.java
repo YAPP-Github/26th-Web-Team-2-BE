@@ -1,6 +1,5 @@
 package com.yapp.backend.service.authorization.impl;
 
-import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.exception.UserAuthorizationException;
 import com.yapp.backend.repository.JpaAccommodationRepository;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
@@ -27,26 +26,26 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
     private final JpaAccommodationRepository accommodationRepository;
 
     @Override
-    public void validateTripBoardAccessOrThrow(Long userId, Long boardId) {
-        log.info("여행보드 접근 권한 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
+    public void validateTripBoardAccessOrThrow(Long userId, Long tripBoardId) {
+        log.info("여행보드 접근 권한 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
 
 
         // 리소스 유효 검사
-        TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(boardId);
+        TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(tripBoardId);
 
         try {
-            if (!hasAccessToTripBoard(userId, boardId)) {
-                log.warn("권한 없는 여행보드 접근 시도 차단 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
-                throw new UserAuthorizationException(userId, boardId);
+            if (!hasAccessToTripBoard(userId, tripBoardId)) {
+                log.warn("권한 없는 여행보드 접근 시도 차단 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
+                throw new UserAuthorizationException(userId, tripBoardId);
             }
 
-            log.info("여행보드 접근 권한 검증 통과 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
+            log.info("여행보드 접근 권한 검증 통과 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
         } catch (UserAuthorizationException e) {
             throw e;
         } catch (Exception e) {
             log.error("여행보드 접근 권한 검증 중 예외 발생 - 사용자 ID: {}, 보드 ID: {}, 오류: {}",
-                    userId, boardId, e.getMessage(), e);
-            throw new UserAuthorizationException(userId, boardId);
+                    userId, tripBoardId, e.getMessage(), e);
+            throw new UserAuthorizationException(userId, tripBoardId);
         }
     }
 
@@ -69,17 +68,17 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
             }
 
             // 2. 해당 숙소가 속한 보드에 대한 사용자 권한 확인
-            Long boardId = accommodation.getBoardId();
-            boolean hasAccess = hasAccessToTripBoard(userId, boardId);
+            Long tripBoardId = accommodation.getTripBoardId();
+            boolean hasAccess = hasAccessToTripBoard(userId, tripBoardId);
 
             if (!hasAccess) {
                 log.warn("숙소 접근 권한 검증 실패 - 사용자 ID: {}, 숙소 ID: {}, 보드 ID: {}",
-                        userId, accommodationId, boardId);
+                        userId, accommodationId, tripBoardId);
                 throw UserAuthorizationException.forAccommodation(userId, accommodationId);
             }
 
             log.info("숙소 접근 권한 검증 성공 - 사용자 ID: {}, 숙소 ID: {}, 보드 ID: {}",
-                    userId, accommodationId, boardId);
+                    userId, accommodationId, tripBoardId);
 
         } catch (UserAuthorizationException e) {
             // 이미 로깅된 예외를 다시 던짐
@@ -92,32 +91,32 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
     }
 
     @Override
-    public void validateTripBoardDeleteOrThrow(Long userId, Long boardId) {
+    public void validateTripBoardDeleteOrThrow(Long userId, Long tripBoardId) {
         // 리소스 유효 검사
-        TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(boardId);
+        TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(tripBoardId);
         // 여행 보드의 생성자 확인
         Long ownerId = tripBoard.getCreatedBy() != null ? tripBoard.getCreatedBy().getId() : null;
         if (ownerId == null || !ownerId.equals(userId)) {
-            throw new UserAuthorizationException(userId, boardId);
+            throw new UserAuthorizationException(userId, tripBoardId);
         }
     }
 
-    private boolean hasAccessToTripBoard(Long userId, Long boardId) {
-        log.info("권한 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
+    private boolean hasAccessToTripBoard(Long userId, Long tripBoardId) {
+        log.info("권한 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
 
-        if (userId == null || boardId == null) {
-            log.warn("권한 검증 실패 - 사유: null 파라미터, userId={}, boardId={}", userId, boardId);
+        if (userId == null || tripBoardId == null) {
+            log.warn("권한 검증 실패 - 사유: null 파라미터, userId={}, boardId={}", userId, tripBoardId);
             return false;
         }
 
         try {
-            boolean hasAccess = userTripBoardRepository.findByUserIdAndTripBoardId(userId, boardId)
+            boolean hasAccess = userTripBoardRepository.findByUserIdAndTripBoardId(userId, tripBoardId)
                     .isPresent();
 
             if (hasAccess) {
-                log.info("권한 검증 성공 - 사용자 ID: {}, 보드 ID: {}", userId, boardId);
+                log.info("권한 검증 성공 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
             } else {
-                log.warn("권한 검증 실패 - 사용자 ID: {}, 보드 ID: {}, 사유: 보드 멤버가 아님", userId, boardId);
+                log.warn("권한 검증 실패 - 사용자 ID: {}, 보드 ID: {}, 사유: 보드 멤버가 아님", userId, tripBoardId);
             }
 
             return hasAccess;

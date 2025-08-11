@@ -14,6 +14,7 @@ import com.yapp.backend.controller.dto.response.TripBoardJoinResponse;
 import com.yapp.backend.controller.dto.response.TripBoardLeaveResponse;
 import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
+import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.service.TripBoardService;
@@ -96,6 +97,29 @@ public class TripBoardController implements TripBoardDocs {
     }
 
     /**
+     * 여행 보드 상세 조회 API
+     * 권한 : 여행 보드 참여자 - OWNER / MEMBER
+     */
+    @Override
+    @RequirePermission(value = PermissionType.TRIP_BOARD_ACCESS, paramName = "tripBoardId")
+    @GetMapping("/{tripBoardId}")
+    public ResponseEntity<StandardResponse<TripBoardSummaryResponse>> getTripBoardDetail(
+            @PathVariable Long tripBoardId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // JWT 인증을 통한 현재 사용자 정보 추출
+        Long whoAmI = userDetails.getUserId();
+
+        // 여행 보드 접근 권한 검증
+        authorizationService.validateTripBoardAccessOrThrow(whoAmI, tripBoardId);
+
+        // 여행 보드 상세 정보 조회
+        TripBoardSummaryResponse response = tripBoardService.getTripBoardDetail(tripBoardId, whoAmI);
+
+        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
+    }
+
+    /**
      * 여행 보드 참여 API
      */
     @Override
@@ -119,10 +143,10 @@ public class TripBoardController implements TripBoardDocs {
      * 권한 : 여행 보드 참여자 - OWNER / MEMBER
      */
     @Override
-    @RequirePermission(value = PermissionType.TRIP_BOARD_MODIFY, paramName = "boardId")
-    @PutMapping("/{boardId}")
+    @RequirePermission(value = PermissionType.TRIP_BOARD_MODIFY, paramName = "tripBoardId")
+    @PutMapping("/{tripBoardId}")
     public ResponseEntity<StandardResponse<TripBoardUpdateResponse>> updateTripBoard(
-            @PathVariable Long boardId,
+            @PathVariable Long tripBoardId,
             @RequestBody @Valid TripBoardUpdateRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -130,10 +154,10 @@ public class TripBoardController implements TripBoardDocs {
         Long whoAmI = userDetails.getUserId();
 
         // 여행 보드 접근 권한 검증
-        authorizationService.validateTripBoardAccessOrThrow(whoAmI, boardId);
+        authorizationService.validateTripBoardAccessOrThrow(whoAmI, tripBoardId);
 
         // 여행 보드 수정
-        TripBoardUpdateResponse response = tripBoardService.updateTripBoard(boardId, request, whoAmI);
+        TripBoardUpdateResponse response = tripBoardService.updateTripBoard(tripBoardId, request, whoAmI);
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
@@ -165,7 +189,7 @@ public class TripBoardController implements TripBoardDocs {
     @Override
     @PostMapping("/leave/{tripBoardId}")
     public ResponseEntity<StandardResponse<TripBoardLeaveResponse>> leaveTripBoard(
-            @PathVariable Long boardId,
+            @PathVariable Long tripBoardId,
             @RequestBody @Valid TripBoardLeaveRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -173,11 +197,11 @@ public class TripBoardController implements TripBoardDocs {
         Long whoAmI = userDetails.getUserId();
 
         // 여행 보드 접근 권한 검증
-        authorizationService.validateTripBoardAccessOrThrow(whoAmI, boardId);
+        authorizationService.validateTripBoardAccessOrThrow(whoAmI, tripBoardId);
 
         // 여행 보드 나가기
         TripBoardLeaveResponse response = tripBoardService.leaveTripBoard(
-                boardId, whoAmI, request.getRemoveResources());
+                tripBoardId, whoAmI, request.getRemoveResources());
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }

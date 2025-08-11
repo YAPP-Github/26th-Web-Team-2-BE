@@ -197,7 +197,7 @@ public class TripBoardServiceImpl implements TripBoardService {
 
             // 3. 유저가 참여한 보드 ID 목록 조회
             List<Long> tripBoardIds = tripBoardPage.getContent().stream()
-                    .map(TripBoardSummary::getBoardId)
+                    .map(TripBoardSummary::getTripBoardId)
                     .collect(Collectors.toList());
 
             // 4. 보드들에 참여한 모든 유저 ID 조회
@@ -349,7 +349,7 @@ public class TripBoardServiceImpl implements TripBoardService {
             log.debug("비교표 삭제 완료 - 보드 ID: {}", tripBoardId);
 
             // 2. 숙소 삭제
-            accommodationRepository.deleteByBoardId(tripBoardId);
+            accommodationRepository.deleteByTripBoardId(tripBoardId);
             log.debug("숙소 삭제 완료 - 보드 ID: {}", tripBoardId);
 
             // 3. 사용자-여행보드 매핑 삭제
@@ -491,7 +491,7 @@ public class TripBoardServiceImpl implements TripBoardService {
         log.debug("사용자 비교표 삭제 완료 - 사용자 ID: {}", userId);
 
         // 사용자가 등록한 숙소 삭제
-        accommodationRepository.deleteByBoardIdAndCreatedById(tripBoardId, userId);
+        accommodationRepository.deleteByTripBoardIdAndCreatedById(tripBoardId, userId);
         log.debug("사용자 숙소 삭제 완료 - 사용자 ID: {}", userId);
     }
 
@@ -627,6 +627,98 @@ public class TripBoardServiceImpl implements TripBoardService {
         log.debug("새로운 UserTripBoard 생성 완료 - 사용자 ID: {}, 보드 ID: {}, 역할: {}",
                 user.getId(), tripBoard.getId(), TripBoardRole.MEMBER);
         return newUserTripBoard;
+    }
+
+    /**
+     * 여행보드 상세 정보 조회
+     * 참여자만 조회할 수 있으며, 보드의 기본 정보와 참여자 목록을 반환합니다.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public TripBoardSummaryResponse getTripBoardDetail(Long tripBoardId, Long userId) {
+        try {
+            log.info("여행보드 상세조회 시작 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+
+            // 1. 여행보드 존재 여부 검증
+            if (!tripBoardRepository.existsById(tripBoardId)) {
+                log.warn("존재하지 않는 여행보드 조회 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+                throw new TripBoardNotFoundException();
+            }
+
+            // 2. 사용자 참여 권한 검증
+            Optional<UserTripBoard> userTripBoardOpt = userTripBoardRepository
+                    .findByUserIdAndTripBoardId(userId, tripBoardId);
+
+            if (userTripBoardOpt.isEmpty()) {
+                log.warn("참여하지 않은 여행보드 조회 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+                throw new UserAuthorizationException(userId, tripBoardId);
+            }
+
+            UserTripBoard userTripBoard = userTripBoardOpt.get();
+            TripBoardRole userRole = userTripBoard.getRole();
+
+            log.debug("사용자 권한 확인 완료 - 사용자 ID: {}, 역할: {}", userId, userRole);
+
+            // 3. 여행보드 기본 정보 조회
+            TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(tripBoardId);
+
+            // 4. 참여자 목록 조회
+            List<ParticipantProfile> participantProfiles = tripBoardRepository
+                    .findParticipantsByTripBoardIds(List.of(tripBoardId));
+
+            log.debug("참여자 정보 조회 완료 - 보드 ID: {}, 참여자 수: {}", tripBoardId, participantProfiles.size());
+
+            // 5. 해당 여행보드의 전체 숙소 개수 조회
+            Long accommodationCount = accommodationRepository.countByTripBoardId(tripBoardId, null);
+
+            // 6. TripBoardSummary 객체 생성
+            TripBoardSummary tripBoardSummary = TripBoardSummary.builder()
+                    .tripBoardId(tripBoard.getId())
+                    .boardName(tripBoard.getBoardName())
+                    .destination(tripBoard.getDestination())
+                    .startDate(tripBoard.getStartDate())
+                    .endDate(tripBoard.getEndDate())
+                    .travelPeriod(formatTravelPeriod(tripBoard.getStartDate(), tripBoard.getEndDate()))
+                    .userRole(userRole)
+                    .accommodationCount(accommodationCount.intValue())
+                    .createdAt(tripBoard.getCreatedAt())
+                    .updatedAt(tripBoard.getUpdatedAt())
+                    .build();
+
+            // 7. TripBoardSummaryResponse 객체 생성 및 반환
+            TripBoardSummaryResponse response = tripBoardSummaryMapper
+                    .toResponse(tripBoardSummary, participantProfiles);
+
+            log.info("여행보드 상세조회 완료 - 보드 ID: {}, 사용자 ID: {}, 참여자 수: {}",
+                    tripBoardId, userId, response.getParticipantCount());
+
+            return response;
+
+        } catch (TripBoardNotFoundException | UserAuthorizationException e) {
+            log.error("여행보드 상세조회 실패 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
+            throw e;
+        } catch (Exception e) {
+            log.error("여행보드 상세조회 중 예상치 못한 오류 발생 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
+            throw new RuntimeException("여행보드 상세조회에 실패했습니다.", e);
+        }
+    }
+
+    /**
+     * 여행 기간을 "YY.MM.DD~MM.DD" 형식으로 포맷팅합니다.
+     */
+    private String formatTravelPeriod(java.time.LocalDate startDate, java.time.LocalDate endDate) {
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yy.MM.dd");
+
+        String formattedStartDate = startDate.format(formatter);
+        String formattedEndDate = endDate.format(formatter);
+
+        // 같은 년도인 경우 끝날짜에서 년도 생략
+        if (startDate.getYear() == endDate.getYear()) {
+            String shortEndDate = endDate.format(java.time.format.DateTimeFormatter.ofPattern("MM.dd"));
+            return formattedStartDate + "~" + shortEndDate;
+        }
+
+        return formattedStartDate + "~" + formattedEndDate;
     }
 
 }

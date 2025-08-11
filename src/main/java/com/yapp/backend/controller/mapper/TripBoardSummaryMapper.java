@@ -18,7 +18,6 @@ public class TripBoardSummaryMapper {
     /**
      * TripBoardSummary를 TripBoardSummaryResponse로 변환
      * 미리 조회한 참여자 프로필 정보를 사용하여 N+1 문제를 방지합니다.
-     * 
      * @param tripBoardSummary       여행 보드 요약 정보
      * @param allParticipantProfiles 모든 참여자 프로필 정보 (미리 조회됨)
      * @return 변환된 응답 DTO
@@ -29,12 +28,12 @@ public class TripBoardSummaryMapper {
 
         // 현재 여행 보드의 참여자 프로필 정보만 필터링
         List<ParticipantProfileResponse> participants = allParticipantProfiles.stream()
-                .filter(profile -> profile.getTripBoardId().equals(tripBoardSummary.getBoardId()))
+                .filter(profile -> profile.getTripBoardId().equals(tripBoardSummary.getTripBoardId()))
                 .map(this::toParticipantProfileResponse)
                 .collect(Collectors.toList());
 
         return TripBoardSummaryResponse.builder()
-                .boardId(tripBoardSummary.getBoardId())
+                .tripBoardId(tripBoardSummary.getTripBoardId())
                 .boardName(tripBoardSummary.getBoardName())
                 .destination(tripBoardSummary.getDestination())
                 .startDate(tripBoardSummary.getStartDate())
@@ -42,6 +41,7 @@ public class TripBoardSummaryMapper {
                 .travelPeriod(tripBoardSummary.getTravelPeriod())
                 .userRole(tripBoardSummary.getUserRole())
                 .participantCount(participants.size())
+                .accommodationCount(tripBoardSummary.getAccommodationCount())
                 .participants(participants)
                 .createdAt(tripBoardSummary.getCreatedAt())
                 .updatedAt(tripBoardSummary.getUpdatedAt())
@@ -50,7 +50,6 @@ public class TripBoardSummaryMapper {
 
     /**
      * ParticipantProfile을 ParticipantProfileResponse로 변환
-     * 
      * @param profile 참여자 프로필 정보
      * @return 변환된 참여자 프로필 응답 DTO
      */
@@ -65,7 +64,6 @@ public class TripBoardSummaryMapper {
 
     /**
      * TripBoardSummary 리스트를 TripBoardSummaryResponse 리스트로 변환
-     * 
      * @param tripBoardSummaries     여행 보드 요약 정보 리스트
      * @param allParticipantProfiles 모든 참여자 프로필 정보
      * @return 변환된 응답 DTO 리스트
