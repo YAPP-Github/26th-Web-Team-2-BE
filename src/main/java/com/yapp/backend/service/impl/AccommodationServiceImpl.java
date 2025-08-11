@@ -5,10 +5,12 @@ import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
+import com.yapp.backend.controller.dto.response.AccommodationDeleteResponse;
 import com.yapp.backend.repository.entity.AccommodationEntity;
 import com.yapp.backend.repository.mapper.ScrapingDataMapper;
 import com.yapp.backend.service.model.Accommodation;
 import com.yapp.backend.repository.AccommodationRepository;
+import com.yapp.backend.repository.ComparisonTableRepository;
 import com.yapp.backend.service.AccommodationService;
 import com.yapp.backend.service.ScrapingService;
 import com.yapp.backend.service.dto.ScrapingResponse;
@@ -35,9 +37,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccommodationServiceImpl implements AccommodationService {
 
-	private final AccommodationRepository accommodationRepository;
-	private final ScrapingService scrapingService;
-	private final ScrapingDataMapper scrapingDataMapper;
+    private final AccommodationRepository accommodationRepository;
+    private final ComparisonTableRepository comparisonTableRepository;
+    private final ScrapingService scrapingService;
+    private final ScrapingDataMapper scrapingDataMapper;
 
 	/**
 	 * 숙소 목록 조회
@@ -134,29 +137,25 @@ public class AccommodationServiceImpl implements AccommodationService {
 		}
 	}
 
-	/**
-	 * 숙소 단건 조회
-	 * 특정 숙소 ID로 숙소 정보를 조회합니다.
-	 */
-	@Override
-	@Transactional(readOnly = true)
-	public AccommodationResponse findAccommodationById(Long accommodationId) {
-		try {
-			Accommodation accommodation = accommodationRepository.findById(accommodationId);
+    /**
+     * 숙소 단건 조회
+     * 특정 숙소 ID로 숙소 정보를 조회합니다.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public AccommodationResponse findAccommodationById(Long accommodationId) {
+        try {
+            Accommodation accommodation = accommodationRepository.findByIdOrThrow(accommodationId);
 
-			if (accommodation == null) {
-				throw new CustomException(ErrorCode.ACCOMMODATION_NOT_FOUND);
-			}
-
-			return AccommodationResponse.from(accommodation);
-		} catch (CustomException e) {
-			// Re-throw custom exceptions as-is
-			throw e;
-		} catch (DataAccessException e) {
-			log.error("Database error while finding accommodation by id: {}", accommodationId, e);
-			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
-		}
-	}
+            return AccommodationResponse.from(accommodation);
+        } catch (CustomException e) {
+            // Re-throw custom exceptions as-is
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("Database error while finding accommodation by id: {}", accommodationId, e);
+            throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+        }
+    }
 
 	/**
 	 * 숙소 정보 업데이트
@@ -188,6 +187,48 @@ public class AccommodationServiceImpl implements AccommodationService {
 		}
 	}
 
-	// Helper methods for mapping updates
+    /**
+     * 숙소 삭제
+     * 본인이 등록한 숙소만 삭제할 수 있으며, 관련 비교표 데이터도 함께 정리됩니다.
+     */
+    @Override
+    @Transactional
+    public AccommodationDeleteResponse deleteAccommodation(Long accommodationId, Long userId) {
+        try {
+            log.info("숙소 삭제 요청 - 사용자ID: {}, 숙소ID: {}", userId, accommodationId);
 
+            // 숙소 존재 여부 확인
+            Accommodation accommodation = accommodationRepository.findByIdOrThrow(accommodationId);
+
+            // 소유자 권한 검증 (createdBy 필드 확인)
+            if (!accommodation.getCreatedBy().equals(userId)) {
+                log.warn("숙소 삭제 권한 없음 - 사용자ID: {}, 숙소ID: {}", userId, accommodationId);
+                throw new CustomException(ErrorCode.USER_AUTHORIZATION_FAILED);
+            }
+
+            // 관련 비교표 데이터 정리 (숙소가 포함된 모든 비교표에서 해당 숙소 제거)
+            comparisonTableRepository.removeAccommodationFromAllTables(accommodationId);
+            log.info("비교표에서 숙소 참조 제거 완료 - 숙소ID: {}", accommodationId);
+
+            // 숙소 삭제 실행
+            accommodationRepository.deleteById(accommodationId);
+
+            log.info("숙소 삭제 완료 - 사용자ID: {}, 숙소ID: {}", userId, accommodationId);
+
+            // 응답 객체 생성
+            return AccommodationDeleteResponse.builder()
+                    .accommodationId(accommodationId)
+                    .build();
+
+        } catch (CustomException e) {
+            // Re-throw custom exceptions as-is
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("숙소 삭제 실패 - 사용자ID: {}, 숙소ID: {}, 오류: {}", userId, accommodationId, e.getMessage());
+            throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+        } catch (Exception e) {
+            log.error("숙소 삭제 중 예상치 못한 오류 - 사용자ID: {}, 숙소ID: {}", userId, accommodationId, e);
+            throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+        }
+    }
 }

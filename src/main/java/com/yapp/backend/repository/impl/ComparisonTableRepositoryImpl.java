@@ -163,4 +163,10 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
     public void deleteByTripBoardId(Long tripBoardId) {
         jpaComparisonTableRepository.deleteByTripBoardEntityId(tripBoardId);
     }
+
+    @Override
+    @Transactional
+    public void removeAccommodationFromAllTables(Long accommodationId) {
+        jpaComparisonTableRepository.deleteComparisonAccommodationsByAccommodationId(accommodationId);
+    }
 }

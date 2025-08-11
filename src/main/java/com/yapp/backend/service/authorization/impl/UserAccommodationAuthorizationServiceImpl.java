@@ -35,11 +35,7 @@ public class UserAccommodationAuthorizationServiceImpl implements UserAccommodat
 
         try {
             // 1. 숙소 조회
-            Accommodation accommodation = accommodationRepository.findById(accommodationId);
-            if (accommodation == null) {
-                log.warn("숙소 삭제 권한 검증 실패 - 사유: 숙소를 찾을 수 없음, accommodationId={}", accommodationId);
-                throw new AccommodationNotFoundException(ErrorCode.ACCOMMODATION_NOT_FOUND);
-            }
+            Accommodation accommodation = accommodationRepository.findByIdOrThrow(accommodationId);
 
             // 2. 숙소 소유자 검증 (createdBy 필드 확인)
             Long ownerId = accommodation.getCreatedBy();
@@ -73,11 +69,7 @@ public class UserAccommodationAuthorizationServiceImpl implements UserAccommodat
 
         try {
             // 1. 숙소 조회
-            Accommodation accommodation = accommodationRepository.findById(accommodationId);
-            if (accommodation == null) {
-                log.warn("숙소 접근 권한 검증 실패 - 사유: 숙소를 찾을 수 없음, accommodationId={}", accommodationId);
-                throw new AccommodationNotFoundException(ErrorCode.ACCOMMODATION_NOT_FOUND);
-            }
+            Accommodation accommodation = accommodationRepository.findByIdOrThrow(accommodationId);
 
             log.info("숙소 접근 권한 검증 성공 - 사용자 ID: {}, 숙소 ID: {}", userId, accommodationId);
 
