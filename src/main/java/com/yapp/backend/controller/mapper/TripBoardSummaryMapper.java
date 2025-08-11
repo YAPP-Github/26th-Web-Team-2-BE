@@ -28,12 +28,12 @@ public class TripBoardSummaryMapper {
 
         // 현재 여행 보드의 참여자 프로필 정보만 필터링
         List<ParticipantProfileResponse> participants = allParticipantProfiles.stream()
-                .filter(profile -> profile.getTripBoardId().equals(tripBoardSummary.getBoardId()))
+                .filter(profile -> profile.getTripBoardId().equals(tripBoardSummary.getTripBoardId()))
                 .map(this::toParticipantProfileResponse)
                 .collect(Collectors.toList());
 
         return TripBoardSummaryResponse.builder()
-                .boardId(tripBoardSummary.getBoardId())
+                .tripBoardId(tripBoardSummary.getTripBoardId())
                 .boardName(tripBoardSummary.getBoardName())
                 .destination(tripBoardSummary.getDestination())
                 .startDate(tripBoardSummary.getStartDate())

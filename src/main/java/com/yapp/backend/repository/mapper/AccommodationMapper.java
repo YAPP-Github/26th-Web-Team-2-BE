@@ -34,7 +34,7 @@ public class AccommodationMapper {
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .createdBy(entity.getCreatedBy().getId())
-                .boardId(entity.getBoardId())
+                .tripBoardId(entity.getTripBoardId())
                 .accommodationName(entity.getAccommodationName())
                 .images(entity.getImages())
                 .address(entity.getAddress())

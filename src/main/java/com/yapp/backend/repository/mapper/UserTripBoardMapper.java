@@ -75,7 +75,7 @@ public class UserTripBoardMapper {
         }
 
         return TripBoardSummary.builder()
-                .boardId(tripBoard.getId())
+                .tripBoardId(tripBoard.getId())
                 .boardName(tripBoard.getBoardName())
                 .destination(tripBoard.getDestination())
                 .startDate(tripBoard.getStartDate())

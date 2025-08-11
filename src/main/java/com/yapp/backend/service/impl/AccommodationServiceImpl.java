@@ -1,15 +1,9 @@
 package com.yapp.backend.service.impl;
 
-import static com.yapp.backend.service.model.Attraction.*;
-
 import com.yapp.backend.common.exception.CustomException;
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
-import com.yapp.backend.controller.dto.request.update.AmenityUpdate;
-import com.yapp.backend.controller.dto.request.update.AttractionUpdate;
-import com.yapp.backend.controller.dto.request.update.CheckTimeUpdate;
-import com.yapp.backend.controller.dto.request.update.TransportationUpdate;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 import com.yapp.backend.repository.entity.AccommodationEntity;
 import com.yapp.backend.repository.mapper.ScrapingDataMapper;
@@ -19,10 +13,6 @@ import com.yapp.backend.service.AccommodationService;
 import com.yapp.backend.service.ScrapingService;
 import com.yapp.backend.service.dto.ScrapingResponse;
 
-import com.yapp.backend.service.model.Amenity;
-import com.yapp.backend.service.model.Attraction;
-import com.yapp.backend.service.model.CheckTime;
-import com.yapp.backend.service.model.Transportation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,12 +46,12 @@ public class AccommodationServiceImpl implements AccommodationService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public AccommodationPageResponse findAccommodationsByBoardId(Long boardId, int page, int size, Long userId,
-			String sort) {
+	public AccommodationPageResponse findAccommodationsByTripBoardId(Long tripBoardId, int page, int size, Long userId,
+																	 String sort) {
 		try {
 			// size + 1개를 조회하여 다음 페이지 존재 여부를 한 번의 쿼리로 확인
-			List<Accommodation> accommodations = accommodationRepository.findByBoardIdWithPagination(
-					boardId, page, size + 1, userId, sort);
+			List<Accommodation> accommodations = accommodationRepository.findByTripBoardIdWithPagination(
+					tripBoardId, page, size + 1, userId, sort);
 
 			// 실제 반환할 데이터와 다음 페이지 존재 여부 판단
 			boolean hasNext = accommodations.size() > size;
@@ -78,8 +68,8 @@ public class AccommodationServiceImpl implements AccommodationService {
 					.hasNext(hasNext)
 					.build();
 		} catch (DataAccessException e) {
-			log.error("Database error while finding accommodations for boardId: {}, userId: {}",
-					boardId, userId, e);
+			log.error("Database error while finding accommodations for tripBoardId: {}, userId: {}",
+					tripBoardId, userId, e);
 			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
 		}
 	}
@@ -88,12 +78,12 @@ public class AccommodationServiceImpl implements AccommodationService {
 	 * table에 포함된 숙소 카드의 개수 반환
 	 */
 	@Override
-	public Long countAccommodationsByBoardId(Long boardId, Long userId) {
+	public Long countAccommodationsByTripBoardId(Long tripBoardId, Long userId) {
 		try {
-			return accommodationRepository.countByBoardId(boardId, userId);
+			return accommodationRepository.countByTripBoardId(tripBoardId, userId);
 		} catch (DataAccessException e) {
-			log.error("Database error while counting accommodations for boardId: {}, userId: {}",
-					boardId, userId, e);
+			log.error("Database error while counting accommodations for tripBoardId: {}, userId: {}",
+					tripBoardId, userId, e);
 			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
 		}
 	}
@@ -106,7 +96,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 	@Override
 	public AccommodationRegisterResponse registerAccommodationCard(AccommodationRegisterRequest request, Long userId) {
 		try {
-			log.info("숙소 등록 시작 - 사용자 ID: {}, 보드 ID: {}, URL: {}", userId, request.getBoardId(), request.getUrl());
+			log.info("숙소 등록 시작 - 사용자 ID: {}, 보드 ID: {}, URL: {}", userId, request.getTripBoardId(), request.getUrl());
 
 			// 외부 스크래핑 서버에서 숙소 정보 가져오기
 			ScrapingResponse scrapingResponse = scrapingService.scrapeAccommodationData(request.getUrl());
@@ -117,7 +107,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 					request.getUrl(),
 					request.getMemo(),
 					userId, // 인증된 사용자 ID를 created_by 필드에 저장
-					request.getBoardId());
+					request.getTripBoardId());
 
 			// 새로운 숙소 카드 등록
 			Accommodation savedAccommodation = accommodationRepository.save(accommodationEntity);

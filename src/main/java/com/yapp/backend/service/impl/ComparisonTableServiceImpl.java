@@ -18,7 +18,7 @@ import com.yapp.backend.service.model.ComparisonTable;
 import com.yapp.backend.service.model.TripBoard;
 import com.yapp.backend.service.model.User;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
-import java.util.Set;
+
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,10 +51,10 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
             factors = ComparisonFactor.convertToComparisonFactorList(request.getFactorList());
         }
 
-        // TODO : request boardId에서 DB에서 실제 trip board data 가져오기
+        // TODO : request tripBoardId에서 DB에서 실제 trip board data 가져오기
         TripBoard tripBoard = TripBoard.builder()
-                .id(request.getBoardId())
-                .boardName("테스트 여행 그룹 " + request.getBoardId())
+                .id(request.getTripBoardId())
+                .boardName("테스트 여행 그룹 " + request.getTripBoardId())
                 .createdBy(User.builder()
                         .id(userId)
                         .nickname("그룹생성자" + userId)
@@ -120,7 +120,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
                 .id(existingTable.getId())
                 .tableName(request.getTableName())
                 .createdById(existingTable.getCreatedById())
-                .tripBoardId(request.getBoardId())
+                .tripBoardId(request.getTripBoardId())
                 .accommodationList(updatedAccommodationList)
                 .factors(updatedFactors)
                 .createdAt(existingTable.getCreatedAt())

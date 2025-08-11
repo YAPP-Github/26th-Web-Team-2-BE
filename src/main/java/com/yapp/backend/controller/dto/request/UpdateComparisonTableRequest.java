@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 public class UpdateComparisonTableRequest {
     @NotNull(message = "여행 보드 ID는 필수 입력값입니다.")
-    private Long boardId;
+    private Long tripBoardId;
 
     @NotBlank(message = "수정될 숙소 상세 정보 객체 리스트입니다.")
     private String tableName;

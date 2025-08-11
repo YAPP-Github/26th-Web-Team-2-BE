@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TripBoardCreateResponse {
-    private Long boardId;
+    private Long tripBoardId;
     private String boardName;
     private String destination;
     private String travelPeriod; // "25.08.14~08.16" 형식
@@ -42,7 +42,7 @@ public class TripBoardCreateResponse {
      */
     public static TripBoardCreateResponse from(TripBoard tripBoard, UserTripBoard userTripBoard) {
         return TripBoardCreateResponse.builder()
-                .boardId(tripBoard.getId())
+                .tripBoardId(tripBoard.getId())
                 .boardName(tripBoard.getBoardName())
                 .destination(tripBoard.getDestination())
                 .travelPeriod(DateUtil.formatTravelPeriod(tripBoard.getStartDate(), tripBoard.getEndDate()))

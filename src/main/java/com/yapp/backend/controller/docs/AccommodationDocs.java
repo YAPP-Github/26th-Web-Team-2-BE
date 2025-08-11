@@ -27,8 +27,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 public interface AccommodationDocs {
 	@Operation(summary = "숙소 목록 조회", description = "숙소 목록을 조회합니다.")
 	@SecurityRequirement(name = "JWT")
-	ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationByBoardIdAndUserId(
-			@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "숙소가 포함된 여행보드의 ID") @NotNull(message = "여행보드 ID는 필수입니다.") @Min(value = 1, message = "여행보드 ID는 1 이상이어야 합니다.") Long boardId,
+	ResponseEntity<StandardResponse<AccommodationPageResponse>> getAccommodationByTripBoardIdAndUserId(
+			@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "숙소가 포함된 여행보드의 ID") @NotNull(message = "여행보드 ID는 필수입니다.") @Min(value = 1, message = "여행보드 ID는 1 이상이어야 합니다.") Long tripBoardId,
 			@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 번호") @NotNull(message = "페이지 번호는 필수입니다.") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
 			@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 크기") @NotNull(message = "페이지 크기는 필수입니다.") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size,
 			@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer", format = "int64"), description = "유저 ID, 없는 경우 모든 유저가 생성한 숙소 목록을 반환합니다. 현재 parameter로 받는 것은 임시 로직입니다.") Long userId,
@@ -37,8 +37,8 @@ public interface AccommodationDocs {
 
 	@Operation(summary = "여행보드 숙소 개수 조회", description = "여행보드에 포함된 숙소의 개수를 조회합니다.")
 	@SecurityRequirement(name = "JWT")
-	ResponseEntity<StandardResponse<AccommodationCountResponse>> getAccommodationCountByBoardId(
-			@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer", format = "int64"), description = "숙소가 포함된 여행보드의 ID") @Min(value = 1, message = "여행보드 ID는 1 이상이어야 합니다.") Long boardId,
+	ResponseEntity<StandardResponse<AccommodationCountResponse>> getAccommodationCountByTripBoardId(
+			@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer", format = "int64"), description = "숙소가 포함된 여행보드의 ID") @Min(value = 1, message = "여행보드 ID는 1 이상이어야 합니다.") Long tripBoardId,
 			@Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer", format = "int64"), description = "유저 ID, 없는 경우 모든 유저가 생성한 숙소 목록을 반환합니다. 현재 parameter로 받는 것은 임시 로직입니다.") Long userId,
 			@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 

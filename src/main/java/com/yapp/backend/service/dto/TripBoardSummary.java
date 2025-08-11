@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TripBoardSummary {
-    private Long boardId;
+    private Long tripBoardId;
     private String boardName;
     private String destination;
     private LocalDate startDate;

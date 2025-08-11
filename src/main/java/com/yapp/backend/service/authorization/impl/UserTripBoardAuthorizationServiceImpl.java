@@ -1,6 +1,5 @@
 package com.yapp.backend.service.authorization.impl;
 
-import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.exception.UserAuthorizationException;
 import com.yapp.backend.repository.JpaAccommodationRepository;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
@@ -69,7 +68,7 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
             }
 
             // 2. 해당 숙소가 속한 보드에 대한 사용자 권한 확인
-            Long boardId = accommodation.getBoardId();
+            Long boardId = accommodation.getTripBoardId();
             boolean hasAccess = hasAccessToTripBoard(userId, boardId);
 
             if (!hasAccess) {

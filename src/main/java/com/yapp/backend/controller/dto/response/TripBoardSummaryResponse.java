@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TripBoardSummaryResponse {
-    private Long boardId;
+    private Long tripBoardId;
     private String boardName;
     private String destination;
     private LocalDate startDate;
