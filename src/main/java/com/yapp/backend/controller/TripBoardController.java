@@ -16,6 +16,7 @@ import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
+import com.yapp.backend.controller.dto.response.InvitationCodeResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.service.TripBoardService;
 
@@ -202,6 +203,26 @@ public class TripBoardController implements TripBoardDocs {
         // 여행 보드 나가기
         TripBoardLeaveResponse response = tripBoardService.leaveTripBoard(
                 tripBoardId, whoAmI, request.getRemoveResources());
+
+        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
+    }
+
+    /**
+     * 초대 링크 정보 조회 API
+     * 권한 : 여행 보드 참여자 - OWNER / MEMBER
+     */
+    @Override
+    @RequirePermission(value = PermissionType.TRIP_BOARD_ACCESS, paramName = "tripBoardId")
+    @GetMapping("/{tripBoardId}/invitation")
+    public ResponseEntity<StandardResponse<InvitationCodeResponse>> getInvitationCode(
+            @PathVariable Long tripBoardId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // JWT 인증을 통한 현재 사용자 정보 추출
+        Long whoAmI = userDetails.getUserId();
+
+        // 초대 링크 정보 조회
+        InvitationCodeResponse response = tripBoardService.getInvitationCode(tripBoardId, whoAmI);
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }

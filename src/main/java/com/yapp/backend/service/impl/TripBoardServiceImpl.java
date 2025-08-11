@@ -24,6 +24,7 @@ import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
+import com.yapp.backend.controller.dto.response.InvitationCodeResponse;
 import com.yapp.backend.controller.mapper.TripBoardSummaryMapper;
 import com.yapp.backend.controller.mapper.TripBoardUpdateMapper;
 import com.yapp.backend.repository.AccommodationRepository;
@@ -719,6 +720,30 @@ public class TripBoardServiceImpl implements TripBoardService {
         }
 
         return formattedStartDate + "~" + formattedEndDate;
+    }
+
+    /**
+     * 여행 보드에서 사용자의 초대 링크 정보를 조회합니다.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public InvitationCodeResponse getInvitationCode(Long tripBoardId, Long userId) {
+
+        // 1. 사용자가 해당 여행보드의 참여자인지 확인
+        UserTripBoard userTripBoard = userTripBoardRepository
+                .findByUserIdAndTripBoardId(userId, tripBoardId)
+                .orElseThrow(() -> {
+                    log.warn("참여하지 않은 여행보드 초대 링크 조회 시도 - 보드 ID: {}, 사용자 ID: {}",
+                            tripBoardId, userId);
+                    return new UserAuthorizationException();
+                });
+
+        // 2. 응답 생성
+        return new InvitationCodeResponse(
+                tripBoardId,
+                userTripBoard.getInvitationActive(),
+                userTripBoard.getInvitationCode()
+        );
     }
 
 }

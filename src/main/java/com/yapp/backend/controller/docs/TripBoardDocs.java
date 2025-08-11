@@ -12,16 +12,13 @@ import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
+import com.yapp.backend.controller.dto.response.InvitationCodeResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -80,4 +77,10 @@ public interface TripBoardDocs {
                         @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
                         @RequestBody @Valid TripBoardLeaveRequest request,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
+
+        @Operation(summary = "초대 링크 정보 조회", description = "여행 보드에서 현재 사용자의 초대 링크 정보를 조회합니다. 초대 코드, 활성화 상태, 사용자 역할 등의 정보를 포함합니다.")
+        @SecurityRequirement(name = "JWT")
+        ResponseEntity<StandardResponse<InvitationCodeResponse>> getInvitationCode(
+                @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
+                @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 }
