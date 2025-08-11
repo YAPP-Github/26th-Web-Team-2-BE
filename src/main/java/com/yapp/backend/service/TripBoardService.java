@@ -27,5 +27,5 @@ public interface TripBoardService {
      */
     TripBoardJoinResponse joinTripBoard(String invitationCode, Long userId);
 
-    TripBoardSummaryResponse getTripBoardDetail(Long boardId, Long userId);
+    TripBoardSummaryResponse getTripBoardDetail(Long tripBoardId, Long userId);
 }

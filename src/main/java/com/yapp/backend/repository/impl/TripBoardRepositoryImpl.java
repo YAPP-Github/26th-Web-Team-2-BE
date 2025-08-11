@@ -81,8 +81,8 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
         // 사전 계산된 카운트 맵을 이용하여 TripBoardSummary로 변환
         List<TripBoardSummary> content = userTripBoardPage.getContent().stream()
                 .map(userTripBoard -> {
-                    Long boardId = userTripBoard.getTripBoard().getId();
-                    long count = countsByBoardId.getOrDefault(boardId, 0L);
+                    Long tripBoardId = userTripBoard.getTripBoard().getId();
+                    long count = countsByBoardId.getOrDefault(tripBoardId, 0L);
                     return userTripBoardMapper.entityToTripBoardSummary(userTripBoard, Math.toIntExact(count));
                 })
                 .collect(Collectors.toList());

@@ -70,15 +70,15 @@ public class PermissionService {
      * 여행보드 권한 검증 진입 메서드
      *
      * @param permissionType    검증할 권한 타입
-     * @param boardId           여행 보드 ID
+     * @param tripBoardId           여행 보드 ID
      * @param userId            현재 사용자 ID
      */
     private void validateTripBoardPermission(
             PermissionType permissionType,
-            Long boardId,
+            Long tripBoardId,
             Long userId
     ) {
-        log.info("validateTripBoardPermission: {}", boardId);
+        log.info("validateTripBoardPermission: {}", tripBoardId);
 
         /**
          // 여행 보드 수정 권한은 해당 여행 보드에 참여한 사용자 모두에게 있습니다. (OWNER / MEMBER)
@@ -87,10 +87,10 @@ public class PermissionService {
         switch (permissionType) {
             case TRIP_BOARD_ACCESS:
             case TRIP_BOARD_MODIFY:
-                userTripBoardAuthorizationService.validateTripBoardAccessOrThrow(userId, boardId);
+                userTripBoardAuthorizationService.validateTripBoardAccessOrThrow(userId, tripBoardId);
                 break;
             case TRIP_BOARD_DELETE:
-                userTripBoardAuthorizationService.validateTripBoardDeleteOrThrow(userId, boardId);
+                userTripBoardAuthorizationService.validateTripBoardDeleteOrThrow(userId, tripBoardId);
                 break;
         }
     }

@@ -71,6 +71,7 @@ public class AccommodationMapper {
                 .siteName(accommodation.getSiteName())
                 .memo(accommodation.getMemo())
                 .createdBy(userProxy)
+                .tripBoardId(accommodation.getTripBoardId())
                 .accommodationName(accommodation.getAccommodationName())
                 .images(accommodation.getImages())
                 .address(accommodation.getAddress())
@@ -89,23 +90,5 @@ public class AccommodationMapper {
                 .checkInTime(accommodation.getCheckInTime())
                 .checkOutTime(accommodation.getCheckOutTime())
                 .build();
-    }
-
-    /**
-     * 숙소 데이터 모델 생성
-     */
-    public AccommodationEntity createEntityForRegistration(String url, String memo, Long createdBy) {
-        return AccommodationEntity.builder()
-                .url(url)
-                .memo(memo)
-                .createdBy(new UserEntity(createdBy))
-                .build();
-    }
-
-    /**
-     * Converts LocalDateTime to LocalDate, handling null values
-     */
-    private LocalDate convertToLocalDate(LocalDateTime dateTime) {
-        return dateTime != null ? dateTime.toLocalDate() : null;
     }
 }

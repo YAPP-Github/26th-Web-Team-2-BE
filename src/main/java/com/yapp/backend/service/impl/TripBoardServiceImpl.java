@@ -635,23 +635,23 @@ public class TripBoardServiceImpl implements TripBoardService {
      */
     @Override
     @Transactional(readOnly = true)
-    public TripBoardSummaryResponse getTripBoardDetail(Long boardId, Long userId) {
+    public TripBoardSummaryResponse getTripBoardDetail(Long tripBoardId, Long userId) {
         try {
-            log.info("여행보드 상세조회 시작 - 보드 ID: {}, 사용자 ID: {}", boardId, userId);
+            log.info("여행보드 상세조회 시작 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
 
             // 1. 여행보드 존재 여부 검증
-            if (!tripBoardRepository.existsById(boardId)) {
-                log.warn("존재하지 않는 여행보드 조회 시도 - 보드 ID: {}, 사용자 ID: {}", boardId, userId);
+            if (!tripBoardRepository.existsById(tripBoardId)) {
+                log.warn("존재하지 않는 여행보드 조회 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
                 throw new TripBoardNotFoundException();
             }
 
             // 2. 사용자 참여 권한 검증
             Optional<UserTripBoard> userTripBoardOpt = userTripBoardRepository
-                    .findByUserIdAndTripBoardId(userId, boardId);
+                    .findByUserIdAndTripBoardId(userId, tripBoardId);
 
             if (userTripBoardOpt.isEmpty()) {
-                log.warn("참여하지 않은 여행보드 조회 시도 - 보드 ID: {}, 사용자 ID: {}", boardId, userId);
-                throw new UserAuthorizationException(userId, boardId);
+                log.warn("참여하지 않은 여행보드 조회 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
+                throw new UserAuthorizationException(userId, tripBoardId);
             }
 
             UserTripBoard userTripBoard = userTripBoardOpt.get();
@@ -660,16 +660,16 @@ public class TripBoardServiceImpl implements TripBoardService {
             log.debug("사용자 권한 확인 완료 - 사용자 ID: {}, 역할: {}", userId, userRole);
 
             // 3. 여행보드 기본 정보 조회
-            TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(boardId);
+            TripBoard tripBoard = tripBoardRepository.findByIdOrThrow(tripBoardId);
 
             // 4. 참여자 목록 조회
             List<ParticipantProfile> participantProfiles = tripBoardRepository
-                    .findParticipantsByTripBoardIds(List.of(boardId));
+                    .findParticipantsByTripBoardIds(List.of(tripBoardId));
 
-            log.debug("참여자 정보 조회 완료 - 보드 ID: {}, 참여자 수: {}", boardId, participantProfiles.size());
+            log.debug("참여자 정보 조회 완료 - 보드 ID: {}, 참여자 수: {}", tripBoardId, participantProfiles.size());
 
             // 5. 해당 여행보드의 전체 숙소 개수 조회
-            Long accommodationCount = accommodationRepository.countByTripBoardId(boardId, null);
+            Long accommodationCount = accommodationRepository.countByTripBoardId(tripBoardId, null);
 
             // 6. TripBoardSummary 객체 생성
             TripBoardSummary tripBoardSummary = TripBoardSummary.builder()
@@ -690,15 +690,15 @@ public class TripBoardServiceImpl implements TripBoardService {
                     .toResponse(tripBoardSummary, participantProfiles);
 
             log.info("여행보드 상세조회 완료 - 보드 ID: {}, 사용자 ID: {}, 참여자 수: {}",
-                    boardId, userId, response.getParticipantCount());
+                    tripBoardId, userId, response.getParticipantCount());
 
             return response;
 
         } catch (TripBoardNotFoundException | UserAuthorizationException e) {
-            log.error("여행보드 상세조회 실패 - 보드 ID: {}, 사용자 ID: {}", boardId, userId, e);
+            log.error("여행보드 상세조회 실패 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
             throw e;
         } catch (Exception e) {
-            log.error("여행보드 상세조회 중 예상치 못한 오류 발생 - 보드 ID: {}, 사용자 ID: {}", boardId, userId, e);
+            log.error("여행보드 상세조회 중 예상치 못한 오류 발생 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
             throw new RuntimeException("여행보드 상세조회에 실패했습니다.", e);
         }
     }

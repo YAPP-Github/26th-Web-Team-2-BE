@@ -89,20 +89,20 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	/**
 	 * userId가 있는 경우의 엔티티 페이지 조회
 	 */
-	private Page<AccommodationEntity> getEntityPageWithUserId(Long boardId, Long userId, Pageable pageable,
+	private Page<AccommodationEntity> getEntityPageWithUserId(Long tripBoardId, Long userId, Pageable pageable,
 			boolean isPriceSort) {
 		return isPriceSort
-				? jpaAccommodationRepository.findByTripBoardIdAndCreatedByOrderByLowestPriceAsc(boardId, userId, pageable)
-				: jpaAccommodationRepository.findByTripBoardIdAndCreatedByOrderByCreatedAtDesc(boardId, userId, pageable);
+				? jpaAccommodationRepository.findByTripBoardIdAndCreatedByOrderByLowestPriceAsc(tripBoardId, userId, pageable)
+				: jpaAccommodationRepository.findByTripBoardIdAndCreatedByOrderByCreatedAtDesc(tripBoardId, userId, pageable);
 	}
 
 	/**
 	 * userId가 없는 경우의 엔티티 페이지 조회
 	 */
-	private Page<AccommodationEntity> getEntityPageWithoutUserId(Long boardId, Pageable pageable, boolean isPriceSort) {
+	private Page<AccommodationEntity> getEntityPageWithoutUserId(Long tripBoardId, Pageable pageable, boolean isPriceSort) {
 		return isPriceSort
-				? jpaAccommodationRepository.findByTripBoardIdOrderByLowestPriceAsc(boardId, pageable)
-				: jpaAccommodationRepository.findByTripBoardIdOrderByCreatedAtDesc(boardId, pageable);
+				? jpaAccommodationRepository.findByTripBoardIdOrderByLowestPriceAsc(tripBoardId, pageable)
+				: jpaAccommodationRepository.findByTripBoardIdOrderByCreatedAtDesc(tripBoardId, pageable);
 	}
 
     /**
