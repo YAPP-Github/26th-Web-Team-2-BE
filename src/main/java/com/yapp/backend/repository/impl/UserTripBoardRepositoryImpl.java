@@ -7,6 +7,7 @@ import com.yapp.backend.repository.UserTripBoardRepository;
 import com.yapp.backend.repository.entity.UserTripBoardEntity;
 import com.yapp.backend.repository.enums.TripBoardRole;
 import com.yapp.backend.repository.mapper.UserTripBoardMapper;
+import com.yapp.backend.service.dto.ParticipantProfile;
 import com.yapp.backend.service.model.UserTripBoard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,5 +83,13 @@ public class UserTripBoardRepositoryImpl implements UserTripBoardRepository {
 
         log.debug("초대 코드 유효성 검증 완료 - 보드 ID: {}", userTripBoard.getTripBoard().getId());
         return userTripBoard;
+    }
+
+    @Override
+    public List<ParticipantProfile> findParticipantsByTripBoardId(Long tripBoardId) {
+        return jpaUserTripBoardRepository.findByTripBoardIdWithUser(tripBoardId)
+                .stream()
+                .map(userTripBoardMapper::entityToParticipantProfile)
+                .toList();
     }
 }

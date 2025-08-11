@@ -11,6 +11,7 @@ import com.yapp.backend.repository.entity.UserTripBoardEntity;
 import com.yapp.backend.repository.mapper.TripBoardMapper;
 import com.yapp.backend.repository.mapper.UserTripBoardMapper;
 import com.yapp.backend.repository.mapper.UserMapper;
+import com.yapp.backend.repository.projection.AccommodationCountPerBoard;
 import com.yapp.backend.service.dto.ParticipantProfile;
 import com.yapp.backend.service.dto.TripBoardSummary;
 import com.yapp.backend.service.model.TripBoard;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -52,8 +54,7 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
 
     @Override
     public TripBoard findByIdOrThrow(Long id) {
-        TripBoardEntity tripBoardEntity =
-                jpaTripBoardRepository.findById(id)
+        TripBoardEntity tripBoardEntity = jpaTripBoardRepository.findById(id)
                 .orElseThrow(TripBoardNotFoundException::new);
         return tripBoardMapper.entityToDomain(tripBoardEntity);
     }
@@ -64,9 +65,26 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
         Page<UserTripBoardEntity> userTripBoardPage = jpaUserTripBoardRepository
                 .findByUserIdOrderByTripBoardCreatedAtDescIdDesc(userId, pageable);
 
-        // UserTripBoardEntity를 TripBoardSummary로 변환
+        // N+1 쿼리 방지: 모든 보드 ID를 수집하여 한 번에 숙소 개수 조회
+        List<Long> boardIds = userTripBoardPage.getContent().stream()
+                .map(userTripBoard -> userTripBoard.getTripBoard().getId())
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 배치로 숙소 개수 조회하여 Map으로 변환
+        Map<Long, Long> countsByBoardId = jpaAccommodationRepository.countByTripBoardIds(boardIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        AccommodationCountPerBoard::getTripBoardId,
+                        AccommodationCountPerBoard::getCount));
+
+        // 사전 계산된 카운트 맵을 이용하여 TripBoardSummary로 변환
         List<TripBoardSummary> content = userTripBoardPage.getContent().stream()
-                .map(userTripBoardMapper::entityToTripBoardSummary)
+                .map(userTripBoard -> {
+                    Long tripBoardId = userTripBoard.getTripBoard().getId();
+                    long count = countsByBoardId.getOrDefault(tripBoardId, 0L);
+                    return userTripBoardMapper.entityToTripBoardSummary(userTripBoard, Math.toIntExact(count));
+                })
                 .collect(Collectors.toList());
 
         return new PageImpl<>(content, pageable, userTripBoardPage.getTotalElements());
@@ -130,13 +148,19 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
         jpaComparisonTableRepository.deleteByTripBoardEntityId(tripBoardId);
 
         // 2. 숙소 삭제
-        jpaAccommodationRepository.deleteByBoardId(tripBoardId);
+        jpaAccommodationRepository.deleteByTripBoardId(tripBoardId);
 
         // 3. 사용자-여행보드 매핑 삭제
         jpaUserTripBoardRepository.deleteByTripBoardId(tripBoardId);
 
         // 4. 여행보드 삭제
         jpaTripBoardRepository.deleteById(tripBoardId);
+    }
+
+    @Override
+    public Optional<TripBoard> findById(Long id) {
+        return jpaTripBoardRepository.findById(id)
+                .map(tripBoardMapper::entityToDomain);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.yapp.backend.repository;
 
+import com.yapp.backend.service.dto.ParticipantProfile;
 import com.yapp.backend.service.model.UserTripBoard;
 import com.yapp.backend.repository.enums.TripBoardRole;
 
@@ -46,4 +47,10 @@ public interface UserTripBoardRepository {
      * 초대 코드가 유효하지 않거나 비활성화된 경우 예외를 발생시킵니다.
      */
     UserTripBoard findByInvitationCodeOrThrow(String invitationCode);
+
+    /**
+     * 특정 여행보드의 모든 참여자 프로필 정보를 조회합니다.
+     * 효율적인 JOIN 쿼리를 통해 참여자 정보를 한 번에 조회합니다.
+     */
+    List<ParticipantProfile> findParticipantsByTripBoardId(Long tripBoardId);
 }

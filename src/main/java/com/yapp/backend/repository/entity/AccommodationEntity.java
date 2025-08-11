@@ -1,6 +1,5 @@
 package com.yapp.backend.repository.entity;
 
-import com.yapp.backend.service.model.Accommodation;
 import com.yapp.backend.service.model.Amenity;
 import com.yapp.backend.service.model.Attraction;
 import com.yapp.backend.service.model.CheckTime;
@@ -32,7 +31,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Table(name = "accommodation")
 public class AccommodationEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // 메타데이터
@@ -57,8 +57,8 @@ public class AccommodationEntity {
     @JoinColumn(name = "created_by")
     private UserEntity createdBy;
 
-    @Column(name = "board_id")
-    private Long boardId;
+    @Column(name = "trip_board_id")
+    private Long tripBoardId;
 
     // 숙소 정보
     @Column(name = "accommodation_name")

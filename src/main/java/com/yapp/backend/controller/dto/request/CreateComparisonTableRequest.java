@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 public class CreateComparisonTableRequest {
     @NotNull(message = "여행 보드 ID는 필수 입력값입니다.")
-    private Long boardId;
+    private Long tripBoardId;
 
     @NotBlank
     private String tableName;

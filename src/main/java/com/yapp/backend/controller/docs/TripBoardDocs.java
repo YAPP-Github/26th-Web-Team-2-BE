@@ -11,6 +11,7 @@ import com.yapp.backend.controller.dto.response.TripBoardJoinResponse;
 import com.yapp.backend.controller.dto.response.TripBoardLeaveResponse;
 import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
+import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
 import com.yapp.backend.controller.dto.response.InvitationToggleResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
@@ -18,7 +19,11 @@ import com.yapp.backend.filter.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -63,6 +68,12 @@ public interface TripBoardDocs {
         @SecurityRequirement(name = "JWT")
         ResponseEntity<StandardResponse<TripBoardDeleteResponse>> deleteTripBoard(
                         @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
+                        @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
+
+        @Operation(summary = "여행 보드 상세 조회", description = "특정 여행 보드의 상세 정보를 조회합니다. JWT 인증을 통해 현재 사용자 정보를 추출하고, 여행 보드 참여자만 접근할 수 있습니다. 보드의 기본 정보, 참여자 목록, 사용자 역할 등을 포함한 완전한 정보를 반환합니다.")
+        @SecurityRequirement(name = "JWT")
+        ResponseEntity<StandardResponse<TripBoardSummaryResponse>> getTripBoardDetail(
+                        @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer", example = "1"), description = "조회할 여행 보드의 고유 ID", required = true) @PathVariable Long tripBoardId,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 
         @Operation(summary = "여행 보드 나가기", description = "여행 보드에서 나갑니다. OWNER인 경우 가장 먼저 입장한 MEMBER에게 권한이 이양되며, 마지막 참여자인 경우 여행보드가 삭제됩니다. 나가는 사용자는 자신이 생성한 리소스(비교표, 숙소)를 유지하거나 제거할 수 있습니다.")

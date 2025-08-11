@@ -21,9 +21,9 @@ public class UserAuthorizationException extends CustomException {
     /**
      * 사용자 ID와 보드 ID를 포함한 상세 메시지로 예외 생성
      */
-    public UserAuthorizationException(Long userId, Long boardId) {
+    public UserAuthorizationException(Long userId, Long tripBoardId) {
         super(ErrorCode.USER_AUTHORIZATION_FAILED,
-                String.format("사용자 %d는 보드 %d에 접근 권한이 없습니다", userId, boardId));
+                String.format("사용자 %d는 보드 %d에 접근 권한이 없습니다", userId, tripBoardId));
     }
 
     /**

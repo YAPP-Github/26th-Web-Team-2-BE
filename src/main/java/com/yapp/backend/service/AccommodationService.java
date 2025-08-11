@@ -8,9 +8,9 @@ import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 import com.yapp.backend.controller.dto.response.AccommodationResponse;
 
 public interface AccommodationService {
-    AccommodationPageResponse findAccommodationsByBoardId(Long boardId, int page, int size, Long userId, String sort);
+    AccommodationPageResponse findAccommodationsByTripBoardId(Long tripBoardId, int page, int size, Long userId, String sort);
 
-    Long countAccommodationsByBoardId(Long boardId, Long userId);
+    Long countAccommodationsByTripBoardId(Long tripBoardId, Long userId);
 
     AccommodationRegisterResponse registerAccommodationCard(AccommodationRegisterRequest request, Long userId);
 
