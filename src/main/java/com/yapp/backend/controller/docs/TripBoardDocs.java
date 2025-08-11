@@ -78,7 +78,7 @@ public interface TripBoardDocs {
                         @RequestBody @Valid TripBoardLeaveRequest request,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 
-        @Operation(summary = "초대 링크 정보 조회", description = "여행 보드에서 현재 사용자의 초대 링크 정보를 조회합니다. 초대 코드, 활성화 상태, 사용자 역할 등의 정보를 포함합니다.")
+        @Operation(summary = "초대 링크 정보 조회", description = "여행 보드에서 현재 사용자의 초대 링크 정보를 조회합니다. 초대 코드, 활성화 상태 등의 정보를 포함합니다.")
         @SecurityRequirement(name = "JWT")
         ResponseEntity<StandardResponse<InvitationCodeResponse>> getInvitationCode(
                 @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
