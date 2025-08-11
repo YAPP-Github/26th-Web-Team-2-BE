@@ -24,6 +24,7 @@ import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
+import com.yapp.backend.controller.dto.response.InvitationToggleResponse;
 import com.yapp.backend.controller.mapper.TripBoardSummaryMapper;
 import com.yapp.backend.controller.mapper.TripBoardUpdateMapper;
 import com.yapp.backend.repository.AccommodationRepository;
@@ -86,8 +87,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     private final TripBoardUpdateMapper tripBoardUpdateMapper;
 
     /**
-     * 여행 보드 생성
-     * 생성자를 OWNER 역할로 자동 등록하고 초대 링크를 생성합니다.
+     * 여행 보드 생성 생성자를 OWNER 역할로 자동 등록하고 초대 링크를 생성합니다.
      */
     @Override
     @Transactional
@@ -131,15 +131,18 @@ public class TripBoardServiceImpl implements TripBoardService {
                     .role(TripBoardRole.OWNER)
                     .build();
 
-            UserTripBoardEntity savedUserTripBoard = jpaUserTripBoardRepository.save(userTripBoardEntity);
+            UserTripBoardEntity savedUserTripBoard = jpaUserTripBoardRepository.save(
+                    userTripBoardEntity);
             log.debug("사용자-여행보드 매핑 저장 완료 - ID: {}", savedUserTripBoard.getId());
 
             // 7. Entity를 Domain Model로 변환
             TripBoard tripBoardDomain = tripBoardMapper.entityToDomain(savedTripBoard);
-            UserTripBoard userTripBoardDomain = userTripBoardMapper.entityToDomain(savedUserTripBoard);
+            UserTripBoard userTripBoardDomain = userTripBoardMapper.entityToDomain(
+                    savedUserTripBoard);
 
             // 8. Domain Model을 이용해서 응답 DTO 생성
-            TripBoardCreateResponse response = TripBoardCreateResponse.from(tripBoardDomain, userTripBoardDomain);
+            TripBoardCreateResponse response = TripBoardCreateResponse.from(tripBoardDomain,
+                    userTripBoardDomain);
 
             log.info("여행 보드 생성 완료 - 보드 ID: {}, 사용자 ID: {}", tripBoardDomain.getId(), userId);
             return response;
@@ -157,8 +160,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     }
 
     /**
-     * 여행 기간 유효성 검증
-     * 출발일이 도착일보다 늦을 수 없습니다.
+     * 여행 기간 유효성 검증 출발일이 도착일보다 늦을 수 없습니다.
      */
     private void validateTravelPeriod(java.time.LocalDate startDate, java.time.LocalDate endDate) {
         if (startDate.isAfter(endDate)) {
@@ -168,8 +170,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     }
 
     /**
-     * 여행지 유효성 검증
-     * 한글, 영문, 공백만 허용됩니다.
+     * 여행지 유효성 검증 한글, 영문, 공백만 허용됩니다.
      */
     private void validateDestination(String destination) {
         if (!destination.matches("^[가-힣a-zA-Z\\s]+$")) {
@@ -179,8 +180,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     }
 
     /**
-     * 사용자가 참여한 여행 보드 목록 조회
-     * 페이징과 정렬을 지원하며, 최신순으로 정렬됩니다.
+     * 사용자가 참여한 여행 보드 목록 조회 페이징과 정렬을 지원하며, 최신순으로 정렬됩니다.
      */
     @Override
     @Transactional(readOnly = true)
@@ -193,7 +193,8 @@ public class TripBoardServiceImpl implements TripBoardService {
             PageUtil.validatePagingParameters(pageable);
 
             // 2. Repository 계층에서 페이징된 여행보드 조회 (최신순 정렬)
-            Page<TripBoardSummary> tripBoardPage = tripBoardRepository.findTripBoardsByUser(userId, pageable);
+            Page<TripBoardSummary> tripBoardPage = tripBoardRepository.findTripBoardsByUser(userId,
+                    pageable);
 
             // 3. 유저가 참여한 보드 ID 목록 조회
             List<Long> tripBoardIds = tripBoardPage.getContent().stream()
@@ -232,12 +233,12 @@ public class TripBoardServiceImpl implements TripBoardService {
     }
 
     /**
-     * 여행 보드 수정
-     * 기존 여행보드의 기본 정보(보드 이름, 목적지, 여행 기간)를 수정합니다.
+     * 여행 보드 수정 기존 여행보드의 기본 정보(보드 이름, 목적지, 여행 기간)를 수정합니다.
      */
     @Override
     @Transactional
-    public TripBoardUpdateResponse updateTripBoard(Long tripBoardId, TripBoardUpdateRequest request, Long userId) {
+    public TripBoardUpdateResponse updateTripBoard(Long tripBoardId, TripBoardUpdateRequest request,
+            Long userId) {
         try {
             log.info("여행 보드 수정 시작 - 보드 ID: {}, 사용자 ID: {}, 보드명: {}, 여행지: {}",
                     tripBoardId, userId, request.getBoardName(), request.getDestination());
@@ -253,14 +254,16 @@ public class TripBoardServiceImpl implements TripBoardService {
             User updatedByUser = userRepository.findByIdOrThrow(userId);
 
             // 4. Request DTO를 Domain 모델로 변환
-            TripBoard tripBoardToUpdate = tripBoardUpdateMapper.requestToDomain(request, tripBoardId, updatedByUser);
+            TripBoard tripBoardToUpdate = tripBoardUpdateMapper.requestToDomain(request,
+                    tripBoardId, updatedByUser);
 
             // 5. 여행보드 업데이트 실행
             TripBoard updatedTripBoard = tripBoardRepository.updateTripBoard(tripBoardToUpdate);
             log.debug("여행 보드 업데이트 완료 - 보드 ID: {}", updatedTripBoard.getId());
 
             // 6. Domain 모델을 Response DTO로 변환
-            TripBoardUpdateResponse response = tripBoardUpdateMapper.domainToResponse(updatedTripBoard);
+            TripBoardUpdateResponse response = tripBoardUpdateMapper.domainToResponse(
+                    updatedTripBoard);
 
             log.info("여행 보드 수정 완료 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
             return response;
@@ -269,7 +272,8 @@ public class TripBoardServiceImpl implements TripBoardService {
             log.error("여행 보드 수정 실패 - 보드를 찾을 수 없음: 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId);
             throw e;
         } catch (InvalidDestinationException | InvalidTravelPeriodException e) {
-            log.error("여행 보드 수정 실패 - 입력 데이터 유효성 검증 실패: 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
+            log.error("여행 보드 수정 실패 - 입력 데이터 유효성 검증 실패: 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId,
+                    e);
             throw e;
         } catch (DataAccessException e) {
             log.error("여행 보드 수정 중 데이터베이스 오류 발생 - 보드 ID: {}, 사용자 ID: {}", tripBoardId, userId, e);
@@ -281,8 +285,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     }
 
     /**
-     * 여행 보드 삭제
-     * 소유자만 삭제할 수 있으며, 관련된 모든 데이터를 cascade 방식으로 삭제합니다.
+     * 여행 보드 삭제 소유자만 삭제할 수 있으며, 관련된 모든 데이터를 cascade 방식으로 삭제합니다.
      */
     @Override
     @Transactional
@@ -336,9 +339,8 @@ public class TripBoardServiceImpl implements TripBoardService {
     }
 
     /**
-     * 여행보드와 관련된 모든 데이터를 순서에 따라 삭제
-     * 삭제 순서: ComparisonAccommodation → ComparisonTable → Accommodation →
-     * UserTripBoard
+     * 여행보드와 관련된 모든 데이터를 순서에 따라 삭제 삭제 순서: ComparisonAccommodation → ComparisonTable → Accommodation
+     * → UserTripBoard
      */
     private void deleteRelatedData(Long tripBoardId) {
         log.debug("관련 데이터 삭제 시작 - 보드 ID: {}", tripBoardId);
@@ -363,13 +365,13 @@ public class TripBoardServiceImpl implements TripBoardService {
     }
 
     /**
-     * 여행보드 나가기
-     * OWNER가 나가는 경우 다음 MEMBER에게 권한을 이양하고, 마지막 참여자인 경우 여행보드를 완전 삭제합니다.
+     * 여행보드 나가기 OWNER가 나가는 경우 다음 MEMBER에게 권한을 이양하고, 마지막 참여자인 경우 여행보드를 완전 삭제합니다.
      * todo 치명적: 마지막 두 명이 동시에 나가면 ‘참여자 0명 보드’가 남을 수 있음 + removeResources NPE 위험
      */
     @Override
     @Transactional
-    public TripBoardLeaveResponse leaveTripBoard(Long tripBoardId, Long userId, Boolean removeResources) {
+    public TripBoardLeaveResponse leaveTripBoard(Long tripBoardId, Long userId,
+            Boolean removeResources) {
         try {
             log.info("여행보드 나가기 시작 - 보드 ID: {}, 사용자 ID: {}, 리소스 제거: {}",
                     tripBoardId, userId, removeResources);
@@ -398,7 +400,8 @@ public class TripBoardServiceImpl implements TripBoardService {
             long totalParticipants = userTripBoardRepository.countByTripBoardId(tripBoardId);
             boolean isLastParticipant = totalParticipants == 1;
 
-            log.debug("참여자 수 확인 - 전체 참여자: {}, 마지막 참여자 여부: {}", totalParticipants, isLastParticipant);
+            log.debug("참여자 수 확인 - 전체 참여자: {}, 마지막 참여자 여부: {}", totalParticipants,
+                    isLastParticipant);
 
             // 4. 응답 객체 초기화
             TripBoardLeaveResponse.TripBoardLeaveResponseBuilder responseBuilder = TripBoardLeaveResponse.builder()
@@ -446,8 +449,7 @@ public class TripBoardServiceImpl implements TripBoardService {
     }
 
     /**
-     * OWNER 권한을 다음 MEMBER에게 이양합니다.
-     * 가장 먼저 입장한 MEMBER를 찾아 OWNER로 변경합니다.
+     * OWNER 권한을 다음 MEMBER에게 이양합니다. 가장 먼저 입장한 MEMBER를 찾아 OWNER로 변경합니다.
      */
     private Long transferOwnership(Long tripBoardId, Long currentOwnerId) {
         log.debug("OWNER 권한 이양 시작 - 보드 ID: {}, 현재 OWNER: {}", tripBoardId, currentOwnerId);
@@ -496,9 +498,8 @@ public class TripBoardServiceImpl implements TripBoardService {
     }
 
     /**
-     * 초대 코드를 통해 여행 보드에 참여합니다.
-     * 초대 코드 유효성 검증, 활성화 상태 확인, 중복 참여 검증을 수행한 후 새로운 참여자를 추가합니다.
-     * 동시성 안전성을 위해 DataIntegrityViolationException을 처리합니다.
+     * 초대 코드를 통해 여행 보드에 참여합니다. 초대 코드 유효성 검증, 활성화 상태 확인, 중복 참여 검증을 수행한 후 새로운 참여자를 추가합니다. 동시성 안전성을 위해
+     * DataIntegrityViolationException을 처리합니다.
      */
     @Override
     @Transactional
@@ -549,7 +550,8 @@ public class TripBoardServiceImpl implements TripBoardService {
             return response;
 
         } catch (InvalidInvitationUrlException | InactiveInvitationUrlException
-                | DuplicateTripBoardParticipationException | TripBoardParticipantLimitExceededException e) {
+                 | DuplicateTripBoardParticipationException |
+                 TripBoardParticipantLimitExceededException e) {
             log.error("여행 보드 참여 실패 - 사용자 ID: {}, 초대 코드: {}", userId, invitationCode, e);
             throw e;
         } catch (DataAccessException e) {
@@ -627,6 +629,45 @@ public class TripBoardServiceImpl implements TripBoardService {
         log.debug("새로운 UserTripBoard 생성 완료 - 사용자 ID: {}, 보드 ID: {}, 역할: {}",
                 user.getId(), tripBoard.getId(), TripBoardRole.MEMBER);
         return newUserTripBoard;
+    }
+
+    /**
+     * 여행 보드의 초대 링크 활성화 상태를 토글합니다. 현재 상태의 반대로 변경됩니다.
+     */
+    @Override
+    @Transactional
+    public InvitationToggleResponse toggleInvitationActive(Long tripBoardId, Long userId) {
+        log.info("초대 링크 활성화 상태 토글 시작 - 보드 ID: {}, 사용자 ID: {}",
+                tripBoardId, userId);
+
+        // 1. 사용자가 해당 여행보드의 참여자인지 확인
+        UserTripBoard userTripBoard = userTripBoardRepository
+                .findByUserIdAndTripBoardId(userId, tripBoardId)
+                .orElseThrow(() -> {
+                    log.warn("참여하지 않은 여행보드 초대 링크 토글 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId,
+                            userId);
+                    return new UserAuthorizationException();
+                });
+
+        // 2. 도메인 객체의 토글 메서드를 사용하여 상태 변경
+        Boolean currentActive = userTripBoard.getInvitationActive();
+        UserTripBoard toggledUserTripBoard = userTripBoard.toggleInvitationActive();
+        Boolean newActive = toggledUserTripBoard.getInvitationActive();
+
+        log.debug("초대 링크 상태 토글 - 보드 ID: {}, 사용자 ID: {}, 이전 상태: {}, 새 상태: {}",
+                tripBoardId, userId, currentActive, newActive);
+
+        // 3. 토글된 상태 저장
+        UserTripBoard savedUserTripBoard = userTripBoardRepository.save(toggledUserTripBoard);
+
+        log.info("초대 링크 활성화 상태 토글 완료 - 보드 ID: {}, 사용자 ID: {}, 새 상태: {}",
+                tripBoardId, userId, newActive);
+
+        return new InvitationToggleResponse(
+                tripBoardId,
+                savedUserTripBoard.getInvitationActive(),
+                savedUserTripBoard.getInvitationCode()
+        );
     }
 
 }
