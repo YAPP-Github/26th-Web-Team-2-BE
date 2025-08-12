@@ -5,6 +5,7 @@ import com.yapp.backend.controller.dto.request.TripBoardCreateRequest;
 import com.yapp.backend.controller.dto.request.TripBoardJoinRequest;
 import com.yapp.backend.controller.dto.request.TripBoardLeaveRequest;
 import com.yapp.backend.controller.dto.request.TripBoardUpdateRequest;
+import com.yapp.backend.controller.dto.response.InvitationToggleResponse;
 import com.yapp.backend.controller.dto.response.TripBoardCreateResponse;
 import com.yapp.backend.controller.dto.response.TripBoardJoinResponse;
 import com.yapp.backend.controller.dto.response.TripBoardLeaveResponse;
@@ -77,6 +78,12 @@ public interface TripBoardDocs {
                         @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
                         @RequestBody @Valid TripBoardLeaveRequest request,
                         @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
+
+        @Operation(summary = "초대 링크 활성화/비활성화 토글", description = "여행 보드의 초대 링크 활성화 상태를 토글합니다. 현재 상태의 반대로 변경되며, 활성화된 초대 링크만 사용하여 여행 보드에 참여할 수 있습니다.")
+        @SecurityRequirement(name = "JWT")
+        ResponseEntity<StandardResponse<InvitationToggleResponse>> toggleInvitationActive(
+                @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "여행 보드 ID") @PathVariable Long tripBoardId,
+                @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 
         @Operation(summary = "초대 링크 정보 조회", description = "여행 보드에서 현재 사용자의 초대 링크 정보를 조회합니다. 초대 코드, 활성화 상태 등의 정보를 포함합니다.")
         @SecurityRequirement(name = "JWT")

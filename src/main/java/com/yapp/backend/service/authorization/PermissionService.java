@@ -4,7 +4,9 @@ import com.yapp.backend.common.annotation.RequirePermission;
 import com.yapp.backend.common.annotation.RequirePermission.PermissionType;
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.exception.UserAuthorizationException;
+
 import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,14 +21,15 @@ import org.springframework.stereotype.Service;
 public class PermissionService {
 
     private final UserTripBoardAuthorizationService userTripBoardAuthorizationService;
-
+    private final UserAccommodationAuthorizationService userAccommodationAuthorizationService;
 
     /**
      * 권한 검증 분기 메소드
      * 리소스에 따라 권한 검증 메소드를 호출합니다.
-     * @param annotation        검증 리소스 정보
-     * @param resourceIds       검증할 리소스 ID들
-     * @param userId            현재 사용자 ID
+     *
+     * @param annotation  검증 리소스 정보
+     * @param resourceIds 검증할 리소스 ID들
+     * @param userId      현재 사용자 ID
      */
     public void validatePermission(
             RequirePermission annotation,
@@ -35,7 +38,7 @@ public class PermissionService {
     ) {
         PermissionType permissionType = annotation.value();
         Long resourceId = resourceIds.get(annotation.paramName());
-        if(resourceId == null)
+        if (resourceId == null)
             resourceId = resourceIds.get(annotation.requestBodyField());
 
         log.info("권한 검증 시작: type={}, resourceIds={}, userId={}", permissionType, resourceIds, userId);
@@ -65,24 +68,22 @@ public class PermissionService {
         log.info("권한 검증 완료: type={}, resourceIds={}, userId={}", permissionType, resourceIds, userId);
     }
 
-
     /**
      * 여행보드 권한 검증 진입 메서드
      *
-     * @param permissionType    검증할 권한 타입
-     * @param tripBoardId           여행 보드 ID
-     * @param userId            현재 사용자 ID
+     * @param permissionType 검증할 권한 타입
+     * @param tripBoardId    여행 보드 ID
+     * @param userId         현재 사용자 ID
      */
     private void validateTripBoardPermission(
             PermissionType permissionType,
             Long tripBoardId,
-            Long userId
-    ) {
+            Long userId) {
         log.info("validateTripBoardPermission: {}", tripBoardId);
 
         /**
-         // 여행 보드 수정 권한은 해당 여행 보드에 참여한 사용자 모두에게 있습니다. (OWNER / MEMBER)
-         *  여행보드 삭제는 소유자만 가능합니다. (ONLY OWNER)
+         * // 여행 보드 수정 권한은 해당 여행 보드에 참여한 사용자 모두에게 있습니다. (OWNER / MEMBER)
+         * 여행보드 삭제는 소유자만 가능합니다. (ONLY OWNER)
          */
         switch (permissionType) {
             case TRIP_BOARD_ACCESS:
@@ -98,15 +99,15 @@ public class PermissionService {
     /**
      * 비교 테이블 권한 검증 진입 메서드
      * 세부적인 권한 타입에 따라 검증 메서드를 호출합니다.
-     * @param permissionType        검증할 권한 타입
-     * @param comparisonTableId     비교 테이블 ID
-     * @param userId                현재 사용자 ID
+     *
+     * @param permissionType    검증할 권한 타입
+     * @param comparisonTableId 비교 테이블 ID
+     * @param userId            현재 사용자 ID
      */
     private void validateComparisonTablePermission(
             PermissionType permissionType,
             Long comparisonTableId,
-            Long userId
-    ) {
+            Long userId) {
         log.info("validateComparisonTablePermission: {}", comparisonTableId);
 
         /**
@@ -126,19 +127,18 @@ public class PermissionService {
 
     }
 
-
     /**
      * 숙소 권한 검증 진입 메서드
      * 세부적인 권한 타입에 따라 검증 메서드를 호출합니다.
-     * @param permissionType        검증할 권한 타입
-     * @param accommodationId       숙소 ID
-     * @param userId                현재 사용자 ID
+     *
+     * @param permissionType  검증할 권한 타입
+     * @param accommodationId 숙소 ID
+     * @param userId          현재 사용자 ID
      */
     private void validateAccommodationPermission(
             PermissionType permissionType,
             Long accommodationId,
-            Long userId
-    ) {
+            Long userId) {
         log.info("validateAccommodationPermission: {}", accommodationId);
 
         /**
@@ -151,7 +151,7 @@ public class PermissionService {
                 userTripBoardAuthorizationService.validateAccommodationAccessOrThrow(userId, accommodationId);
                 break;
             case ACCOMMODATION_DELETE:
-                // TODO : 숙소 삭제 권한 검증 메소드
+                userAccommodationAuthorizationService.validateAccommodationDeleteOrThrow(userId, accommodationId);
                 break;
         }
     }

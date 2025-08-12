@@ -24,6 +24,7 @@ import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
+import com.yapp.backend.controller.dto.response.InvitationToggleResponse;
 import com.yapp.backend.controller.dto.response.InvitationCodeResponse;
 import com.yapp.backend.controller.mapper.TripBoardSummaryMapper;
 import com.yapp.backend.controller.mapper.TripBoardUpdateMapper;
@@ -720,6 +721,45 @@ public class TripBoardServiceImpl implements TripBoardService {
         }
 
         return formattedStartDate + "~" + formattedEndDate;
+    }
+
+    /**
+     * 여행 보드의 초대 링크 활성화 상태를 토글합니다. 현재 상태의 반대로 변경됩니다.
+     */
+    @Override
+    @Transactional
+    public InvitationToggleResponse toggleInvitationActive(Long tripBoardId, Long userId) {
+        log.info("초대 링크 활성화 상태 토글 시작 - 보드 ID: {}, 사용자 ID: {}",
+                tripBoardId, userId);
+
+        // 1. 사용자가 해당 여행보드의 참여자인지 확인
+        UserTripBoard userTripBoard = userTripBoardRepository
+                .findByUserIdAndTripBoardId(userId, tripBoardId)
+                .orElseThrow(() -> {
+                    log.warn("참여하지 않은 여행보드 초대 링크 토글 시도 - 보드 ID: {}, 사용자 ID: {}", tripBoardId,
+                            userId);
+                    return new UserAuthorizationException();
+                });
+
+        // 2. 도메인 객체의 토글 메서드를 사용하여 상태 변경
+        Boolean currentActive = userTripBoard.getInvitationActive();
+        UserTripBoard toggledUserTripBoard = userTripBoard.toggleInvitationActive();
+        Boolean newActive = toggledUserTripBoard.getInvitationActive();
+
+        log.debug("초대 링크 상태 토글 - 보드 ID: {}, 사용자 ID: {}, 이전 상태: {}, 새 상태: {}",
+                tripBoardId, userId, currentActive, newActive);
+
+        // 3. 토글된 상태 저장
+        UserTripBoard savedUserTripBoard = userTripBoardRepository.save(toggledUserTripBoard);
+
+        log.info("초대 링크 활성화 상태 토글 완료 - 보드 ID: {}, 사용자 ID: {}, 새 상태: {}",
+                tripBoardId, userId, newActive);
+
+        return new InvitationToggleResponse(
+                tripBoardId,
+                savedUserTripBoard.getInvitationActive(),
+                savedUserTripBoard.getInvitationCode()
+        );
     }
 
     /**
