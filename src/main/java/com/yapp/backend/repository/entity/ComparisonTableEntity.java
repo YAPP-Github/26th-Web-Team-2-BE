@@ -56,6 +56,9 @@ public class ComparisonTableEntity {
     @Column(name = "factors", columnDefinition = "jsonb")
     private List<ComparisonFactor> factors;
 
+    @Column(name = "share_code", unique = true)
+    private String shareCode;
+
     @OneToMany(
             mappedBy = "comparisonTableEntity",
             cascade = ALL,
