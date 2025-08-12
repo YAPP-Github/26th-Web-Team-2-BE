@@ -16,6 +16,7 @@ import com.yapp.backend.controller.dto.response.TripBoardDeleteResponse;
 import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
+import com.yapp.backend.controller.dto.response.InvitationToggleResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.service.TripBoardService;
 
@@ -32,6 +33,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -202,6 +204,27 @@ public class TripBoardController implements TripBoardDocs {
         // 여행 보드 나가기
         TripBoardLeaveResponse response = tripBoardService.leaveTripBoard(
                 tripBoardId, whoAmI, request.getRemoveResources());
+
+        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
+    }
+
+    /**
+     * 초대 링크 활성화/비활성화 토글 API
+     * 권한 : 여행 보드 참여자 - OWNER / MEMBER
+     * 현재 상태의 반대로 토글됩니다.
+     */
+    @Override
+    @RequirePermission(value = PermissionType.TRIP_BOARD_MODIFY, paramName = "tripBoardId")
+    @PatchMapping("/{tripBoardId}/invitation/toggle")
+    public ResponseEntity<StandardResponse<InvitationToggleResponse>> toggleInvitationActive(
+            @PathVariable Long tripBoardId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // JWT 인증을 통한 현재 사용자 정보 추출
+        Long whoAmI = userDetails.getUserId();
+
+        // 초대 링크 활성화 상태 토글 (현재 상태의 반대로 변경)
+        InvitationToggleResponse response = tripBoardService.toggleInvitationActive(tripBoardId, whoAmI);
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
