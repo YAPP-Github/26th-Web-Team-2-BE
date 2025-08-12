@@ -10,6 +10,7 @@ import com.yapp.backend.controller.dto.response.TripBoardPageResponse;
 import com.yapp.backend.controller.dto.response.TripBoardSummaryResponse;
 import com.yapp.backend.controller.dto.response.TripBoardUpdateResponse;
 import com.yapp.backend.controller.dto.response.InvitationToggleResponse;
+import com.yapp.backend.controller.dto.response.InvitationCodeResponse;
 import org.springframework.data.domain.Pageable;
 
 public interface TripBoardService {
@@ -35,4 +36,9 @@ public interface TripBoardService {
      * 현재 상태의 반대로 변경됩니다.
      */
     InvitationToggleResponse toggleInvitationActive(Long tripBoardId, Long userId);
+
+    /**
+     * 여행 보드에서 사용자의 초대 링크 정보를 조회합니다.
+     */
+    InvitationCodeResponse getInvitationCode(Long tripBoardId, Long userId);
 }
