@@ -203,7 +203,7 @@ public class AccommodationServiceImpl implements AccommodationService {
             // 소유자 권한 검증 (createdBy 필드 확인)
             if (!accommodation.getCreatedBy().equals(userId)) {
                 log.warn("숙소 삭제 권한 없음 - 사용자ID: {}, 숙소ID: {}", userId, accommodationId);
-                throw new CustomException(ErrorCode.USER_AUTHORIZATION_FAILED);
+                throw new CustomException(ErrorCode.ACCOMMODATION_DELETE_FORBIDDEN);
             }
 
             // 관련 비교표 데이터 정리 (숙소가 포함된 모든 비교표에서 해당 숙소 제거)

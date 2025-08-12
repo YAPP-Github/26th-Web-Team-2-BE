@@ -14,13 +14,4 @@ public interface UserAccommodationAuthorizationService {
      * @param accommodationId 숙소 ID
      */
     void validateAccommodationDeleteOrThrow(Long userId, Long accommodationId);
-
-    /**
-     * 숙소 접근 권한을 검증합니다.
-     * 사용자가 해당 숙소에 접근할 수 있는지 확인합니다.
-     * 
-     * @param userId          사용자 ID
-     * @param accommodationId 숙소 ID
-     */
-    void validateAccommodationAccessOrThrow(Long userId, Long accommodationId);
 }
