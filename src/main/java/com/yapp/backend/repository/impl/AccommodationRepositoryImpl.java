@@ -77,24 +77,17 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
         return accommodationMapper.entityToDomain(accommodationEntity);
     }
 
-	/**
-	 * 숙소 ID로 단건 조회합니다.
-	 */
-	@Override
-	public Accommodation findById(Long accommodationId) {
-		AccommodationEntity entity = jpaAccommodationRepository.findByAccommodationId(accommodationId);
-		return entity != null ? convertToAccommodation(entity) : null;
-	}
-
-	/**
-	 * userId가 있는 경우의 엔티티 페이지 조회
-	 */
-	private Page<AccommodationEntity> getEntityPageWithUserId(Long tripBoardId, Long userId, Pageable pageable,
-			boolean isPriceSort) {
-		return isPriceSort
-				? jpaAccommodationRepository.findByTripBoardIdAndCreatedByOrderByLowestPriceAsc(tripBoardId, userId, pageable)
-				: jpaAccommodationRepository.findByTripBoardIdAndCreatedByOrderByCreatedAtDesc(tripBoardId, userId, pageable);
-	}
+    /**
+     * userId가 있는 경우의 엔티티 페이지 조회
+     */
+    private Page<AccommodationEntity> getEntityPageWithUserId(Long tripBoardId, Long userId, Pageable pageable,
+                                                              boolean isPriceSort) {
+        return isPriceSort
+                ? jpaAccommodationRepository.findByTripBoardIdAndCreatedByOrderByLowestPriceAsc(tripBoardId, userId,
+                pageable)
+                : jpaAccommodationRepository.findByTripBoardIdAndCreatedByOrderByCreatedAtDesc(tripBoardId, userId,
+                pageable);
+    }
 
 	/**
 	 * userId가 없는 경우의 엔티티 페이지 조회
@@ -127,5 +120,10 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
 	public void deleteByTripBoardIdAndCreatedById(Long tripBoardId, Long createdById) {
 		jpaAccommodationRepository.deleteByTripBoardIdAndCreatedById(tripBoardId, createdById);
 	}
+
+    @Override
+    public void deleteById(Long accommodationId) {
+        jpaAccommodationRepository.deleteById(accommodationId);
+    }
 
 }

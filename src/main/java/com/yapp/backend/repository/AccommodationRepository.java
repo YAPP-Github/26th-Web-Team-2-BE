@@ -26,12 +26,8 @@ public interface AccommodationRepository {
     Accommodation save(AccommodationEntity accommodationEntity);
 
     /**
-     * 숙소 ID로 단건 조회합니다.
-     */
-    Accommodation findById(Long accommodationId);
-
-    /**
      * 숙소 ID로 조회, 실패시 에러를 던집니다.
+     * 
      * @param accommodationId
      * @return
      */
@@ -48,5 +44,10 @@ public interface AccommodationRepository {
      * 여행보드 ID로 해당 보드의 모든 숙소를 삭제합니다.
      */
     void deleteByTripBoardId(Long tripBoardId);
+
+    /**
+     * 숙소 ID로 개별 숙소를 삭제합니다.
+     */
+    void deleteById(Long accommodationId);
 
 }

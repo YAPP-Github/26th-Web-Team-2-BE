@@ -27,6 +27,8 @@ public enum ErrorCode {
     INVALID_USER_ID("잘못된 사용자 ID", "존재하지 않거나 유효하지 않은 사용자 ID입니다.", HttpStatus.BAD_REQUEST),
     INVALID_URL_FORMAT("잘못된 URL 형식", "유효하지 않은 URL 형식입니다.", HttpStatus.BAD_REQUEST),
     ACCOMMODATION_REGISTRATION_FAILED("숙소 등록 실패", "숙소 등록 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    ACCOMMODATION_DELETE_FORBIDDEN("숙소 삭제 권한 없음", "본인이 등록한 숙소만 삭제할 수 있습니다.", HttpStatus.FORBIDDEN),
+    ACCOMMODATION_DELETE_FAILED("숙소 삭제 실패", "숙소 삭제 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     DATABASE_CONNECTION_ERROR("데이터베이스 연결 오류", "데이터베이스 연결에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     DATABASE_CONSTRAINT_VIOLATION("데이터베이스 제약 조건 위반", "데이터베이스 제약 조건을 위반했습니다.", HttpStatus.BAD_REQUEST),
     INVALID_PAGINATION_PARAMETERS("잘못된 페이징 파라미터", "페이지 번호나 크기가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),

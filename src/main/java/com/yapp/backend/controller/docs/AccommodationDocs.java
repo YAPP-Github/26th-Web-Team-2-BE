@@ -3,6 +3,7 @@ package com.yapp.backend.controller.docs;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.response.AccommodationCountResponse;
+import com.yapp.backend.controller.dto.response.AccommodationDeleteResponse;
 import com.yapp.backend.controller.dto.response.AccommodationPageResponse;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 import com.yapp.backend.controller.dto.response.AccommodationResponse;
@@ -14,6 +15,8 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -50,5 +53,11 @@ public interface AccommodationDocs {
 	@Operation(summary = "숙소 단건 조회", description = "특정 숙소 ID로 숙소 정보를 조회합니다.")
 	ResponseEntity<StandardResponse<AccommodationResponse>> getAccommodationById(
 			@Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer", format = "int64"), description = "조회할 숙소의 ID") @NotNull(message = "숙소 ID는 필수입니다.") @Min(value = 1, message = "숙소 ID는 1 이상이어야 합니다.") Long accommodationId,
+			@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
+
+	@Operation(summary = "숙소 삭제", description = "본인이 등록한 숙소를 삭제합니다.")
+	@SecurityRequirement(name = "JWT")
+	ResponseEntity<StandardResponse<AccommodationDeleteResponse>> deleteAccommodation(
+			@Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer", format = "int64"), description = "삭제할 숙소의 ID") @NotNull(message = "숙소 ID는 필수입니다.") @Min(value = 1, message = "숙소 ID는 1 이상이어야 합니다.") Long accommodationId,
 			@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 }
