@@ -10,6 +10,11 @@ public interface ComparisonTableRepository {
     void update(ComparisonTable comparisonTable);
 
     /**
+     * 특정 ID의 비교표를 삭제합니다.
+     */
+    void deleteById(Long tableId);
+
+    /**
      * 비교표에 새로운 숙소들을 추가합니다 (매핑 테이블에만 추가)
      */
     ComparisonTable addAccommodationsToTable(Long tableId, java.util.List<Long> accommodationIds, Long userId);
