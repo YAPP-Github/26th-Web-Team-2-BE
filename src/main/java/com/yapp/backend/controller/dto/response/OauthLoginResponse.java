@@ -8,8 +8,14 @@ import lombok.Getter;
 @AllArgsConstructor
 @Schema(description = "OAuth 로그인 응답")
 public class OauthLoginResponse {
+        
+        @Schema(description = "사용자 ID", example = "12345")
         private Long userId;
+        
+        @Schema(description = "사용자 닉네임", example = "홍길동")
         private String nickname;
+        
+        @Schema(description = "토큰 정보")
         private TokenSuccessResponse token;
 
         public OauthLoginResponse(Long userId, String nickname) {
