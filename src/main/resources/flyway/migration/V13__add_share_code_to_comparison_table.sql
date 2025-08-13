@@ -1,4 +1,7 @@
 -- 비교표에 공유 코드 컬럼 추가 (32자리 UUID: f47ac10b58cc4372a5670e02b2c3d479 형태)
+-- gen_random_uuid() 사용을 위해 pgcrypto 확장 활성화
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- NULL을 허용하는 컬럼 추가
 ALTER TABLE comparison_table 
 ADD COLUMN share_code VARCHAR(32);

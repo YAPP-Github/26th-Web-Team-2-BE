@@ -36,7 +36,6 @@ public class ComparisonTableMapper {
                 .createdByEntity(createdByProxy)
                 .items(new ArrayList<>())
                 .factors(comparisonTable.getFactors())
-                .shareCode(comparisonTable.getShareCode())
                 .build();
         for (int i = 0; i < comparisonTable.getAccommodationList().size(); i++) {
             Accommodation accommodation = comparisonTable.getAccommodationList().get(i);
