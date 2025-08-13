@@ -62,7 +62,11 @@ public enum ErrorCode {
     // Trip Board Join related errors
     INVALID_INVITATION_URL("유효하지 않은 초대링크", "존재하지 않는 초대링크입니다.", HttpStatus.NOT_FOUND),
     INACTIVE_INVITATION_URL("비활성화된 초대링크", "비활성화된 초대링크입니다.", HttpStatus.BAD_REQUEST),
-    DUPLICATE_TRIP_BOARD_PARTICIPATION("중복 참여", "이미 참여한 여행 보드입니다.", HttpStatus.CONFLICT)
+    DUPLICATE_TRIP_BOARD_PARTICIPATION("중복 참여", "이미 참여한 여행 보드입니다.", HttpStatus.CONFLICT),
+
+    // Comparison Table Delete related errors
+    COMPARISON_TABLE_DELETE_FORBIDDEN("비교표 삭제 권한 없음", "본인이 생성한 비교표만 삭제할 수 있습니다.", HttpStatus.FORBIDDEN),
+    COMPARISON_TABLE_DELETE_FAILED("비교표 삭제 실패", "비교표 삭제 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR)
     // 필요에 따라 추가
     ;
 
