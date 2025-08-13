@@ -113,6 +113,7 @@ public class OauthController implements OauthDocs {
     /**
      * 리프레시 토큰 재발급 API
      * 유효한 리프레시 토큰을 사용하여 새로운 액세스 토큰과 리프레시 토큰을 발급합니다.
+     * 액세스 토큰이 만료된 상황에서 사용되므로 JWT 인증이 필요하지 않습니다.
      *
      * @param request 리프레시 토큰 재발급 요청
      * @return 새로 발급된 토큰 정보

@@ -76,7 +76,8 @@ public interface OauthDocs {
             summary = "리프레시 토큰 재발급",
             description = "유효한 리프레시 토큰을 사용하여 새로운 액세스 토큰과 리프레시 토큰을 발급받습니다. " +
                          "기존 리프레시 토큰은 무효화되고 새로운 토큰 쌍이 생성됩니다. " +
-                         "토큰 회전(Token Rotation)을 통해 보안을 강화합니다."
+                         "토큰 회전(Token Rotation)을 통해 보안을 강화합니다. " +
+                         "이 API는 액세스 토큰이 만료된 상황에서 사용되므로 JWT 인증이 필요하지 않습니다."
     )
     @ApiResponse(
             responseCode = "200",
