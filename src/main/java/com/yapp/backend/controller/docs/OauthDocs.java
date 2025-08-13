@@ -1,9 +1,11 @@
 package com.yapp.backend.controller.docs;
 
 import com.yapp.backend.common.response.StandardResponse;
+import com.yapp.backend.controller.dto.request.RefreshTokenRequest;
 import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
 import com.yapp.backend.controller.dto.response.LogoutResponse;
 import com.yapp.backend.controller.dto.response.OauthLoginResponse;
+import com.yapp.backend.controller.dto.response.TokenSuccessResponse;
 import com.yapp.backend.controller.dto.response.WithdrawResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "OAUTH API", description = "소셜 로그인 API")
@@ -68,6 +71,25 @@ public interface OauthDocs {
             @Parameter(hidden = true) HttpServletRequest request,
             @Parameter(hidden = true) HttpServletResponse response
     );
+
+    @Operation(
+            summary = "리프레시 토큰 재발급",
+            description = "유효한 리프레시 토큰을 사용하여 새로운 액세스 토큰과 리프레시 토큰을 발급받습니다. " +
+                         "기존 리프레시 토큰은 무효화되고 새로운 토큰 쌍이 생성됩니다. " +
+                         "토큰 회전(Token Rotation)을 통해 보안을 강화합니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "새로운 토큰이 성공적으로 발급되었습니다."
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "리프레시 토큰이 유효하지 않거나 만료되었습니다."
+    )
+    ResponseEntity<StandardResponse<TokenSuccessResponse>> refreshTokens(
+            @RequestBody RefreshTokenRequest request
+    );
+
     @Operation(
             summary = "사용자 회원탈퇴",
             description = ""

@@ -2,27 +2,24 @@ package com.yapp.backend.controller;
 
 import static com.yapp.backend.common.response.ResponseType.*;
 import static com.yapp.backend.common.util.CookieUtil.REFRESH_TOKEN_COOKIE;
-import static com.yapp.backend.filter.JwtFilter.ACCESS_TOKEN_HEADER;
 import static com.yapp.backend.common.util.TokenUtil.extractTokenFromHeader;
 
 import com.google.common.net.HttpHeaders;
 import com.yapp.backend.common.response.StandardResponse;
-import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.common.util.CookieUtil;
 import com.yapp.backend.controller.docs.OauthDocs;
+import com.yapp.backend.controller.dto.request.RefreshTokenRequest;
 import com.yapp.backend.controller.dto.response.LogoutResponse;
 import com.yapp.backend.filter.service.RefreshTokenService;
 import com.yapp.backend.controller.dto.response.AuthorizeUrlResponse;
 import com.yapp.backend.controller.dto.response.OauthLoginResponse;
+import com.yapp.backend.controller.dto.response.TokenSuccessResponse;
 import com.yapp.backend.controller.dto.response.WithdrawResponse;
 import com.yapp.backend.service.OauthService;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import com.yapp.backend.service.UserService;
-import com.yapp.backend.filter.dto.CustomUserDetails;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +28,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 @Slf4j
 @RestController
@@ -42,7 +41,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class OauthController implements OauthDocs {
 
     private final OauthService oauthService;
-    private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final CookieUtil cookieUtil;
     private final UserService userService;
@@ -62,13 +60,12 @@ public class OauthController implements OauthDocs {
     }
 
     /**
-     * 카카오 인가 코드를 통해 토큰을 교환하고 JWT를 쿠키로 설정합니다.
-     * Request Body 또는 Query Parameter 모두 지원합니다.
+     * 카카오 인가 코드를 통해 토큰을 교환하고 사용자 정보를 반환합니다.
      *
      * @param code 인가 코드 Query Parameter
      * @param baseUrl 클라이언트의 베이스 URL (토큰 교환 시 redirect_uri 생성용)
-     * @param response HTTP 응답 (쿠키 설정용)
-     * @return 사용자 정보 응답 (토큰은 쿠키로 전달)
+     * @param response HTTP 응답
+     * @return 사용자 정보 및 토큰 정보
      */
     @Override
     @PostMapping("/kakao/token")
@@ -77,19 +74,8 @@ public class OauthController implements OauthDocs {
             @RequestParam("baseUrl") String baseUrl,
             HttpServletResponse response) {
         
-        // 1. OAuth 인증 처리 및 사용자 정보 조회
+        // OAuth 인증 처리, 토큰 생성 및 사용자 정보 조회
         OauthLoginResponse oauthResponse = oauthService.exchangeCodeForToken("kakao", code, baseUrl);
-
-        // TODO: access, refresh 생성 메서드 재활용 가능하도록 리팩토링
-        // 2. 토큰 생성
-        String accessToken = jwtTokenProvider.createAccessToken(oauthResponse.getUserId());
-        String refreshToken = jwtTokenProvider.createRefreshToken(oauthResponse.getUserId());
-        
-        // 3. Redis에 Refresh Token 저장
-        refreshTokenService.storeRefresh(oauthResponse.getUserId(), refreshToken);
-
-        // 4. 사용자 정보만 응답 바디로 반환 (토큰은 헤더로 전달됨)
-        oauthResponse.deliverToken(accessToken, refreshToken);
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, oauthResponse));
     }
 
@@ -122,6 +108,22 @@ public class OauthController implements OauthDocs {
         response.addHeader(HttpHeaders.SET_COOKIE, invalidatedCookie.toString());
 
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, new LogoutResponse(true)));
+    }
+
+    /**
+     * 리프레시 토큰 재발급 API
+     * 유효한 리프레시 토큰을 사용하여 새로운 액세스 토큰과 리프레시 토큰을 발급합니다.
+     *
+     * @param request 리프레시 토큰 재발급 요청
+     * @return 새로 발급된 토큰 정보
+     */
+    @Override
+    @PostMapping("/refresh")
+    public ResponseEntity<StandardResponse<TokenSuccessResponse>> refreshTokens(
+            @Valid @RequestBody RefreshTokenRequest request) {
+        
+        TokenSuccessResponse response = oauthService.refreshTokens(request.getRefreshToken());
+        return ResponseEntity.ok(new StandardResponse<>(SUCCESS, response));
     }
 
     /**
