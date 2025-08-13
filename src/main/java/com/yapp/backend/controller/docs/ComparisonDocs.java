@@ -1,12 +1,12 @@
 package com.yapp.backend.controller.docs;
 
-
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
 import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
 import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
 import com.yapp.backend.controller.dto.response.AmenityFactorList;
 import com.yapp.backend.controller.dto.response.ComparisonFactorList;
+import com.yapp.backend.controller.dto.response.ComparisonTableDeleteResponse;
 import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import com.yapp.backend.controller.dto.response.CreateComparisonTableResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +58,19 @@ public interface ComparisonDocs {
     ResponseEntity<StandardResponse<ComparisonTableResponse>> addAccommodationToComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "테이블의 ID") Long tableId,
             @RequestBody AddAccommodationRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
-    );
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
+
+    @Operation(summary = "비교표 삭제", description = "사용자가 생성한 비교표를 삭제합니다. 생성자만 삭제할 수 있습니다. (Authorization 헤더에 Bearer 토큰 필요)")
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비교표 삭제 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않은 토큰 또는 인증 정보 없음"),
+            @ApiResponse(responseCode = "403", description = "권한 없음 - 비교표 생성자가 아님"),
+            @ApiResponse(responseCode = "404", description = "비교표를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 - 비교표 삭제 중 오류 발생")
+    })
+    ResponseEntity<StandardResponse<ComparisonTableDeleteResponse>> deleteComparisonTable(
+            @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "삭제할 비교표의 ID") Long tableId,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 
 }
