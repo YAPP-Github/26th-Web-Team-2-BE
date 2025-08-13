@@ -1,5 +1,6 @@
 package com.yapp.backend.controller;
 
+import com.yapp.backend.common.annotation.PublicApi;
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.docs.ComparisonDocs;
@@ -36,6 +37,7 @@ public class ComparisonTableController implements ComparisonDocs {
     private final ComparisonTableService comparisonTableService;
 
     @Override
+    @PublicApi(description = "비교 기준 항목 목록 조회 - 인증 불필요")
     @GetMapping("/factors")
     public ResponseEntity<StandardResponse<ComparisonFactorList>> getComparisonFactorList() {
         return ResponseEntity.ok(
@@ -48,6 +50,7 @@ public class ComparisonTableController implements ComparisonDocs {
 
 
     @Override
+    @PublicApi(description = "편의시설 항목 목록 조회 - 인증 불필요")
     @GetMapping("/amenity")
     public ResponseEntity<StandardResponse<AmenityFactorList>> getAmenityFactorList() {
         return ResponseEntity.ok(

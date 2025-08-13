@@ -2,10 +2,10 @@ package com.yapp.backend.controller;
 
 import static com.yapp.backend.common.response.ResponseType.*;
 import static com.yapp.backend.common.util.CookieUtil.REFRESH_TOKEN_COOKIE;
-import static com.yapp.backend.filter.JwtFilter.ACCESS_TOKEN_HEADER;
 import static com.yapp.backend.common.util.TokenUtil.extractTokenFromHeader;
 
 import com.google.common.net.HttpHeaders;
+import com.yapp.backend.common.annotation.PublicApi;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.common.util.CookieUtil;
@@ -20,9 +20,6 @@ import com.yapp.backend.filter.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import com.yapp.backend.service.UserService;
-import com.yapp.backend.filter.dto.CustomUserDetails;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +50,7 @@ public class OauthController implements OauthDocs {
      * @return 카카오 OAuth 인가 URL
      */
     @Override
+    @PublicApi(description = "카카오 OAuth 인가 URL 조회 - 인증 불필요")
     @GetMapping("/kakao/authorize")
     public ResponseEntity<StandardResponse<AuthorizeUrlResponse>> getKakaoAuthorizeUrl(
             @RequestParam("baseUrl") String baseUrl) {
@@ -71,6 +69,7 @@ public class OauthController implements OauthDocs {
      * @return 사용자 정보 응답 (토큰은 쿠키로 전달)
      */
     @Override
+    @PublicApi(description = "카카오 OAuth 토큰 교환 - 인증 불필요")
     @PostMapping("/kakao/token")
     public ResponseEntity<StandardResponse<OauthLoginResponse>> exchangeKakaoToken(
             @RequestParam("code") String code,
