@@ -65,6 +65,9 @@ public class ComparisonTableMapper {
                                 .map(item -> accommodationMapper.entityToDomain(item.getAccommodationEntity())).collect(
                                         Collectors.toList()))
                 .factors(entity.getFactors())
+                .shareCode(entity.getShareCode())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 

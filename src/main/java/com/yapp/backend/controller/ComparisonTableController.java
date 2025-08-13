@@ -64,7 +64,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @RequestBody @Valid CreateComparisonTableRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long userId = userDetails == null ? 1L : userDetails.getUserId();
+        Long userId = userDetails.getUserId();
         Long tableId = comparisonTableService.createComparisonTable(request, userId);
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, new CreateComparisonTableResponse(tableId))
@@ -78,7 +78,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         // TODO: 인증/인가 로직 리팩토링 - 해당 테이블 조회 권한이 있는지 확인 (여행그룹 참여 여부)
-        Long userId = userDetails == null ? 1L : userDetails.getUserId();
+        Long userId = userDetails.getUserId();
         ComparisonTableResponse comparisonTableResponse = comparisonTableService.getComparisonTable(tableId, userId);
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, comparisonTableResponse)
@@ -93,7 +93,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @RequestBody UpdateComparisonTableRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long userId = userDetails == null ? 1L : userDetails.getUserId();
+        Long userId = userDetails.getUserId();
         Boolean isUpdated = comparisonTableService.updateComparisonTable(tableId, request, userId);
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, isUpdated));
@@ -106,7 +106,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @RequestBody AddAccommodationRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long userId = userDetails == null ? 1L : userDetails.getUserId();
+        Long userId = userDetails.getUserId();
         ComparisonTableResponse response = comparisonTableService.addAccommodationToComparisonTable(tableId, request, userId);
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, response));

@@ -1,5 +1,6 @@
 package com.yapp.backend.service.model;
 
+import com.yapp.backend.common.util.ShareCodeGeneratorUtil;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class ComparisonTable {
     private Long tripBoardId;
     private List<Accommodation> accommodationList;
     private List<ComparisonFactor> factors;
+    private String shareCode;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -37,6 +39,7 @@ public class ComparisonTable {
                 .tripBoardId(tripBoard.getId())
                 .accommodationList(accommodationList)
                 .factors(factors)
+                .shareCode(ShareCodeGeneratorUtil.generateUniqueShareCode())
                 .build();
     }
 
