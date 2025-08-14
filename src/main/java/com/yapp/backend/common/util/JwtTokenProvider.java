@@ -7,6 +7,7 @@ import com.yapp.backend.filter.service.RefreshTokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import com.yapp.backend.common.exception.TokenGenerationException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -59,18 +60,30 @@ public class JwtTokenProvider {
      *
      * @param userId 사용자 ID
      * @return JWT Access Token
+     * @throws IllegalArgumentException 사용자 ID가 유효하지 않은 경우
+     * @throws TokenGenerationException 토큰 생성 실패 시
      */
     public String createAccessToken(Long userId) {
         validateUserId(userId);
-        Date now = new Date();
-        Date expiration = new Date(now.getTime() + accessTokenValidityInMs);
         
-        return Jwts.builder()
-                .setSubject(String.valueOf(userId))
-                .setIssuedAt(now)
-                .setExpiration(expiration)
-                .signWith(accessSecretKey, SignatureAlgorithm.HS256)
-                .compact();
+        try {
+            Date now = new Date();
+            Date expiration = new Date(now.getTime() + accessTokenValidityInMs);
+
+            String token = Jwts.builder()
+                    .subject(String.valueOf(userId))
+                    .issuedAt(now)
+                    .expiration(expiration)
+                    .signWith(accessSecretKey, Jwts.SIG.HS256)
+                    .compact();
+                    
+            log.debug("Access token 생성 완료. userId: {}", userId);
+            return token;
+            
+        } catch (Exception e) {
+            log.error("Access token 생성 실패. userId: {}, error: {}", userId, e.getMessage(), e);
+            throw new TokenGenerationException(userId, e);
+        }
     }
 
     /**
@@ -78,18 +91,30 @@ public class JwtTokenProvider {
      *
      * @param userId 사용자 ID
      * @return JWT Refresh Token
+     * @throws IllegalArgumentException 사용자 ID가 유효하지 않은 경우
+     * @throws TokenGenerationException 토큰 생성 실패 시
      */
     public String createRefreshToken(Long userId) {
         validateUserId(userId);
-        Date now = new Date();
-        Date expiration = new Date(now.getTime() + refreshTokenValidityInMs);
         
-        return Jwts.builder()
-                .setSubject(String.valueOf(userId))
-                .setIssuedAt(now)
-                .setExpiration(expiration)
-                .signWith(refreshSecretKey, SignatureAlgorithm.HS256)
-                .compact();
+        try {
+            Date now = new Date();
+            Date expiration = new Date(now.getTime() + refreshTokenValidityInMs);
+            
+            String token = Jwts.builder()
+                    .subject(String.valueOf(userId))
+                    .issuedAt(now)
+                    .expiration(expiration)
+                    .signWith(refreshSecretKey, Jwts.SIG.HS256)
+                    .compact();
+
+            log.debug("Refresh token 생성 완료. userId: {}", userId);
+            return token;
+            
+        } catch (Exception e) {
+            log.error("Refresh token 생성 실패. userId: {}, error: {}", userId, e.getMessage(), e);
+            throw new TokenGenerationException(userId, e);
+        }
     }
 
     // ==================== 쿠키 생성 메서드 ====================
@@ -105,7 +130,7 @@ public class JwtTokenProvider {
         long maxAgeInSeconds = refreshTokenValidityInMs / MILLISECONDS_PER_SECOND;
         
         // Redis에 Refresh Token 저장
-        refreshTokenService.storeRefresh(userId, refreshToken);
+        refreshTokenService.storeRefreshOrThrow(userId, refreshToken);
         
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE, refreshToken)
                 .httpOnly(true)

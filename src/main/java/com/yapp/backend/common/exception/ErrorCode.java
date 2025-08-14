@@ -21,6 +21,12 @@ public enum ErrorCode {
     AUTHENTICATION_CREDENTIALS_NOT_FOUND("인증 정보 누락", "인증 정보가 필요합니다.", HttpStatus.UNAUTHORIZED),
     ACCESS_DENIED("접근 권한 부족", "접근 권한이 부족합니다.", HttpStatus.FORBIDDEN),
     AUTHENTICATION_SERVICE_ERROR("인증 서비스 오류", "인증 처리 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    
+    // Token related errors
+    INVALID_REFRESH_TOKEN("유효하지 않은 리프레시 토큰", "리프레시 토큰이 유효하지 않거나 만료되었습니다.", HttpStatus.UNAUTHORIZED),
+    EXPIRED_REFRESH_TOKEN("만료된 리프레시 토큰", "리프레시 토큰이 만료되었습니다. 다시 로그인해 주세요.", HttpStatus.UNAUTHORIZED),
+    TOKEN_GENERATION_FAILED("토큰 생성 실패", "토큰 생성 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    REDIS_OPERATION_FAILED("Redis 작업 실패", "Redis 저장소 작업 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // Accommodation related errors
     INVALID_TABLE_ID("잘못된 테이블 ID", "존재하지 않거나 유효하지 않은 테이블 ID입니다.", HttpStatus.BAD_REQUEST),
