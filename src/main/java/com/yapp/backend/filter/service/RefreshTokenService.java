@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import com.yapp.backend.common.exception.RedisOperationException;
+import com.yapp.backend.common.exception.ExpiredRefreshTokenException;
 
 @Slf4j
 @Service
@@ -59,6 +60,33 @@ public class RefreshTokenService {
         } catch (Exception e) {
             log.error("Refresh token 회전 실패. userId: {}, error: {}", userId, e.getMessage(), e);
             throw new RedisOperationException("refresh token 회전", userId, e);
+        }
+    }
+    
+    // 검증 후 회전
+    public void validateAndRotateRefresh(Long userId, String currentRefreshToken, String newRefreshToken) {
+        try {
+            // 1. 현재 토큰 검증
+            String savedToken = redisTemplate.opsForValue().get(keyFor(userId));
+            if (!currentRefreshToken.equals(savedToken)) {
+                log.warn("Refresh token 불일치. userId: {}", userId);
+                throw new ExpiredRefreshTokenException(userId);
+            }
+            
+            // 2. 검증 성공 시 회전
+            rotateRefresh(userId, newRefreshToken);
+            
+            log.debug("Refresh token 검증 및 회전 완료. userId: {}", userId);
+            
+        } catch (ExpiredRefreshTokenException e) {
+            // 토큰 검증 실패는 그대로 전파 (401 Unauthorized)
+            throw e;
+        } catch (RedisOperationException e) {
+            // Redis 오류는 그대로 전파
+            throw e;
+        } catch (Exception e) {
+            log.error("Refresh token 검증 중 예상치 못한 오류. userId: {}, error: {}", userId, e.getMessage(), e);
+            throw new RedisOperationException("refresh token 검증", userId, e);
         }
     }
 

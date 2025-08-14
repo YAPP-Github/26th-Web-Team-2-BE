@@ -164,20 +164,14 @@ public class OauthServiceImpl implements OauthService {
         // 2. 리프레시 토큰에서 사용자 ID 추출
         Long userId = Long.valueOf(jwtTokenProvider.getRefreshUsername(refreshToken));
 
-        // 3. Redis에 저장된 토큰과 일치하는지 검증
-        if (!refreshTokenService.isValidRefresh(userId, refreshToken)) {
-            log.warn("Redis에 저장된 토큰과 일치하지 않음. userId: {}", userId);
-            throw new ExpiredRefreshTokenException(userId);
-        }
-
-        // 4. 새로운 액세스 토큰과 리프레시 토큰 생성 (JwtTokenProvider에서 예외 처리됨)
+        // 3. 새로운 액세스 토큰과 리프레시 토큰 생성 (JwtTokenProvider에서 예외 처리됨)
         String newAccessToken = jwtTokenProvider.createAccessToken(userId);
         String newRefreshToken = jwtTokenProvider.createRefreshToken(userId);
         
         log.debug("리프레시 토큰 재발급을 위한 새 토큰 생성 완료. userId: {}", userId);
 
-        // 5. Redis에서 리프레시 토큰 회전 (RefreshTokenService에서 예외 처리됨)
-        refreshTokenService.rotateRefresh(userId, newRefreshToken);
+        // 4. Redis 검증 후 즉시 회전
+        refreshTokenService.validateAndRotateRefresh(userId, refreshToken, newRefreshToken);
 
         log.info("리프레시 토큰 재발급 완료. userId: {}", userId);
         return new TokenSuccessResponse(newAccessToken, newRefreshToken);
