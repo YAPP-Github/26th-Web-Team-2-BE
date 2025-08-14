@@ -9,9 +9,9 @@ import lombok.Getter;
 @Schema(description = "토큰 발급 응답")
 public class TokenSuccessResponse {
     
-    @Schema(description = "액세스 토큰", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NSIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxNzAwMDAzNjAwfQ.example-access-token-signature")
+    @Schema(description = "액세스 토큰", accessMode = Schema.AccessMode.READ_ONLY, example = "access-token-example")
     private String accessToken;
     
-    @Schema(description = "리프레시 토큰", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NSIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxNzAyNTkyMDAwfQ.example-refresh-token-signature")
+    @Schema(description = "리프레시 토큰", accessMode = Schema.AccessMode.READ_ONLY, example = "refresh-token-example")
     private String refreshToken;
 }
