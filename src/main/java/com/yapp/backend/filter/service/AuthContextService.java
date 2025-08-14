@@ -25,7 +25,7 @@ public class AuthContextService {
      */
     public Authentication createAuthContext(String accessToken) {
         String userId = jwtTokenProvider.getUserIdFromToken(accessToken);
-        User user = userService.getUserById(Long.valueOf(userId));
+        User user = userService.getActiveUserById(Long.valueOf(userId));
         // userId와 socialId로 customOauthUserDetail을 만든 Authentication 객체를 SecurityContext에 저장합니다.
         UserDetails userDetails = jwtTokenProvider.createUserDetails(accessToken, user.getSocialId());
         UsernamePasswordAuthenticationToken authentication =

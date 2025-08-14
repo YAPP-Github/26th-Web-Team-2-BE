@@ -39,7 +39,7 @@ public class UserController implements UserDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         
         Long userId = userDetails.getUserId();
-        User user = userService.getUserById(userId);
+        User user = userService.getActiveUserById(userId);
 
         UserInfoResponse response = new UserInfoResponse(
             user.getNickname(),
