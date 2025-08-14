@@ -69,12 +69,12 @@ public class JwtTokenProvider {
         try {
             Date now = new Date();
             Date expiration = new Date(now.getTime() + accessTokenValidityInMs);
-            
+
             String token = Jwts.builder()
-                    .setSubject(String.valueOf(userId))
-                    .setIssuedAt(now)
-                    .setExpiration(expiration)
-                    .signWith(accessSecretKey, SignatureAlgorithm.HS256)
+                    .subject(String.valueOf(userId))
+                    .issuedAt(now)
+                    .expiration(expiration)
+                    .signWith(accessSecretKey, Jwts.SIG.HS256)
                     .compact();
                     
             log.debug("Access token 생성 완료. userId: {}", userId);
@@ -102,12 +102,12 @@ public class JwtTokenProvider {
             Date expiration = new Date(now.getTime() + refreshTokenValidityInMs);
             
             String token = Jwts.builder()
-                    .setSubject(String.valueOf(userId))
-                    .setIssuedAt(now)
-                    .setExpiration(expiration)
-                    .signWith(refreshSecretKey, SignatureAlgorithm.HS256)
+                    .subject(String.valueOf(userId))
+                    .issuedAt(now)
+                    .expiration(expiration)
+                    .signWith(refreshSecretKey, Jwts.SIG.HS256)
                     .compact();
-                    
+
             log.debug("Refresh token 생성 완료. userId: {}", userId);
             return token;
             
