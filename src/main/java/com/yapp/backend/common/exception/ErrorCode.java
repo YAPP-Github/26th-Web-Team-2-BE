@@ -26,6 +26,7 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN("유효하지 않은 리프레시 토큰", "리프레시 토큰이 유효하지 않거나 만료되었습니다.", HttpStatus.UNAUTHORIZED),
     EXPIRED_REFRESH_TOKEN("만료된 리프레시 토큰", "리프레시 토큰이 만료되었습니다. 다시 로그인해 주세요.", HttpStatus.UNAUTHORIZED),
     TOKEN_GENERATION_FAILED("토큰 생성 실패", "토큰 생성 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    REDIS_OPERATION_FAILED("Redis 작업 실패", "Redis 저장소 작업 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // Accommodation related errors
     INVALID_TABLE_ID("잘못된 테이블 ID", "존재하지 않거나 유효하지 않은 테이블 ID입니다.", HttpStatus.BAD_REQUEST),

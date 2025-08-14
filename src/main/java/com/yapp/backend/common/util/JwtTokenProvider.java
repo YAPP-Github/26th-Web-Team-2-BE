@@ -130,7 +130,7 @@ public class JwtTokenProvider {
         long maxAgeInSeconds = refreshTokenValidityInMs / MILLISECONDS_PER_SECOND;
         
         // Redis에 Refresh Token 저장
-        refreshTokenService.storeRefresh(userId, refreshToken);
+        refreshTokenService.storeRefreshOrThrow(userId, refreshToken);
         
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE, refreshToken)
                 .httpOnly(true)

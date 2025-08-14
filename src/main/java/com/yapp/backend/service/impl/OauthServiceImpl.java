@@ -74,8 +74,8 @@ public class OauthServiceImpl implements OauthService {
         String accessToken = jwtTokenProvider.createAccessToken(user.getId());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
-        // 5. Redis에 Refresh Token 저장
-        refreshTokenService.storeRefresh(user.getId(), refreshToken);
+        // 5. Redis에 Refresh Token 저장 (RefreshTokenService에서 예외 처리)
+        refreshTokenService.storeRefreshOrThrow(user.getId(), refreshToken);
 
         // 6. 토큰 정보를 포함한 응답 생성
         OauthLoginResponse response = new OauthLoginResponse(
@@ -176,7 +176,7 @@ public class OauthServiceImpl implements OauthService {
         
         log.debug("리프레시 토큰 재발급을 위한 새 토큰 생성 완료. userId: {}", userId);
 
-        // 5. Redis에서 리프레시 토큰 회전 (기존 토큰 무효화 및 새 토큰 저장)
+        // 5. Redis에서 리프레시 토큰 회전 (RefreshTokenService에서 예외 처리됨)
         refreshTokenService.rotateRefresh(userId, newRefreshToken);
 
         log.info("리프레시 토큰 재발급 완료. userId: {}", userId);

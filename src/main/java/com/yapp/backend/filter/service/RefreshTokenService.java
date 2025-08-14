@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import com.yapp.backend.common.exception.RedisOperationException;
 
 @Slf4j
 @Service
@@ -32,9 +33,15 @@ public class RefreshTokenService {
     }
 
     // 로그인 시, 새 리프레시 토큰 저장
-    public void storeRefresh(Long userId, String refreshToken) {
-        redisTemplate.opsForValue()
-                .set(keyFor(userId), refreshToken, Duration.ofMillis(refreshTtlMs));
+    public void storeRefreshOrThrow(Long userId, String refreshToken) {
+        try {
+            redisTemplate.opsForValue()
+                    .set(keyFor(userId), refreshToken, Duration.ofMillis(refreshTtlMs));
+            log.debug("Refresh token 저장 완료. userId: {}", userId);
+        } catch (Exception e) {
+            log.error("Refresh token 저장 실패. userId: {}, error: {}", userId, e.getMessage(), e);
+            throw new RedisOperationException("refresh token 저장", userId, e);
+        }
     }
 
     // 재발급 시, 기존 토큰과 비교
@@ -45,8 +52,14 @@ public class RefreshTokenService {
 
     // 토큰 회전: old→new 교체
     public void rotateRefresh(Long userId, String newRefreshToken) {
-        redisTemplate.opsForValue()
-                .set(keyFor(userId), newRefreshToken, Duration.ofMillis(refreshTtlMs));
+        try {
+            redisTemplate.opsForValue()
+                    .set(keyFor(userId), newRefreshToken, Duration.ofMillis(refreshTtlMs));
+            log.debug("Refresh token 회전 완료. userId: {}", userId);
+        } catch (Exception e) {
+            log.error("Refresh token 회전 실패. userId: {}, error: {}", userId, e.getMessage(), e);
+            throw new RedisOperationException("refresh token 회전", userId, e);
+        }
     }
 
     // 로그아웃 등: 토큰 삭제
