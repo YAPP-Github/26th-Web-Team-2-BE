@@ -170,9 +170,11 @@ public class OauthServiceImpl implements OauthService {
             throw new ExpiredRefreshTokenException(userId);
         }
 
-        // 4. 새로운 액세스 토큰과 리프레시 토큰 생성
+        // 4. 새로운 액세스 토큰과 리프레시 토큰 생성 (JwtTokenProvider에서 예외 처리됨)
         String newAccessToken = jwtTokenProvider.createAccessToken(userId);
         String newRefreshToken = jwtTokenProvider.createRefreshToken(userId);
+        
+        log.debug("리프레시 토큰 재발급을 위한 새 토큰 생성 완료. userId: {}", userId);
 
         // 5. Redis에서 리프레시 토큰 회전 (기존 토큰 무효화 및 새 토큰 저장)
         refreshTokenService.rotateRefresh(userId, newRefreshToken);
