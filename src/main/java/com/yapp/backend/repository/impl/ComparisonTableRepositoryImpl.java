@@ -61,6 +61,12 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
         jpaComparisonTableRepository.save(existingEntity);
     }
 
+    @Override
+    @Transactional
+    public void deleteById(Long tableId) {
+        jpaComparisonTableRepository.deleteById(tableId);
+    }
+
     /**
      * 숙소 매핑 정보를 업데이트합니다.
      * 기존 매핑을 삭제/생성하는 대신 position을 업데이트하고 필요한 경우에만 추가/삭제합니다.

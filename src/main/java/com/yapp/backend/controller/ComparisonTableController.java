@@ -8,6 +8,7 @@ import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
 import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
 import com.yapp.backend.controller.dto.response.AmenityFactorList;
 import com.yapp.backend.controller.dto.response.ComparisonFactorList;
+import com.yapp.backend.controller.dto.response.ComparisonTableDeleteResponse;
 import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import com.yapp.backend.controller.dto.response.CreateComparisonTableResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
@@ -15,10 +16,13 @@ import com.yapp.backend.service.ComparisonTableService;
 import com.yapp.backend.service.model.enums.AmenityFactor;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
 import jakarta.validation.Valid;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,11 +45,8 @@ public class ComparisonTableController implements ComparisonDocs {
         return ResponseEntity.ok(
                 new StandardResponse<>(
                         ResponseType.SUCCESS,
-                        new ComparisonFactorList(List.of(ComparisonFactor.values()))
-                )
-        );
+                        new ComparisonFactorList(List.of(ComparisonFactor.values()))));
     }
-
 
     @Override
     @GetMapping("/amenity")
@@ -53,36 +54,32 @@ public class ComparisonTableController implements ComparisonDocs {
         return ResponseEntity.ok(
                 new StandardResponse<>(
                         ResponseType.SUCCESS,
-                        new AmenityFactorList(List.of(AmenityFactor.values()))
-                )
-        );
+                        new AmenityFactorList(List.of(AmenityFactor.values()))));
     }
 
     @Override
     @PostMapping("/new")
     public ResponseEntity<StandardResponse<CreateComparisonTableResponse>> createComparisonTable(
             @RequestBody @Valid CreateComparisonTableRequest request,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         Long tableId = comparisonTableService.createComparisonTable(request, userId);
         return ResponseEntity.ok(
-                new StandardResponse<>(ResponseType.SUCCESS, new CreateComparisonTableResponse(tableId))
-        );
+                new StandardResponse<>(ResponseType.SUCCESS,
+                        new CreateComparisonTableResponse(tableId)));
     }
 
     @Override
     @GetMapping("/{tableId}")
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTable(
             @PathVariable("tableId") Long tableId,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         // TODO: 인증/인가 로직 리팩토링 - 해당 테이블 조회 권한이 있는지 확인 (여행그룹 참여 여부)
         Long userId = userDetails.getUserId();
-        ComparisonTableResponse comparisonTableResponse = comparisonTableService.getComparisonTable(tableId, userId);
+        ComparisonTableResponse comparisonTableResponse = comparisonTableService.getComparisonTable(tableId,
+                userId);
         return ResponseEntity.ok(
-                new StandardResponse<>(ResponseType.SUCCESS, comparisonTableResponse)
-        );
+                new StandardResponse<>(ResponseType.SUCCESS, comparisonTableResponse));
     }
 
     // TODO: 비교표 수정 API
@@ -91,8 +88,7 @@ public class ComparisonTableController implements ComparisonDocs {
     public ResponseEntity<StandardResponse<Boolean>> updateComparisonTable(
             @PathVariable("tableId") Long tableId,
             @RequestBody UpdateComparisonTableRequest request,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         Boolean isUpdated = comparisonTableService.updateComparisonTable(tableId, request, userId);
         return ResponseEntity.ok(
@@ -104,10 +100,27 @@ public class ComparisonTableController implements ComparisonDocs {
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> addAccommodationToComparisonTable(
             @PathVariable("tableId") Long tableId,
             @RequestBody AddAccommodationRequest request,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        ComparisonTableResponse response = comparisonTableService.addAccommodationToComparisonTable(tableId, request, userId);
+        ComparisonTableResponse response = comparisonTableService.addAccommodationToComparisonTable(tableId,
+                request, userId);
+        return ResponseEntity.ok(
+                new StandardResponse<>(ResponseType.SUCCESS, response));
+    }
+
+    @Override
+    @DeleteMapping("/{tableId}")
+    public ResponseEntity<StandardResponse<ComparisonTableDeleteResponse>> deleteComparisonTable(
+            @PathVariable("tableId") Long tableId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUserId();
+        comparisonTableService.deleteComparisonTable(tableId, userId);
+
+        ComparisonTableDeleteResponse response = ComparisonTableDeleteResponse.builder()
+                .tableId(tableId)
+                .message("비교표가 성공적으로 삭제되었습니다.")
+                .build();
+
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, response));
     }

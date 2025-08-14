@@ -321,6 +321,7 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(errorCode.getHttpStatus())
 				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
+
 	/**
 	 * 외부 인증 서비스 연동 실패 시 처리
 	 */
@@ -333,6 +334,20 @@ public class GlobalExceptionHandler {
 		ProblemDetail problemDetail = createProblemDetail(errorCode);
 		return ResponseEntity
 				.status(errorCode.getHttpStatus())
+				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
+	}
+
+	/**
+	 * 비교표 삭제 예외 처리
+	 */
+	@ExceptionHandler(ComparisonTableDeleteException.class)
+	public ResponseEntity<StandardResponse<ProblemDetail>> handleComparisonTableDeleteException(
+			ComparisonTableDeleteException e) {
+		log.warn("Comparison table delete exception occurred: {}", e.getMessage(), e);
+		Sentry.captureException(e);
+		ErrorCode errorCode = e.getErrorCode();
+		ProblemDetail problemDetail = createProblemDetail(errorCode);
+		return ResponseEntity.status(errorCode.getHttpStatus())
 				.body(new StandardResponse<>(ResponseType.ERROR, problemDetail));
 	}
 
