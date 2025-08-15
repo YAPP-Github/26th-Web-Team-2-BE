@@ -74,7 +74,8 @@ public class SecurityConfig {
                                                 .requestMatchers(
                                                                 "/",
                                                                 "/api/**",
-                                                                "/login/oauth2/**"
+                                                                "/login/oauth2/**",
+                                                                "/error" // Spring Boot 전역 에러 처리용
                                                 ).permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(exception -> exception
