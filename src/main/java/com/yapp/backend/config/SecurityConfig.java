@@ -56,8 +56,9 @@ public class SecurityConfig {
                                                                                                    // 사용
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .anyRequest().authenticated())
-                                .httpBasic(httpBasic -> {
-                                })
+                                .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(basicAuthEntryPoint()))
+                                .exceptionHandling(e -> e.authenticationEntryPoint(basicAuthEntryPoint()))
+                                .requestCache(RequestCacheConfigurer::disable)
                                 .build();
         }
 
@@ -82,6 +83,13 @@ public class SecurityConfig {
                                                 .authenticationEntryPoint(customAuthenticationEntryPoint)
                                                 .accessDeniedHandler(customAccessDeniedHandler))
                                 .build();
+        }
+
+        @Bean
+        AuthenticationEntryPoint basicAuthEntryPoint() {
+                BasicAuthenticationEntryPoint basicAuthenticationEntryPoint = new BasicAuthenticationEntryPoint();
+                basicAuthenticationEntryPoint.setRealmName("ssok-api");
+                return basicAuthenticationEntryPoint;
         }
 
         @Bean
