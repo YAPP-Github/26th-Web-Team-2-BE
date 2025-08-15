@@ -3,7 +3,7 @@ package com.yapp.backend.service.model;
 import com.yapp.backend.common.util.ShareCodeGeneratorUtil;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
 import jakarta.validation.constraints.NotBlank;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,8 +23,8 @@ public class ComparisonTable {
     private List<Accommodation> accommodationList;
     private List<ComparisonFactor> factors;
     private String shareCode;
-    private ZonedDateTime createdAt;
-    private ZonedDateTime updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 
     public static ComparisonTable from(
             @NotBlank String tableName,

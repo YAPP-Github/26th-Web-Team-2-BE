@@ -17,10 +17,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,11 +68,11 @@ public class ComparisonTableEntity {
 
     @CreationTimestamp
     @Column(name = "created_at")
-    private ZonedDateTime createdAt;  // TIMESTAMPTZ와 매핑되어 UTC로 저장됨
+    private Instant createdAt;  // UTC 저장
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;  // TIMESTAMPTZ와 매핑되어 UTC로 저장됨
+    private Instant updatedAt;  // UTC 저장
 
     public void update(ComparisonTable updatedComparison) {
         this.tableName = updatedComparison.getTableName();

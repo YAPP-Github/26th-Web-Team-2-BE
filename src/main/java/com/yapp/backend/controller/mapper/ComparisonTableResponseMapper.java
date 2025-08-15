@@ -5,8 +5,7 @@ import com.yapp.backend.service.model.Accommodation;
 import com.yapp.backend.service.model.ComparisonTable;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,7 @@ public class ComparisonTableResponseMapper {
                 comparisonTable.getTableName(),
                 comparisonTable.getAccommodationList().size(),
                 accommodationNames,
-                comparisonTable.getUpdatedAt().withZoneSameInstant(ZoneOffset.UTC), // UTC로 명시적 변환 (ISO 8601 표준)
+                comparisonTable.getUpdatedAt(),
                 comparisonTable.getShareCode()
         );
     }
