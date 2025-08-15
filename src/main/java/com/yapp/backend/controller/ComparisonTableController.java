@@ -1,5 +1,8 @@
 package com.yapp.backend.controller;
 
+import static com.yapp.backend.common.exception.ErrorCode.*;
+
+import com.yapp.backend.common.exception.ShareCodeException;
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.docs.ComparisonDocs;
@@ -113,7 +116,7 @@ public class ComparisonTableController implements ComparisonDocs {
     private void validateShareCodeAccess(Long tableId, String shareCode, ComparisonTable comparisonTable) {
         if (!shareCode.equals(comparisonTable.getShareCode())) {
             log.warn("유효하지 않은 shareCode로 비교표 조회 시도 - tableId: {}, shareCode: {}", tableId, shareCode);
-            throw new UserAuthorizationException(ErrorCode.INVALID_USER_AUTHORIZATION);
+            throw new ShareCodeException(INVALID_SHARE_CODE);
         }
         log.info("shareCode를 통한 비교표 조회 성공 - tableId: {}, shareCode: {}", tableId, shareCode);
     }
