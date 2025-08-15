@@ -30,14 +30,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.yapp.backend.service.model.ComparisonTable;
+import com.yapp.backend.common.exception.ErrorCode;
+import com.yapp.backend.common.exception.UserAuthorizationException;
+import lombok.extern.slf4j.Slf4j;
+import com.yapp.backend.controller.mapper.ComparisonTableResponseMapper;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/comparison")
 @RequiredArgsConstructor
 public class ComparisonTableController implements ComparisonDocs {
 
     private final ComparisonTableService comparisonTableService;
+    private final ComparisonTableResponseMapper comparisonTableResponseMapper;
 
     @Override
     @GetMapping("/factors")
@@ -57,6 +66,7 @@ public class ComparisonTableController implements ComparisonDocs {
                         new AmenityFactorList(List.of(AmenityFactor.values()))));
     }
 
+    // TODO: 비교 테이블 관련 권한 검증
     @Override
     @PostMapping("/new")
     public ResponseEntity<StandardResponse<CreateComparisonTableResponse>> createComparisonTable(
@@ -74,15 +84,40 @@ public class ComparisonTableController implements ComparisonDocs {
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTable(
             @PathVariable("tableId") Long tableId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        // TODO: 인증/인가 로직 리팩토링 - 해당 테이블 조회 권한이 있는지 확인 (여행그룹 참여 여부)
-        Long userId = userDetails.getUserId();
-        ComparisonTableResponse comparisonTableResponse = comparisonTableService.getComparisonTable(tableId,
-                userId);
-        return ResponseEntity.ok(
-                new StandardResponse<>(ResponseType.SUCCESS, comparisonTableResponse));
+
+        ComparisonTable comparisonTable = comparisonTableService.getComparisonTable(tableId);
+        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable);
+        
+        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 
-    // TODO: 비교표 수정 API
+    /**
+     * shareCode를 통한 비교표 조회 (인증 불필요)
+     */
+    @GetMapping("/{tableId}/shared")
+    public ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTableByShareCode(
+            @PathVariable("tableId") Long tableId,
+            @RequestParam("shareCode") String shareCode) {
+
+        ComparisonTable comparisonTable = comparisonTableService.getComparisonTable(tableId);
+        
+        // shareCode 검증
+        validateShareCodeAccess(tableId, shareCode, comparisonTable);
+        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable);
+        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
+    }
+
+    /**
+     * shareCode를 통한 접근 권한 검증
+     */
+    private void validateShareCodeAccess(Long tableId, String shareCode, ComparisonTable comparisonTable) {
+        if (!shareCode.equals(comparisonTable.getShareCode())) {
+            log.warn("유효하지 않은 shareCode로 비교표 조회 시도 - tableId: {}, shareCode: {}", tableId, shareCode);
+            throw new UserAuthorizationException(ErrorCode.INVALID_USER_AUTHORIZATION);
+        }
+        log.info("shareCode를 통한 비교표 조회 성공 - tableId: {}, shareCode: {}", tableId, shareCode);
+    }
+
     @Override
     @PutMapping("/{tableId}")
     public ResponseEntity<StandardResponse<Boolean>> updateComparisonTable(
@@ -102,10 +137,11 @@ public class ComparisonTableController implements ComparisonDocs {
             @RequestBody AddAccommodationRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        ComparisonTableResponse response = comparisonTableService.addAccommodationToComparisonTable(tableId,
-                request, userId);
-        return ResponseEntity.ok(
-                new StandardResponse<>(ResponseType.SUCCESS, response));
+        
+        ComparisonTable comparisonTable = comparisonTableService.addAccommodationToComparisonTable(tableId, request, userId);
+        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable);
+        
+        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 
     @Override

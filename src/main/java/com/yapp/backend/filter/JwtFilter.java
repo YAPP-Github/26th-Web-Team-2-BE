@@ -48,6 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 || uri.startsWith("/api/comparison/amenity")
                 || uri.startsWith("/api/oauth/kakao")
                 || uri.startsWith("/api/oauth/refresh")
+                || uri.matches("/api/comparison/[0-9]+/shared")
                 ;
     }
 

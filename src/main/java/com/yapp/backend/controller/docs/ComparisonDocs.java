@@ -38,12 +38,36 @@ public interface ComparisonDocs {
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     );
 
-    @Operation(summary = "비교표 조회", description = "비교표 메타 데이터와 포함된 숙소 정보 리스트를 조회합니다. (Authorization 헤더에 Bearer 토큰 필요)")
+    @Operation(
+        summary = "비교표 조회", 
+        description = "비교표 메타 데이터와 포함된 숙소 정보 리스트를 조회합니다. JWT 인증이 필요하며, 비교표 생성자 또는 여행보드 참여자만 접근 가능합니다."
+    )
     @SecurityRequirement(name = "JWT")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "비교표 조회 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않은 토큰"),
+        @ApiResponse(responseCode = "403", description = "권한 없음 - 해당 비교표에 접근 권한이 없음"),
+        @ApiResponse(responseCode = "404", description = "비교표를 찾을 수 없음")
+    })
     ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "숙소가 포함된 테이블의 ID") Long tableId,
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     );
+
+    @Operation(
+        summary = "shareCode를 통한 비교표 조회", 
+        description = "shareCode를 사용하여 인증 없이 비교표를 조회합니다. 유효한 shareCode가 필요합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "비교표 조회 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않은 shareCode"),
+        @ApiResponse(responseCode = "404", description = "비교표를 찾을 수 없음")
+    })
+    ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTableByShareCode(
+            @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "숙소가 포함된 테이블의 ID") Long tableId,
+            @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "string"), description = "비교표 공유 코드", required = true) String shareCode
+    );
+
 
     @Operation(summary = "비교표 수정", description = "비교표 메타 데이터(제목)와 숙소 세부 내용, 비교 기준 정렬 순서, 숙소 정렬 순서를 수정합니다. (Authorization 헤더에 Bearer 토큰 필요)")
     @SecurityRequirement(name = "JWT")
