@@ -30,7 +30,7 @@ public interface JpaComparisonTableRepository extends JpaRepository<ComparisonTa
     /**
      * 특정 여행보드의 비교표 리스트를 페이지네이션으로 조회합니다. (최근 수정일 내림차순)
      */
-    @Query("SELECT c FROM ComparisonTableEntity c WHERE c.tripBoardEntity.id = :tripBoardId ORDER BY c.updatedAt DESC")
+    @Query("SELECT c FROM ComparisonTableEntity c WHERE c.tripBoardEntity.id = :tripBoardId ORDER BY c.updatedAt DESC, c.id DESC")
     Page<ComparisonTableEntity> findByTripBoardEntityIdOrderByUpdatedAtDesc(@Param("tripBoardId") Long tripBoardId, Pageable pageable);
 
 }
