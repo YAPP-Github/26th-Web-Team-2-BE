@@ -4,14 +4,17 @@ spring:
     username: ${TEST_DB_USER}
     password: ${TEST_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${DB_PRIVATE_IP}:5432/${TEST_DB_NAME}?serverTimezone=UTC
+    url: jdbc:postgresql://${DB_PRIVATE_IP}:5432/${TEST_DB_NAME}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
     show-sql: false
     properties:
-      hibernate.format_sql: true
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
   cloud:
     gcp:
       sql:
@@ -20,7 +23,7 @@ spring:
         database-name: ${TEST_DB_NAME}
   flyway:
     enabled: true
-    url: jdbc:postgresql://${DB_PRIVATE_IP}:5432/${TEST_DB_NAME}
+    url: jdbc:postgresql://${DB_PRIVATE_IP}:5432/${TEST_DB_NAME}?options=-c%20TimeZone=UTC
     user: ${TEST_DB_USER}
     password: ${TEST_DB_PASSWORD}
     locations: classpath:flyway/migration
