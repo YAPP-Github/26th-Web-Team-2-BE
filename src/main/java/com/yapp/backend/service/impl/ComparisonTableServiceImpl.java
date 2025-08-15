@@ -77,19 +77,11 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     }
 
     @Override
-    public ComparisonTableResponse getComparisonTable(Long tableId, Long userId) {
-        ComparisonTable comparisonTable = comparisonTableRepository.findByIdOrThrow(tableId);
-        return new ComparisonTableResponse(
-                comparisonTable.getId(),
-                comparisonTable.getTableName(),
-                comparisonTable.getAccommodationList().stream().map(AccommodationResponse::from)
-                        .collect(
-                                Collectors.toList()),
-                comparisonTable.getShareCode(),
-                comparisonTable.getFactors(),
-                comparisonTable.getCreatedById()
-        );
+    public ComparisonTable getComparisonTable(Long tableId) {
+        return comparisonTableRepository.findByIdOrThrow(tableId);
     }
+
+
 
     @Override
     @Transactional
@@ -137,27 +129,15 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
 
     @Override
     @Transactional
-    public ComparisonTableResponse addAccommodationToComparisonTable(
+    public ComparisonTable addAccommodationToComparisonTable(
             Long tableId,
             AddAccommodationRequest request,
             Long userId
     ) {
-        ComparisonTable updatedTable = comparisonTableRepository.addAccommodationsToTable(
+        return comparisonTableRepository.addAccommodationsToTable(
                 tableId,
                 request.getAccommodationIds(),
                 userId
-        );
-
-        // 업데이트된 비교표 반환
-        return new ComparisonTableResponse(
-                updatedTable.getId(),
-                updatedTable.getTableName(),
-                updatedTable.getAccommodationList().stream()
-                        .map(AccommodationResponse::from)
-                        .collect(Collectors.toList()),
-                updatedTable.getShareCode(),
-                updatedTable.getFactors(),
-                updatedTable.getCreatedById()
         );
     }
 
