@@ -10,6 +10,7 @@ import com.yapp.backend.controller.dto.response.AmenityFactorList;
 import com.yapp.backend.controller.dto.response.ComparisonFactorList;
 import com.yapp.backend.controller.dto.response.ComparisonTableDeleteResponse;
 import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
+import com.yapp.backend.controller.dto.response.ComparisonTablePageResponse;
 import com.yapp.backend.controller.dto.response.CreateComparisonTableResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.service.ComparisonTableService;
@@ -30,7 +31,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/api/comparison")
@@ -121,6 +126,25 @@ public class ComparisonTableController implements ComparisonDocs {
                 .message("비교표가 성공적으로 삭제되었습니다.")
                 .build();
 
+        return ResponseEntity.ok(
+                new StandardResponse<>(ResponseType.SUCCESS, response));
+    }
+
+    @Override
+    @GetMapping("/trip-board/{tripBoardId}")
+    public ResponseEntity<StandardResponse<ComparisonTablePageResponse>> getComparisonTablesByTripBoard(
+            @PathVariable("tripBoardId") Long tripBoardId,
+            @RequestParam Integer page,
+            @RequestParam Integer size) {
+        
+        // 페이징 객체 생성 (최신순 정렬: 수정일 내림차순)
+        Pageable pageable = PageRequest.of(page, size,
+                Sort.by(Sort.Direction.DESC, "updatedAt"));
+        
+        // Service로부터 페이지네이션된 응답 조회
+        ComparisonTablePageResponse response = 
+                comparisonTableService.getComparisonTablesByTripBoardId(tripBoardId, pageable);
+        
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, response));
     }
