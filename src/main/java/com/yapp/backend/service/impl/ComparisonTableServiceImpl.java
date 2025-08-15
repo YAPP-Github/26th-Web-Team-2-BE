@@ -85,6 +85,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
                 comparisonTable.getAccommodationList().stream().map(AccommodationResponse::from)
                         .collect(
                                 Collectors.toList()),
+                comparisonTable.getShareCode(),
                 comparisonTable.getFactors(),
                 comparisonTable.getCreatedById()
         );
@@ -141,27 +142,23 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
             AddAccommodationRequest request,
             Long userId
     ) {
-        try {
-            ComparisonTable updatedTable = comparisonTableRepository.addAccommodationsToTable(
-                    tableId,
-                    request.getAccommodationIds(),
-                    userId
-            );
+        ComparisonTable updatedTable = comparisonTableRepository.addAccommodationsToTable(
+                tableId,
+                request.getAccommodationIds(),
+                userId
+        );
 
-            // 업데이트된 비교표 반환
-            return new ComparisonTableResponse(
-                    updatedTable.getId(),
-                    updatedTable.getTableName(),
-                    updatedTable.getAccommodationList().stream()
-                            .map(AccommodationResponse::from)
-                            .collect(Collectors.toList()),
-                    updatedTable.getFactors(),
-                    updatedTable.getCreatedById()
-            );
-
-        } catch (Exception e) {
-            throw new RuntimeException("비교표에 숙소 추가 중 오류가 발생했습니다.", e);
-        }
+        // 업데이트된 비교표 반환
+        return new ComparisonTableResponse(
+                updatedTable.getId(),
+                updatedTable.getTableName(),
+                updatedTable.getAccommodationList().stream()
+                        .map(AccommodationResponse::from)
+                        .collect(Collectors.toList()),
+                updatedTable.getShareCode(),
+                updatedTable.getFactors(),
+                updatedTable.getCreatedById()
+        );
     }
 
     @Override

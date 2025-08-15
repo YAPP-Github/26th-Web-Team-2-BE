@@ -128,7 +128,7 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
         // 기존 숙소 ID 목록 추출 (중복 방지용)
         Set<Long> existingAccommodationIds = tableEntity.getItems().stream()
                 .map(item -> item.getAccommodationEntity().getId())
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
 
         // 중복되지 않는 새로운 숙소 ID들만 필터링
         List<Long> newAccommodationIds = accommodationIds.stream()

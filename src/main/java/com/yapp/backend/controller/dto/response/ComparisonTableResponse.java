@@ -13,6 +13,7 @@ public class ComparisonTableResponse {
     private Long tableId;
     private String tableName;
     private List<AccommodationResponse> accommodationResponsesList;
+    private String shareCode;
     private List<ComparisonFactor> factorsList;
     private Long createdBy;
 }
