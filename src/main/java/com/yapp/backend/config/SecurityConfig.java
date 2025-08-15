@@ -61,7 +61,6 @@ public class SecurityConfig {
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // WebConfig의 CORS 설정
                                 .authorizeHttpRequests(authorize -> authorize
-                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()         // CORS preflight 허용
                                                 .anyRequest().authenticated())
                                 .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(basicAuthEntryPoint()))
                                 .exceptionHandling(e -> e.authenticationEntryPoint(basicAuthEntryPoint()))
