@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Getter
@@ -24,8 +24,8 @@ public class ComparisonTableSummaryResponse {
     @Schema(description = "포함된 숙소 이름들", example = "[\"호텔 신라\", \"롯데 호텔\", \"그랜드 하이얏트\"]")
     private List<String> accommodationNames;
 
-    @Schema(description = "최근 수정일", example = "2025-08-15T10:30:00")
-    private LocalDateTime lastModifiedAt;
+    @Schema(description = "최근 수정일 (UTC)", example = "2025-08-15T08:30:00Z")
+    private ZonedDateTime lastModifiedAt;
 
     @Schema(description = "공유 코드", accessMode = Schema.AccessMode.READ_ONLY, example = "4473fa9aed7044c7a94fa6e99..")
     private String shareCode;
