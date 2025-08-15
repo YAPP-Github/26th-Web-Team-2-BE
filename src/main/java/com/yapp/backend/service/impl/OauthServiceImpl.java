@@ -80,7 +80,8 @@ public class OauthServiceImpl implements OauthService {
         // 6. 토큰 정보를 포함한 응답 생성
         OauthLoginResponse response = new OauthLoginResponse(
                 user.getId(),
-                socialUserInfo.getNickname()
+                user.getNickname(),
+                user.getEmail()
         );
         response.deliverToken(accessToken, refreshToken);
         
