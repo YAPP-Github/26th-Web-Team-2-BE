@@ -14,4 +14,9 @@ public class UserInfoResponse {
     
     @Schema(description = "유저 프로필 이미지 URL", example = "https://example.com/profile/user123.jpg")
     private String profileImageUrl;
+
+    @Schema(description = "사용자 이메일", example = "abc1234@gmail.com")
+    private String email;
+
+
 }
