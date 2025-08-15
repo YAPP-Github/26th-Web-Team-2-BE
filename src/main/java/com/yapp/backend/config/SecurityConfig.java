@@ -52,9 +52,12 @@ public class SecurityConfig {
                 return http
                                 .securityMatcher(
                                                 "/swagger/**",
+                                                "/swagger-ui",
                                                 "/swagger-ui/**",
                                                 "/swagger-ui.html",
-                                                "/v3/api-docs/**")
+                                                "/v3/api-docs",
+                                                "/v3/api-docs/**"
+                                        )
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // WebConfig의 CORS 설정
                                 .authorizeHttpRequests(authorize -> authorize
