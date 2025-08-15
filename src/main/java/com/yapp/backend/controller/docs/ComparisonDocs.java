@@ -44,10 +44,7 @@ public interface ComparisonDocs {
     )
     @SecurityRequirement(name = "JWT")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "비교표 조회 성공"),
-        @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않은 토큰"),
-        @ApiResponse(responseCode = "403", description = "권한 없음 - 해당 비교표에 접근 권한이 없음"),
-        @ApiResponse(responseCode = "404", description = "비교표를 찾을 수 없음")
+        @ApiResponse(responseCode = "200", description = "비교표 조회 성공")
     })
     ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "숙소가 포함된 테이블의 ID") Long tableId,
@@ -59,9 +56,7 @@ public interface ComparisonDocs {
         description = "shareCode를 사용하여 인증 없이 비교표를 조회합니다. 유효한 shareCode가 필요합니다."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "비교표 조회 성공"),
-        @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않은 shareCode"),
-        @ApiResponse(responseCode = "404", description = "비교표를 찾을 수 없음")
+        @ApiResponse(responseCode = "200", description = "비교표 조회 성공")
     })
     ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTableByShareCode(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "숙소가 포함된 테이블의 ID") Long tableId,
