@@ -83,18 +83,11 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     }
 
     @Override
-    public ComparisonTableResponse getComparisonTable(Long tableId, Long userId) {
-        ComparisonTable comparisonTable = comparisonTableRepository.findByIdOrThrow(tableId);
-        return new ComparisonTableResponse(
-                comparisonTable.getId(),
-                comparisonTable.getTableName(),
-                comparisonTable.getAccommodationList().stream().map(AccommodationResponse::from)
-                        .collect(
-                                Collectors.toList()),
-                comparisonTable.getFactors(),
-                comparisonTable.getCreatedById()
-        );
+    public ComparisonTable getComparisonTable(Long tableId) {
+        return comparisonTableRepository.findByIdOrThrow(tableId);
     }
+
+
 
     @Override
     @Transactional
@@ -142,32 +135,16 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
 
     @Override
     @Transactional
-    public ComparisonTableResponse addAccommodationToComparisonTable(
+    public ComparisonTable addAccommodationToComparisonTable(
             Long tableId,
             AddAccommodationRequest request,
             Long userId
     ) {
-        try {
-            ComparisonTable updatedTable = comparisonTableRepository.addAccommodationsToTable(
-                    tableId,
-                    request.getAccommodationIds(),
-                    userId
-            );
-
-            // 업데이트된 비교표 반환
-            return new ComparisonTableResponse(
-                    updatedTable.getId(),
-                    updatedTable.getTableName(),
-                    updatedTable.getAccommodationList().stream()
-                            .map(AccommodationResponse::from)
-                            .collect(Collectors.toList()),
-                    updatedTable.getFactors(),
-                    updatedTable.getCreatedById()
-            );
-
-        } catch (Exception e) {
-            throw new RuntimeException("비교표에 숙소 추가 중 오류가 발생했습니다.", e);
-        }
+        return comparisonTableRepository.addAccommodationsToTable(
+                tableId,
+                request.getAccommodationIds(),
+                userId
+        );
     }
 
     @Override

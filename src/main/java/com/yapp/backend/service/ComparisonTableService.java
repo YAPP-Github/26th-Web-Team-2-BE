@@ -3,9 +3,9 @@ package com.yapp.backend.service;
 import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
 import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
 import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
-import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import com.yapp.backend.controller.dto.response.ComparisonTablePageResponse;
 import org.springframework.data.domain.Pageable;
+import com.yapp.backend.service.model.ComparisonTable;
 
 public interface ComparisonTableService {
 
@@ -20,10 +20,9 @@ public interface ComparisonTableService {
     /**
      * 특정 비교 테이블의 상세 정보를 조회합니다.
      * @param tableId
-     * @param userId
      * @return
      */
-    ComparisonTableResponse getComparisonTable(Long tableId, Long userId);
+    ComparisonTable getComparisonTable(Long tableId);
 
     /**
      * 비교테이블의 상세 정보를 수정하고, 성공 여부를 반환합니다.
@@ -41,7 +40,7 @@ public interface ComparisonTableService {
      * @param userId
      * @return
      */
-    ComparisonTableResponse addAccommodationToComparisonTable(Long tableId, AddAccommodationRequest request, Long userId);
+    ComparisonTable addAccommodationToComparisonTable(Long tableId, AddAccommodationRequest request, Long userId);
 
     /**
      * 특졍 비교 테이블을 삭제하고, 관련된 숙소 매핑 정보도 함께 삭제합니다.

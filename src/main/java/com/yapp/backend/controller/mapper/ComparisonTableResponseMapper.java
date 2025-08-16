@@ -1,5 +1,7 @@
 package com.yapp.backend.controller.mapper;
 
+import com.yapp.backend.controller.dto.response.AccommodationResponse;
+import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import com.yapp.backend.controller.dto.response.ComparisonTableSummaryResponse;
 import com.yapp.backend.service.model.Accommodation;
 import com.yapp.backend.service.model.ComparisonTable;
@@ -18,7 +20,7 @@ public class ComparisonTableResponseMapper {
 
     /**
      * ComparisonTable 도메인 모델을 ComparisonTableListResponse DTO로 변환
-     * 
+     *
      * @param comparisonTable 비교표 도메인 모델
      * @return 비교표 리스트 응답 DTO
      */
@@ -39,7 +41,7 @@ public class ComparisonTableResponseMapper {
 
     /**
      * ComparisonTable 도메인 모델 리스트를 ComparisonTableListResponse DTO 리스트로 변환
-     * 
+     *
      * @param comparisonTables 비교표 도메인 모델 리스트
      * @return 비교표 리스트 응답 DTO 리스트
      */
@@ -47,5 +49,21 @@ public class ComparisonTableResponseMapper {
         return comparisonTables.stream()
                 .map(this::toSummaryResponse)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * ComparisonTable 도메인을 ComparisonTableResponse DTO로 변환
+     */
+    public ComparisonTableResponse toResponse(ComparisonTable comparisonTable) {
+        return new ComparisonTableResponse(
+                comparisonTable.getId(),
+                comparisonTable.getTableName(),
+                comparisonTable.getAccommodationList().stream()
+                        .map(AccommodationResponse::from)
+                        .collect(Collectors.toList()),
+                comparisonTable.getShareCode(),
+                comparisonTable.getFactors(),
+                comparisonTable.getCreatedById()
+        );
     }
 }

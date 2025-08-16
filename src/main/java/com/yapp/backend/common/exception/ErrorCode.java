@@ -72,7 +72,8 @@ public enum ErrorCode {
 
     // Comparison Table Delete related errors
     COMPARISON_TABLE_DELETE_FORBIDDEN("비교표 삭제 권한 없음", "본인이 생성한 비교표만 삭제할 수 있습니다.", HttpStatus.FORBIDDEN),
-    COMPARISON_TABLE_DELETE_FAILED("비교표 삭제 실패", "비교표 삭제 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR)
+    COMPARISON_TABLE_DELETE_FAILED("비교표 삭제 실패", "비교표 삭제 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_SHARE_CODE("유효하지 않은 공유 코드", "제공된 공유 코드가 유효하지 않습니다.", HttpStatus.UNAUTHORIZED),
     // 필요에 따라 추가
     ;
 
