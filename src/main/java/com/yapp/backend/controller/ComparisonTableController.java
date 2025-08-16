@@ -97,7 +97,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         ComparisonTable comparisonTable = comparisonTableService.getComparisonTable(tableId);
-        User creator = userService.getActiveUserById(comparisonTable.getCreatedById());
+        User creator = userService.getUserById(comparisonTable.getCreatedById());
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
@@ -118,7 +118,7 @@ public class ComparisonTableController implements ComparisonDocs {
         // shareCode 검증
         validateShareCodeAccess(tableId, shareCode, comparisonTable);
 
-        User creator = userService.getActiveUserById(comparisonTable.getCreatedById());
+        User creator = userService.getUserById(comparisonTable.getCreatedById());
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
@@ -155,7 +155,7 @@ public class ComparisonTableController implements ComparisonDocs {
         Long userId = userDetails.getUserId();
 
         ComparisonTable comparisonTable = comparisonTableService.addAccommodationToComparisonTable(tableId, request, userId);
-        User creator = userService.getActiveUserById(comparisonTable.getCreatedById());
+        User creator = userService.getUserById(comparisonTable.getCreatedById());
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
