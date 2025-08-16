@@ -29,7 +29,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
 
-        log.warn("Authentication failed for request {}: {}", request.getRequestURI(), authException.getMessage());
+        log.warn("Authentication failed for request {}: {}, {}" , authException.getClass(), request.getRequestURI(), authException.getMessage());
         Sentry.captureException(authException);
 
         // ErrorCode 사용하여 일관된 응답 생성
