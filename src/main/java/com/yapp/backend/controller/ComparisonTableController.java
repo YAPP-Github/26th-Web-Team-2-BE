@@ -3,6 +3,7 @@ package com.yapp.backend.controller;
 import static com.yapp.backend.common.exception.ErrorCode.*;
 
 import com.yapp.backend.common.exception.ShareCodeException;
+import com.yapp.backend.common.annotation.PublicApi;
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
 import com.yapp.backend.controller.docs.ComparisonDocs;
@@ -41,8 +42,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.yapp.backend.service.model.ComparisonTable;
-import com.yapp.backend.common.exception.ErrorCode;
-import com.yapp.backend.common.exception.UserAuthorizationException;
 import lombok.extern.slf4j.Slf4j;
 import com.yapp.backend.controller.mapper.ComparisonTableResponseMapper;
 
@@ -56,6 +55,7 @@ public class ComparisonTableController implements ComparisonDocs {
     private final ComparisonTableResponseMapper comparisonTableResponseMapper;
 
     @Override
+    @PublicApi(description = "비교 기준 항목 목록 조회 - 인증 불필요")
     @GetMapping("/factors")
     public ResponseEntity<StandardResponse<ComparisonFactorList>> getComparisonFactorList() {
         return ResponseEntity.ok(
@@ -65,6 +65,7 @@ public class ComparisonTableController implements ComparisonDocs {
     }
 
     @Override
+    @PublicApi(description = "편의시설 항목 목록 조회 - 인증 불필요")
     @GetMapping("/amenity")
     public ResponseEntity<StandardResponse<AmenityFactorList>> getAmenityFactorList() {
         return ResponseEntity.ok(
@@ -94,20 +95,22 @@ public class ComparisonTableController implements ComparisonDocs {
 
         ComparisonTable comparisonTable = comparisonTableService.getComparisonTable(tableId);
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable);
-        
+
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 
     /**
      * shareCode를 통한 비교표 조회 (인증 불필요)
      */
+    @Override
+    @PublicApi(description = "공유 코드를 통한 비교표 조회 - 인증 불필요")
     @GetMapping("/{tableId}/shared")
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTableByShareCode(
             @PathVariable("tableId") Long tableId,
             @RequestParam("shareCode") String shareCode) {
 
         ComparisonTable comparisonTable = comparisonTableService.getComparisonTable(tableId);
-        
+
         // shareCode 검증
         validateShareCodeAccess(tableId, shareCode, comparisonTable);
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable);
@@ -144,10 +147,10 @@ public class ComparisonTableController implements ComparisonDocs {
             @RequestBody AddAccommodationRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        
+
         ComparisonTable comparisonTable = comparisonTableService.addAccommodationToComparisonTable(tableId, request, userId);
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable);
-        
+
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 
@@ -174,15 +177,15 @@ public class ComparisonTableController implements ComparisonDocs {
             @PathVariable("tripBoardId") Long tripBoardId,
             @RequestParam Integer page,
             @RequestParam Integer size) {
-        
+
         // 페이징 객체 생성 (최신순 정렬: 수정일 내림차순)
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.DESC, "updatedAt"));
-        
+
         // Service로부터 페이지네이션된 응답 조회
-        ComparisonTablePageResponse response = 
+        ComparisonTablePageResponse response =
                 comparisonTableService.getComparisonTablesByTripBoardId(tripBoardId, pageable);
-        
+
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, response));
     }

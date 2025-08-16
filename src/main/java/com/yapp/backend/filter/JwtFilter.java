@@ -3,6 +3,7 @@ package com.yapp.backend.filter;
 import static com.yapp.backend.common.util.TokenUtil.extractTokenFromHeader;
 import static com.yapp.backend.common.util.CookieUtil.getCookieValue;
 
+import com.yapp.backend.common.annotation.PublicApi;
 import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.filter.service.AuthContextService;
 import com.yapp.backend.filter.service.RefreshTokenService;
@@ -19,6 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import io.jsonwebtoken.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 @Component
@@ -29,14 +33,29 @@ public class JwtFilter extends OncePerRequestFilter {
     private final AuthContextService authContextService;
     private final RefreshTokenService refreshTokenService;
 
+    @Autowired
+    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
     public static final String ACCESS_TOKEN_HEADER = "access-token";
     public static final String REFRESH_TOKEN_COOKIE = "REFRESH_TOKEN";
 
-    // 스킵할 URI(인증이 필요 없는 엔드포인트)
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
+        // 1. 시스템 관련 URI는 기본적으로 스킵 (OAuth2, Swagger, 에러 페이지 등)
         String uri = request.getRequestURI();
+        if (isSystemUri(uri)) {
+            return true;
+        }
+
+        // 2. @PublicApi 어노테이션이 붙은 컨트롤러 메서드는 스킵
+        return isPublicApiEndpoint(request);
+    }
+
+    /**
+     * 시스템 관련 URI 체크 (OAuth2, Swagger, 에러 페이지 등)
+     * 이러한 URI들은 Spring Security 또는 시스템에서 자동으로 처리되는 경로들
+     */
+    private boolean isSystemUri(String uri) {
         return uri.startsWith("/oauth2/authorization")
                 || uri.startsWith("/oauth2/authorize")
                 || uri.startsWith("/login/oauth2/code")
@@ -44,12 +63,48 @@ public class JwtFilter extends OncePerRequestFilter {
                 || uri.startsWith("/error")
                 || uri.startsWith("/swagger")
                 || uri.startsWith("/v3/api-docs")
-                || uri.startsWith("/api/comparison/factors")
-                || uri.startsWith("/api/comparison/amenity")
-                || uri.startsWith("/api/oauth/kakao")
-                || uri.startsWith("/api/oauth/refresh")
-                || uri.matches("/api/comparison/[0-9]+/shared")
                 ;
+    }
+
+    /**
+     * @PublicApi 어노테이션이 붙은 엔드포인트인지 체크
+     */
+    private boolean isPublicApiEndpoint(HttpServletRequest request) {
+        try {
+            // HandlerExecutionChain을 먼저 가져와서 null 체크
+            var handlerExecutionChain = requestMappingHandlerMapping.getHandler(request);
+            if (handlerExecutionChain == null) {
+                log.debug("핸들러를 찾을 수 없습니다: {}", request.getRequestURI());
+                return false;
+            }
+
+            // Handler를 가져와서 null 체크 및 타입 확인
+            Object handler = handlerExecutionChain.getHandler();
+            if (!(handler instanceof HandlerMethod)) {
+                log.debug("HandlerMethod가 아닙니다: {}", request.getRequestURI());
+                return false;
+            }
+
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+
+            // 메서드 레벨에서 @PublicApi 어노테이션 체크
+            if (handlerMethod.hasMethodAnnotation(PublicApi.class)) {
+                log.debug("@PublicApi 어노테이션이 붙은 메서드: {}", handlerMethod.getMethod().getName());
+                return true;
+            }
+
+            // 클래스 레벨에서 @PublicApi 어노테이션 체크
+            if (handlerMethod.getBeanType().isAnnotationPresent(PublicApi.class)) {
+                log.debug("@PublicApi 어노테이션이 붙은 클래스: {}", handlerMethod.getBeanType().getSimpleName());
+                return true;
+            }
+
+        } catch (Exception e) {
+            // 핸들러를 찾을 수 없는 경우 (404 등) 인증 필요로 처리
+            log.debug("핸들러 조회 중 오류 발생: {} - {}", request.getRequestURI(), e.getMessage());
+        }
+
+        return false;
     }
 
     @Override
