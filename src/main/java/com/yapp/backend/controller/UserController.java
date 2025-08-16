@@ -43,7 +43,8 @@ public class UserController implements UserDocs {
 
         UserInfoResponse response = new UserInfoResponse(
             user.getNickname(),
-            user.getProfileImage()
+            user.getProfileImage(),
+            user.getEmail()
         );
         
         return ResponseEntity.ok(new StandardResponse<>(SUCCESS, response));

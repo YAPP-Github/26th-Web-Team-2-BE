@@ -9,6 +9,11 @@ import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
 import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
 import com.yapp.backend.controller.dto.response.AccommodationResponse;
 import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
+import com.yapp.backend.controller.dto.response.ComparisonTablePageResponse;
+import com.yapp.backend.controller.dto.response.ComparisonTableSummaryResponse;
+import com.yapp.backend.controller.mapper.ComparisonTableResponseMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import com.yapp.backend.repository.AccommodationRepository;
 import com.yapp.backend.repository.ComparisonTableRepository;
 import com.yapp.backend.repository.TripBoardRepository;
@@ -43,6 +48,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     private final UserRepository userRepository;
     private final AccommodationRepository accommodationRepository;
     private final AccommodationService accommodationService;
+    private final ComparisonTableResponseMapper responseMapper;
 
     @Override
     @Transactional
@@ -169,6 +175,37 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
             log.error("비교표 삭제 중 오류 발생 - tableId: {}, userId: {}", tableId, userId, e);
             throw new ComparisonTableDeleteException(ErrorCode.COMPARISON_TABLE_DELETE_FAILED);
         }
+    }
+
+    @Override
+    public ComparisonTablePageResponse getComparisonTablesByTripBoardId(Long tripBoardId, Pageable pageable) {
+        // 여행보드 존재 확인
+        tripBoardRepository.findByIdOrThrow(tripBoardId);
+
+        // hasNext 확인을 위해 size + 1개 조회하도록 Pageable 조정
+        int requestSize = pageable.getPageSize();
+        Pageable adjustedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                requestSize + 1,
+                pageable.getSort()
+        );
+
+        // 페이지네이션된 비교표 리스트 조회
+        List<ComparisonTable> comparisonTables = comparisonTableRepository.findByTripBoardId(tripBoardId, adjustedPageable);
+        
+        // 다음 페이지 존재 여부 확인
+        boolean hasNext = comparisonTables.size() > requestSize;
+        
+        // 실제 반환할 데이터는 요청한 size만큼만
+        if (hasNext) {
+            comparisonTables = comparisonTables.subList(0, requestSize);
+        }
+        
+        // 매퍼를 사용하여 Response DTO로 변환
+        List<ComparisonTableSummaryResponse> responseList = responseMapper.toResponseList(comparisonTables);
+        
+        // 페이지 응답 객체로 감싸서 반환
+        return ComparisonTablePageResponse.of(responseList, hasNext);
     }
 
     /**
