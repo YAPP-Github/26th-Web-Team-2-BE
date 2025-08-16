@@ -54,7 +54,7 @@ public class ComparisonTableResponseMapper {
     /**
      * ComparisonTable 도메인을 ComparisonTableResponse DTO로 변환
      */
-    public ComparisonTableResponse toResponse(ComparisonTable comparisonTable) {
+    public ComparisonTableResponse toResponse(ComparisonTable comparisonTable, String creatorName) {
         return new ComparisonTableResponse(
                 comparisonTable.getId(),
                 comparisonTable.getTableName(),
@@ -63,7 +63,8 @@ public class ComparisonTableResponseMapper {
                         .collect(Collectors.toList()),
                 comparisonTable.getShareCode(),
                 comparisonTable.getFactors(),
-                comparisonTable.getCreatedById()
+                comparisonTable.getCreatedById(),
+                creatorName
         );
     }
 }
