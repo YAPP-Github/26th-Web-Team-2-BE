@@ -44,7 +44,7 @@ public class KakaoOAuthCodeUserInfoProvider implements OAuthCodeUserInfoProvider
                 .queryParam("client_id", kakaoClientId)
                 .queryParam("redirect_uri", redirectUri)
                 .queryParam("response_type", "code")
-                .queryParam("scope", "profile_nickname,profile_image")
+                .queryParam("scope", "profile_nickname,profile_image,account_email")
                 .build()
                 .toUriString();
     }

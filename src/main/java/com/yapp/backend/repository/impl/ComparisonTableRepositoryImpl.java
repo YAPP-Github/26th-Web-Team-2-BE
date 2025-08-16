@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +61,12 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
         existingEntity.update(comparisonTable);
         updateAccommodationMappings(existingEntity, comparisonTable.getAccommodationList());
         jpaComparisonTableRepository.save(existingEntity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long tableId) {
+        jpaComparisonTableRepository.deleteById(tableId);
     }
 
     /**
@@ -122,7 +130,7 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
         // 기존 숙소 ID 목록 추출 (중복 방지용)
         Set<Long> existingAccommodationIds = tableEntity.getItems().stream()
                 .map(item -> item.getAccommodationEntity().getId())
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
 
         // 중복되지 않는 새로운 숙소 ID들만 필터링
         List<Long> newAccommodationIds = accommodationIds.stream()
@@ -168,5 +176,25 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
     @Transactional
     public void removeAccommodationFromAllTables(Long accommodationId) {
         jpaComparisonTableRepository.deleteComparisonAccommodationsByAccommodationId(accommodationId);
+    }
+
+    @Override
+    public List<ComparisonTable> findByTripBoardId(Long tripBoardId, Pageable pageable) {
+        // Pageable 객체의 정렬 기준에 따라 적절한 JPA 메서드 선택
+        List<ComparisonTableEntity> entities = selectQueryMethodBySort(tripBoardId, pageable);
+
+        return entities.stream()
+                .map(comparisonTableMapper::entityToDomain)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Pageable의 Sort 정보를 분석하여 적절한 JPA 쿼리 메서드를 선택합니다.
+     * 현재는 최근 수정일 기준 내림차순만 지원하며, 향후 확장 가능합니다.
+     */
+    private List<ComparisonTableEntity> selectQueryMethodBySort(Long tripBoardId, Pageable pageable) {
+        // 현재는 최근 수정일 기준 내림차순만 지원
+        Page<ComparisonTableEntity> page = jpaComparisonTableRepository.findByTripBoardEntityIdOrderByUpdatedAtDesc(tripBoardId, pageable);
+        return page.getContent();
     }
 }

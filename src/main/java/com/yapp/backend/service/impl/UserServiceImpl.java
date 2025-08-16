@@ -21,8 +21,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User getUserById(Long id) {
-        return userRepository.findByIdOrThrow(id);
+    public User getActiveUserById(Long userId) {
+        
+        User user = userRepository.findByIdOrThrow(userId);
+        
+        // 탈퇴된 사용자인지 확인
+        if (user.getDeletedAt() != null) {
+            throw new DeletedUserException(DELETED_USER_ACCESS);
+        }
+        
+        return user;
     }
     
     @Override

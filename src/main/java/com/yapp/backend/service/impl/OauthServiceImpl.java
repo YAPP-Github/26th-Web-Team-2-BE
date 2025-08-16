@@ -3,13 +3,18 @@ package com.yapp.backend.service.impl;
 import com.yapp.backend.common.util.JwtTokenProvider;
 import com.yapp.backend.config.OAuthSecurityProperties;
 import com.yapp.backend.controller.dto.response.OauthLoginResponse;
+import com.yapp.backend.controller.dto.response.TokenSuccessResponse;
 import com.yapp.backend.filter.dto.SocialUserInfo;
+import com.yapp.backend.filter.service.RefreshTokenService;
 import com.yapp.backend.service.OauthService;
 import com.yapp.backend.service.UserLoginService;
 import com.yapp.backend.service.model.User;
 import com.yapp.backend.service.oauth.OAuthCodeUserInfoProvider;
 import com.yapp.backend.common.exception.oauth.InvalidBaseUrlException;
 import com.yapp.backend.common.exception.oauth.UnsupportedOAuthProviderException;
+import com.yapp.backend.common.exception.InvalidRefreshTokenException;
+import com.yapp.backend.common.exception.ExpiredRefreshTokenException;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +28,7 @@ public class OauthServiceImpl implements OauthService {
     
     private final UserLoginService userLoginService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
     private final OAuthSecurityProperties oauthSecurityProperties;
     private final Map<String, OAuthCodeUserInfoProvider> providers;
     
@@ -30,6 +36,7 @@ public class OauthServiceImpl implements OauthService {
             List<OAuthCodeUserInfoProvider> providerList,
             UserLoginService userLoginService,
             JwtTokenProvider jwtTokenProvider,
+            RefreshTokenService refreshTokenService,
             OAuthSecurityProperties oauthSecurityProperties
     ) {
         // Spring이 빈 이름 기준으로 자동 주입
@@ -37,6 +44,7 @@ public class OauthServiceImpl implements OauthService {
                 .collect(Collectors.toMap(OAuthCodeUserInfoProvider::getProviderKey, p -> p));
         this.userLoginService = userLoginService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.refreshTokenService = refreshTokenService;
         this.oauthSecurityProperties = oauthSecurityProperties;
     }
     
@@ -62,11 +70,23 @@ public class OauthServiceImpl implements OauthService {
         // 3. 사용자 저장 또는 조회
         User user = userLoginService.handleOAuthLogin(socialUser);
 
-        // 4. 사용자 정보로 응답 생성 (토큰은 컨트롤러에서 쿠키로 설정)
-        return new OauthLoginResponse(
+        // 4. 토큰 생성
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+
+        // 5. Redis에 Refresh Token 저장 (RefreshTokenService에서 예외 처리)
+        refreshTokenService.storeRefreshOrThrow(user.getId(), refreshToken);
+
+        // 6. 토큰 정보를 포함한 응답 생성
+        OauthLoginResponse response = new OauthLoginResponse(
                 user.getId(),
-                socialUserInfo.getNickname()
+                user.getNickname(),
+                user.getEmail()
         );
+        response.deliverToken(accessToken, refreshToken);
+        
+        log.info("OAuth 로그인 완료. userId: {}, provider: {}", user.getId(), provider);
+        return response;
     }
 
     private OAuthCodeUserInfoProvider getProviderOrThrow(String provider) {
@@ -129,5 +149,32 @@ public class OauthServiceImpl implements OauthService {
         }
         
         return normalized;
+    }
+
+    @Override
+    public TokenSuccessResponse refreshTokens(String refreshToken) {
+        log.info("리프레시 토큰 재발급 요청");
+        
+        // 1. 리프레시 토큰 유효성 검증
+        Claims refreshClaims = jwtTokenProvider.parseAndValidateRefreshToken(refreshToken);
+        if (refreshClaims == null) {
+            log.warn("유효하지 않은 리프레시 토큰입니다");
+            throw new InvalidRefreshTokenException("리프레시 토큰이 유효하지 않거나 파싱할 수 없습니다");
+        }
+
+        // 2. 리프레시 토큰에서 사용자 ID 추출
+        Long userId = Long.valueOf(jwtTokenProvider.getRefreshUsername(refreshToken));
+
+        // 3. 새로운 액세스 토큰과 리프레시 토큰 생성 (JwtTokenProvider에서 예외 처리됨)
+        String newAccessToken = jwtTokenProvider.createAccessToken(userId);
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(userId);
+        
+        log.debug("리프레시 토큰 재발급을 위한 새 토큰 생성 완료. userId: {}", userId);
+
+        // 4. Redis 검증 후 즉시 회전
+        refreshTokenService.validateAndRotateRefresh(userId, refreshToken, newRefreshToken);
+
+        log.info("리프레시 토큰 재발급 완료. userId: {}", userId);
+        return new TokenSuccessResponse(newAccessToken, newRefreshToken);
     }
 }

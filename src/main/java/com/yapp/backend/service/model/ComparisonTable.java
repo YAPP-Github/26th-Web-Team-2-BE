@@ -1,8 +1,9 @@
 package com.yapp.backend.service.model;
 
+import com.yapp.backend.common.util.ShareCodeGeneratorUtil;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
 import jakarta.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,8 +22,9 @@ public class ComparisonTable {
     private Long tripBoardId;
     private List<Accommodation> accommodationList;
     private List<ComparisonFactor> factors;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String shareCode;
+    private Instant createdAt;
+    private Instant updatedAt;
 
     public static ComparisonTable from(
             @NotBlank String tableName,
@@ -37,6 +39,7 @@ public class ComparisonTable {
                 .tripBoardId(tripBoard.getId())
                 .accommodationList(accommodationList)
                 .factors(factors)
+                .shareCode(ShareCodeGeneratorUtil.generateUniqueShareCode())
                 .build();
     }
 

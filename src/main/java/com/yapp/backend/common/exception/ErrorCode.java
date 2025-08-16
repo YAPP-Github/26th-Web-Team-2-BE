@@ -21,6 +21,12 @@ public enum ErrorCode {
     AUTHENTICATION_CREDENTIALS_NOT_FOUND("인증 정보 누락", "인증 정보가 필요합니다.", HttpStatus.UNAUTHORIZED),
     ACCESS_DENIED("접근 권한 부족", "접근 권한이 부족합니다.", HttpStatus.FORBIDDEN),
     AUTHENTICATION_SERVICE_ERROR("인증 서비스 오류", "인증 처리 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    
+    // Token related errors
+    INVALID_REFRESH_TOKEN("유효하지 않은 리프레시 토큰", "리프레시 토큰이 유효하지 않거나 만료되었습니다.", HttpStatus.UNAUTHORIZED),
+    EXPIRED_REFRESH_TOKEN("만료된 리프레시 토큰", "리프레시 토큰이 만료되었습니다. 다시 로그인해 주세요.", HttpStatus.UNAUTHORIZED),
+    TOKEN_GENERATION_FAILED("토큰 생성 실패", "토큰 생성 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    REDIS_OPERATION_FAILED("Redis 작업 실패", "Redis 저장소 작업 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // Accommodation related errors
     INVALID_TABLE_ID("잘못된 테이블 ID", "존재하지 않거나 유효하지 않은 테이블 ID입니다.", HttpStatus.BAD_REQUEST),
@@ -62,7 +68,12 @@ public enum ErrorCode {
     // Trip Board Join related errors
     INVALID_INVITATION_URL("유효하지 않은 초대링크", "존재하지 않는 초대링크입니다.", HttpStatus.NOT_FOUND),
     INACTIVE_INVITATION_URL("비활성화된 초대링크", "비활성화된 초대링크입니다.", HttpStatus.BAD_REQUEST),
-    DUPLICATE_TRIP_BOARD_PARTICIPATION("중복 참여", "이미 참여한 여행 보드입니다.", HttpStatus.CONFLICT)
+    DUPLICATE_TRIP_BOARD_PARTICIPATION("중복 참여", "이미 참여한 여행 보드입니다.", HttpStatus.CONFLICT),
+
+    // Comparison Table Delete related errors
+    COMPARISON_TABLE_DELETE_FORBIDDEN("비교표 삭제 권한 없음", "본인이 생성한 비교표만 삭제할 수 있습니다.", HttpStatus.FORBIDDEN),
+    COMPARISON_TABLE_DELETE_FAILED("비교표 삭제 실패", "비교표 삭제 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_SHARE_CODE("유효하지 않은 공유 코드", "제공된 공유 코드가 유효하지 않습니다.", HttpStatus.UNAUTHORIZED),
     // 필요에 따라 추가
     ;
 

@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import com.yapp.backend.common.exception.RedisOperationException;
+import com.yapp.backend.common.exception.ExpiredRefreshTokenException;
 
 @Slf4j
 @Service
@@ -32,9 +34,15 @@ public class RefreshTokenService {
     }
 
     // 로그인 시, 새 리프레시 토큰 저장
-    public void storeRefresh(Long userId, String refreshToken) {
-        redisTemplate.opsForValue()
-                .set(keyFor(userId), refreshToken, Duration.ofMillis(refreshTtlMs));
+    public void storeRefreshOrThrow(Long userId, String refreshToken) {
+        try {
+            redisTemplate.opsForValue()
+                    .set(keyFor(userId), refreshToken, Duration.ofMillis(refreshTtlMs));
+            log.debug("Refresh token 저장 완료. userId: {}", userId);
+        } catch (Exception e) {
+            log.error("Refresh token 저장 실패. userId: {}, error: {}", userId, e.getMessage(), e);
+            throw new RedisOperationException("refresh token 저장", userId, e);
+        }
     }
 
     // 재발급 시, 기존 토큰과 비교
@@ -45,8 +53,41 @@ public class RefreshTokenService {
 
     // 토큰 회전: old→new 교체
     public void rotateRefresh(Long userId, String newRefreshToken) {
-        redisTemplate.opsForValue()
-                .set(keyFor(userId), newRefreshToken, Duration.ofMillis(refreshTtlMs));
+        try {
+            redisTemplate.opsForValue()
+                    .set(keyFor(userId), newRefreshToken, Duration.ofMillis(refreshTtlMs));
+            log.debug("Refresh token 회전 완료. userId: {}", userId);
+        } catch (Exception e) {
+            log.error("Refresh token 회전 실패. userId: {}, error: {}", userId, e.getMessage(), e);
+            throw new RedisOperationException("refresh token 회전", userId, e);
+        }
+    }
+    
+    // 검증 후 회전
+    public void validateAndRotateRefresh(Long userId, String currentRefreshToken, String newRefreshToken) {
+        try {
+            // 1. 현재 토큰 검증
+            String savedToken = redisTemplate.opsForValue().get(keyFor(userId));
+            if (!currentRefreshToken.equals(savedToken)) {
+                log.warn("Refresh token 불일치. userId: {}", userId);
+                throw new ExpiredRefreshTokenException(userId);
+            }
+            
+            // 2. 검증 성공 시 회전
+            rotateRefresh(userId, newRefreshToken);
+            
+            log.debug("Refresh token 검증 및 회전 완료. userId: {}", userId);
+            
+        } catch (ExpiredRefreshTokenException e) {
+            // 토큰 검증 실패는 그대로 전파 (401 Unauthorized)
+            throw e;
+        } catch (RedisOperationException e) {
+            // Redis 오류는 그대로 전파
+            throw e;
+        } catch (Exception e) {
+            log.error("Refresh token 검증 중 예상치 못한 오류. userId: {}, error: {}", userId, e.getMessage(), e);
+            throw new RedisOperationException("refresh token 검증", userId, e);
+        }
     }
 
     // 로그아웃 등: 토큰 삭제

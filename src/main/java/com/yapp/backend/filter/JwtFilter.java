@@ -32,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthContextService authContextService;
     private final RefreshTokenService refreshTokenService;
-    
+
     @Autowired
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
@@ -46,11 +46,11 @@ public class JwtFilter extends OncePerRequestFilter {
         if (isSystemUri(uri)) {
             return true;
         }
-        
+
         // 2. @PublicApi 어노테이션이 붙은 컨트롤러 메서드는 스킵
         return isPublicApiEndpoint(request);
     }
-    
+
     /**
      * 시스템 관련 URI 체크 (OAuth2, Swagger, 에러 페이지 등)
      * 이러한 URI들은 Spring Security 또는 시스템에서 자동으로 처리되는 경로들
@@ -62,9 +62,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 || uri.equals("/")
                 || uri.startsWith("/error")
                 || uri.startsWith("/swagger")
-                || uri.startsWith("/v3/api-docs");
+                || uri.startsWith("/v3/api-docs")
+                ;
     }
-    
+
     /**
      * @PublicApi 어노테이션이 붙은 엔드포인트인지 체크
      */
@@ -76,33 +77,33 @@ public class JwtFilter extends OncePerRequestFilter {
                 log.debug("핸들러를 찾을 수 없습니다: {}", request.getRequestURI());
                 return false;
             }
-            
+
             // Handler를 가져와서 null 체크 및 타입 확인
             Object handler = handlerExecutionChain.getHandler();
             if (!(handler instanceof HandlerMethod)) {
                 log.debug("HandlerMethod가 아닙니다: {}", request.getRequestURI());
                 return false;
             }
-            
+
             HandlerMethod handlerMethod = (HandlerMethod) handler;
-            
+
             // 메서드 레벨에서 @PublicApi 어노테이션 체크
             if (handlerMethod.hasMethodAnnotation(PublicApi.class)) {
                 log.debug("@PublicApi 어노테이션이 붙은 메서드: {}", handlerMethod.getMethod().getName());
                 return true;
             }
-            
+
             // 클래스 레벨에서 @PublicApi 어노테이션 체크
             if (handlerMethod.getBeanType().isAnnotationPresent(PublicApi.class)) {
                 log.debug("@PublicApi 어노테이션이 붙은 클래스: {}", handlerMethod.getBeanType().getSimpleName());
                 return true;
             }
-            
+
         } catch (Exception e) {
             // 핸들러를 찾을 수 없는 경우 (404 등) 인증 필요로 처리
             log.debug("핸들러 조회 중 오류 발생: {} - {}", request.getRequestURI(), e.getMessage());
         }
-        
+
         return false;
     }
 
