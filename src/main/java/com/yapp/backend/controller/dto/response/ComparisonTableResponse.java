@@ -16,4 +16,5 @@ public class ComparisonTableResponse {
     private String shareCode;
     private List<ComparisonFactor> factorsList;
     private Long createdBy;
+    private String creatorName;
 }
