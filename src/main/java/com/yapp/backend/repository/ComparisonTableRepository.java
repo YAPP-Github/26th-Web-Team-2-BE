@@ -1,6 +1,8 @@
 package com.yapp.backend.repository;
 
 import com.yapp.backend.service.model.ComparisonTable;
+import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface ComparisonTableRepository {
     Long save(ComparisonTable comparisonTable);
@@ -33,4 +35,12 @@ public interface ComparisonTableRepository {
      * 특정 숙소가 포함된 모든 비교표 매핑을 삭제합니다.
      */
     void removeAccommodationFromAllTables(Long accommodationId);
+
+    /**
+     * 특정 여행보드의 비교표 리스트를 페이지네이션으로 조회합니다.
+     * @param tripBoardId 여행보드 ID
+     * @param pageable 페이지네이션 정보
+     * @return 조회된 비교표 리스트
+     */
+    List<ComparisonTable> findByTripBoardId(Long tripBoardId, Pageable pageable);
 }
