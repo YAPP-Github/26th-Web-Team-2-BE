@@ -1,21 +1,18 @@
 package com.yapp.backend.repository.entity;
 
-
 import static jakarta.persistence.CascadeType.ALL;
 
-import com.yapp.backend.service.model.Accommodation;
-import com.yapp.backend.service.model.ComparisonTable;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -43,15 +40,15 @@ public class ComparisonTableEntity {
     @Column(name = "table_name")
     private String tableName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_board")
     private TripBoardEntity tripBoardEntity;
-
-    @ManyToOne
+    
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private UserEntity createdByEntity;
 
-    @Type(JsonType.class)
+    @Type(JsonBinaryType.class)
     @Column(name = "factors", columnDefinition = "jsonb")
     private List<ComparisonFactor> factors;
 
@@ -63,7 +60,7 @@ public class ComparisonTableEntity {
             cascade = ALL,
             orphanRemoval = true
     )
-    @OrderBy("position")
+    @Builder.Default
     private List<ComparisonAccommodationEntity> items = new ArrayList<>();
 
     @CreationTimestamp
