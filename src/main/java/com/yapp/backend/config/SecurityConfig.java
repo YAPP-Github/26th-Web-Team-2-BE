@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
@@ -84,7 +83,8 @@ public class SecurityConfig {
                                                                 "/",
                                                                 "/api/**",
                                                                 "/login/oauth2/**",
-                                                                "/error" // Spring Boot 전역 에러 처리용
+                                                                "/error", // Spring Boot 전역 에러 처리용
+                                                                "/actuator/**"
                                                 ).permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(exception -> exception
