@@ -1,5 +1,7 @@
 package com.yapp.backend.service.authorization.impl;
 
+import com.yapp.backend.common.exception.ErrorCode;
+import com.yapp.backend.common.exception.InvalidRequestException;
 import com.yapp.backend.common.exception.UserAuthorizationException;
 import com.yapp.backend.repository.JpaAccommodationRepository;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
@@ -11,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.yapp.backend.service.model.Accommodation;
 
 /**
  * 사용자-여행보드 권한 검증 서비스 구현체
@@ -100,6 +104,24 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
             throw new UserAuthorizationException(userId, tripBoardId);
         }
     }
+
+    @Override
+    public void validateAccommodationBelongsToTripBoardOrThrow(Accommodation accommodation, Long tripBoardId) {
+        log.info("숙소-여행보드 소속 검증 시작 (도메인 객체 기반) - 숙소 ID: {}, 여행보드 ID: {}", 
+                accommodation.getId(), tripBoardId);
+
+        // 숙소가 해당 여행보드에 속하는지 확인
+        Long accommodationTripBoardId = accommodation.getTripBoardId();
+        if (!tripBoardId.equals(accommodationTripBoardId)) {
+            log.warn("숙소-여행보드 소속 검증 실패 - 사유: 다른 여행보드의 숙소, 숙소 ID: {}, 요청 보드 ID: {}, 실제 보드 ID: {}",
+                    accommodation.getId(), tripBoardId, accommodationTripBoardId);
+            throw new InvalidRequestException(ErrorCode.INVALID_ACCOMMODATION, "여행보드에 생성된 숙소 정보가 아닙니다");
+        }
+
+        log.info("숙소-여행보드 소속 검증 성공 (도메인 객체 기반) - 숙소 ID: {}, 여행보드 ID: {}",
+                accommodation.getId(), tripBoardId);
+    }
+
 
     private boolean hasAccessToTripBoard(Long userId, Long tripBoardId) {
         log.info("권한 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);
