@@ -258,17 +258,37 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         return true;
     }
 
-    private static boolean isAuthorizedToTable(Long userId, ComparisonTable existingTable) {
-        return !existingTable.getCreatedById().equals(userId);
-    }
+    /**
+     * 비교 테이블에 숙소를 추가하는 순수 비즈니스 로직
+     * 
+     * @param tableId 비교 테이블 ID
+     * @param request 숙소 추가 요청
+     * @param userId 사용자 ID
+     * @return 업데이트된 비교 테이블
+     */
+    private ComparisonTable addAccommodationToComparisonTableInternal(Long tableId, AddAccommodationRequest request, Long userId) {
+        log.debug("비교 테이블에 숙소 추가 시작 - tableId: {}, userId: {}", tableId, userId);
 
-    @Override
-    @Transactional
-    public ComparisonTable addAccommodationToComparisonTable(
-            Long tableId,
-            AddAccommodationRequest request,
-            Long userId
-    ) {
+
+        // 기존 비교 테이블 조회
+        ComparisonTable comparisonTable = comparisonTableRepository.findByIdOrThrow(tableId);
+
+        // 추가하려는 숙소들이 해당 여행보드에 속하는지 확인
+        if (request.getAccommodationIds() != null && !request.getAccommodationIds().isEmpty()) {
+            // 먼저 숙소들을 조회
+            List<Accommodation> accommodationList = request.getAccommodationIds().stream()
+                    .map(accommodationRepository::findByIdOrThrow)
+                    .toList();
+
+            // 조회된 숙소들을 사용하여 검증
+            for (Accommodation accommodation : accommodationList) {
+                tripBoardAuthorizationService.validateAccommodationBelongsToTripBoardOrThrow(
+                    accommodation,
+                    comparisonTable.getTripBoardId()
+                );
+            }
+        }
+
         return comparisonTableRepository.addAccommodationsToTable(
                 tableId,
                 request.getAccommodationIds(),
