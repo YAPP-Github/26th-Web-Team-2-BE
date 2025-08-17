@@ -64,11 +64,11 @@ public class ComparisonTable {
     }
     /**
      * 도메인 객체를 Entity로 변환하기 전에 유효성을 검증합니다.
-     * @throws IllegalArgumentException 유효하지 않은 경우
+     * @throws InvalidComparisonTable 유효하지 않은 경우
      */
     public void validateBeforeSave() {
         if (!isValid()) {
-            throw new InvalidComparisonTable(ErrorCode.INVALID_ACCOMMODATION);
+            throw new InvalidComparisonTable(ErrorCode.INVALID_COMPARISON_TABLE);
         }
     }
 

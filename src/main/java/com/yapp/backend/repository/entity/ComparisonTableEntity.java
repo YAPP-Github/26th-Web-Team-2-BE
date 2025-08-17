@@ -79,6 +79,7 @@ public class ComparisonTableEntity {
     public void updateComparisonTableEntity(String tableName, List<ComparisonFactor> factors, List<ComparisonAccommodationEntity> newItems) {
         this.tableName = tableName;
         this.factors = factors;
+        this.items.clear();
         this.items.addAll(newItems);
         this.updatedAt = Instant.now();
     }

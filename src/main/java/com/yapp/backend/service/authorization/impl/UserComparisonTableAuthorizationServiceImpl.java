@@ -5,6 +5,7 @@ import com.yapp.backend.common.exception.UserAuthorizationException;
 import com.yapp.backend.service.authorization.UserComparisonTableAuthorizationService;
 import com.yapp.backend.service.authorization.UserTripBoardAuthorizationService;
 import com.yapp.backend.service.model.ComparisonTable;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class UserComparisonTableAuthorizationServiceImpl implements UserComparis
         log.debug("비교 테이블 삭제 권한 검증 시작 (엔티티 사용) - tableId: {}, userId: {}", comparisonTable.getId(), userId);
         
         // 비교 테이블 생성자만 삭제 가능
-        if (!comparisonTable.getCreatedById().equals(userId)) {
+        if (!Objects.equals(comparisonTable.getCreatedById(), userId)) {
             log.warn("비교 테이블 삭제 권한 없음 - tableId: {}, userId: {}, createdById: {}", 
                     comparisonTable.getId(), userId, comparisonTable.getCreatedById());
             throw new UserAuthorizationException(ErrorCode.INVALID_USER_AUTHORIZATION);

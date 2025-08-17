@@ -1,5 +1,6 @@
 package com.yapp.backend.repository;
 
+import com.yapp.backend.common.exception.ComparisonTableNotFoundException;
 import com.yapp.backend.service.model.ComparisonTable;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -9,10 +10,16 @@ public interface ComparisonTableRepository {
     /**
      * 비교표를 저장하고, 저장한 비교표 도메인을 반환합니다.
      * @param comparisonTable
-     * @return
+     * @return 저장 결과(생성된 ID 및 메타 정보가 반영된) 비교표 도메인 객체
      */
     ComparisonTable save(ComparisonTable comparisonTable);
 
+    /**
+     * 비교표를 조회하고,없으면 예외를 던집니다.
+     * @param tableId
+     * @return 비교표 도메인 객체
+     * @throws ComparisonTableNotFoundException
+     */
     ComparisonTable findByIdOrThrow(Long tableId);
 
     /**
