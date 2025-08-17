@@ -7,8 +7,6 @@ import com.yapp.backend.service.model.Accommodation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * Mapper utility for converting between AccommodationEntity and Accommodation domain model
@@ -70,6 +68,8 @@ public class AccommodationMapper {
                 .url(accommodation.getUrl())
                 .siteName(accommodation.getSiteName())
                 .memo(accommodation.getMemo())
+                .createdAt(accommodation.getCreatedAt())
+                .updatedAt(accommodation.getUpdatedAt())
                 .createdBy(userProxy)
                 .tripBoardId(accommodation.getTripBoardId())
                 .accommodationName(accommodation.getAccommodationName())
