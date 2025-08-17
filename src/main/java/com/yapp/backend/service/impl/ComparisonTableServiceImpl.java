@@ -304,8 +304,14 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         log.info("비교 테이블 삭제 완료 - tableId: {}", tableId);
     }
 
-    @Override
-    public ComparisonTablePageResponse getComparisonTablesByTripBoardId(Long tripBoardId, Pageable pageable) {
+    /**
+     * 여행보드의 비교 테이블 목록을 페이지네이션으로 조회하는 순수 비즈니스 로직
+     * 
+     * @param tripBoardId 여행보드 ID
+     * @param pageable 페이지네이션 정보
+     * @return 페이지네이션된 비교표 리스트 응답
+     */
+    private ComparisonTablePageResponse getComparisonTablesByTripBoardIdInternal(Long tripBoardId, Pageable pageable) {
         // 여행보드 존재 확인
         tripBoardRepository.findByIdOrThrow(tripBoardId);
 
@@ -332,7 +338,11 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         List<ComparisonTableSummaryResponse> responseList = responseMapper.toResponseList(comparisonTables);
         
         // 페이지 응답 객체로 감싸서 반환
-        return ComparisonTablePageResponse.of(responseList, hasNext);
+        ComparisonTablePageResponse response = ComparisonTablePageResponse.of(responseList, hasNext);
+        
+        log.debug("여행보드 비교 테이블 목록 조회 완료 - tripBoardId: {}, 조회된 개수: {}, hasNext: {}", 
+                tripBoardId, responseList.size(), hasNext);
+        return response;
     }
 
     /**

@@ -181,6 +181,12 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
     }
 
     @Override
+    @Transactional
+    public void deleteById(Long tableId) {
+        jpaComparisonTableRepository.deleteById(tableId);
+    }
+
+    @Override
     public List<ComparisonTable> findByTripBoardId(Long tripBoardId, Pageable pageable) {
         // Pageable 객체의 정렬 기준에 따라 적절한 JPA 메서드 선택
         List<ComparisonTableEntity> entities = selectQueryMethodBySort(tripBoardId, pageable);
