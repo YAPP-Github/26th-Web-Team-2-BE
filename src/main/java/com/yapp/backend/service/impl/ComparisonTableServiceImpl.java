@@ -201,12 +201,6 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
                         accommodationList,
                         factors
                 )
-        );
-    }
-
-    @Override
-    public ComparisonTable getComparisonTable(Long tableId) {
-        return comparisonTableRepository.findByIdOrThrow(tableId);
         ).getId();
         
         log.info("비교 테이블 생성 완료 - tableId: {}, tripBoardId: {}, userId: {}", tableId, request.getTripBoardId(), userId);
@@ -296,34 +290,18 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         );
     }
 
-    @Override
-    @Transactional
-    public void deleteComparisonTable(Long tableId, Long userId) {
-        try {
-            log.info("비교표 삭제 시작 - tableId: {}, userId: {}", tableId, userId);
+    /**
+     * 비교 테이블을 삭제하는 순수 비즈니스 로직
+     * 
+     * @param tableId 비교 테이블 ID
+     * @param userId 사용자 ID
+     */
+    private void deleteComparisonTableInternal(Long tableId, Long userId) {
+        log.debug("비교 테이블 삭제 시작 - tableId: {}, userId: {}", tableId, userId);
+        
+        comparisonTableRepository.deleteById(tableId);
 
-            // 1. findByIdOrThrow를 통한 비교표 존재 여부 확인
-            ComparisonTable comparisonTable = comparisonTableRepository.findByIdOrThrow(tableId);
-
-            // 2. 생성자 권한 검증 로직 구현 (기존 isAuthorizedToTable 메서드 활용)
-            if (isAuthorizedToTable(userId, comparisonTable)) {
-                log.warn("비교표 삭제 권한 없음 - tableId: {}, userId: {}, createdById: {}",
-                        tableId, userId, comparisonTable.getCreatedById());
-                throw new ComparisonTableDeleteException(ErrorCode.COMPARISON_TABLE_DELETE_FORBIDDEN);
-            }
-
-            // 3. deleteById 인터페이스 호출을 통한 삭제 수행
-            comparisonTableRepository.deleteById(tableId);
-
-            log.info("비교표 삭제 완료 - tableId: {}", tableId);
-
-        } catch (ComparisonTableDeleteException e) {
-            // 권한 관련 예외는 그대로 재발생
-            throw e;
-        } catch (Exception e) {
-            log.error("비교표 삭제 중 오류 발생 - tableId: {}, userId: {}", tableId, userId, e);
-            throw new ComparisonTableDeleteException(ErrorCode.COMPARISON_TABLE_DELETE_FAILED);
-        }
+        log.info("비교 테이블 삭제 완료 - tableId: {}", tableId);
     }
 
     @Override
