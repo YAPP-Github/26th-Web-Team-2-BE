@@ -57,10 +57,6 @@ public class ComparisonAccommodationEntity {
             }
     }
 
-    public ComparisonAccommodationEntity(AccommodationEntity accommodationEntity) {
-        this.accommodationEntity = accommodationEntity;
-    }
-
     public void updateComparisonTable(ComparisonTableEntity table) {
         this.comparisonTableEntity = table;
     }

@@ -72,10 +72,18 @@ public class ComparisonTableEntity {
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Instant updatedAt;  // UTC 저장
+    private Instant updatedAt;
 
-    public void update(ComparisonTable updatedComparison) {
-        this.tableName = updatedComparison.getTableName();
-        this.factors = updatedComparison.getFactors();
+    // ===== 전용 업데이트 메서드들 (캡슐화 강화) =====
+    /**
+     * 비교 테이블의 기본 정보와 숙소 매핑 리스트를 업데이트합니다.
+     * 기존 매핑을 안전하게 교체합니다.
+     */
+    public void updateComparisonTableEntity(String tableName, List<ComparisonFactor> factors, List<ComparisonAccommodationEntity> newItems) {
+        this.tableName = tableName;
+        this.factors = factors;
+        this.items.addAll(newItems);
+        this.updatedAt = Instant.now();
     }
+
 }

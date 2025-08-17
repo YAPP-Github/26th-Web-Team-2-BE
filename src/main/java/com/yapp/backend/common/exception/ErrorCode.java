@@ -14,6 +14,8 @@ public enum ErrorCode {
     TABLE_NOT_FOUND("비교표 존재하지 않음", "비교표를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ACCOMMODATION_NOT_FOUND("숙소 정보 존재하지 않음", "숙소 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     DELETED_USER_ACCESS("삭제된 유저", "삭제된 유저에 대한 접근", HttpStatus.NOT_FOUND),
+    INVALID_ACCOMMODATION("잘못된 숙소 입력", "잘못된 숙소 정보 입력입니다", HttpStatus.BAD_REQUEST),
+    INVALID_COMPARISON_TABLE("잘못된 비교 테이블 정보", "비교 테이블 정보가 잘못되었습니다.", HttpStatus.BAD_REQUEST),
 
     // Authorization & Authentication
     INVALID_USER_AUTHORIZATION("사용자 권한 없음", "해당 권한이 없는 유저입니다.", HttpStatus.FORBIDDEN),

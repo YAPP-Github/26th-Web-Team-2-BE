@@ -7,8 +7,6 @@ import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
 import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
 import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
 import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
-import com.yapp.backend.controller.dto.response.AccommodationResponse;
-import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import com.yapp.backend.controller.dto.response.ComparisonTablePageResponse;
 import com.yapp.backend.controller.dto.response.ComparisonTableSummaryResponse;
 import com.yapp.backend.controller.mapper.ComparisonTableResponseMapper;
@@ -34,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -214,45 +213,48 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         return tableId;
     }
 
+    /**
+     * 비교 테이블을 수정하는 순수 비즈니스 로직
+     * 
+     * @param existingTable 기존 비교 테이블 엔티티
+     * @param request 수정 요청
+     * @param userId 사용자 ID
+     * @return 수정 성공 여부
+     */
+    private Boolean updateComparisonTableInternal(ComparisonTable existingTable, UpdateComparisonTableRequest request, Long userId) {
+        log.debug("비교 테이블 수정 시작 - tableId: {}, userId: {}", existingTable.getId(), userId);
 
-
-    @Override
-    @Transactional
-    public Boolean updateComparisonTable(
-            Long tableId,
-            UpdateComparisonTableRequest request,
-            Long userId
-    ) {
-        ComparisonTable existingTable = comparisonTableRepository.findByIdOrThrow(tableId);
-        if (isAuthorizedToTable(userId, existingTable)) {
-            throw new UserAuthorizationException(ErrorCode.INVALID_USER_AUTHORIZATION);
+        // 요청된 숙소들이 해당 여행보드에 속하는지 확인
+        // 숙소가 존재하지 않으면 404
+        // 숙소가 여행 보드에 속하지 않으면 400
+        if (request.getAccommodationIdList() != null && !request.getAccommodationIdList().isEmpty()) {
+            // 먼저 숙소들을 조회
+            List<Accommodation> accommodationList = request.getAccommodationIdList().stream()
+                    .map(accommodationRepository::findByIdOrThrow)
+                    .toList();
+            
+            // 조회된 숙소들을 사용하여 검증 (중복 조회 방지)
+            for (Accommodation accommodation : accommodationList) {
+                tripBoardAuthorizationService.validateAccommodationBelongsToTripBoardOrThrow(
+                    accommodation, 
+                    existingTable.getTripBoardId()
+                );
+            }
         }
 
         // 1. 숙소 세부 내용 업데이트
         updateAccommodationsContent(request.getAccommodationRequestList());
 
-        // 2. ComparisonFactor 정렬 순서 업데이트
-        List<ComparisonFactor> updatedFactors = ComparisonFactor.convertToComparisonFactorList(request.getFactorList());
-
-        // 3. Accommodation 정렬 순서에 따라 숙소 리스트 재구성
+        // 2. 도메인 객체 내부 메서드로 ComparisonFactor 정렬 순서, Accommodation 정렬 순서 업데이트
         List<Accommodation> updatedAccommodationList = request.getAccommodationIdList().stream()
                 .map(accommodationRepository::findByIdOrThrow)
                 .toList();
+        List<ComparisonFactor> updatedFactors = ComparisonFactor.convertToComparisonFactorList(request.getFactorList());
+        existingTable.updateTable(request.getTableName(), updatedAccommodationList, updatedFactors);
 
-        // 4. 업데이트된 비교표 생성
-        ComparisonTable updatedTable = ComparisonTable.builder()
-                .id(existingTable.getId())
-                .tableName(request.getTableName())
-                .createdById(existingTable.getCreatedById())
-                .tripBoardId(request.getTripBoardId())
-                .accommodationList(updatedAccommodationList)
-                .factors(updatedFactors)
-                .createdAt(existingTable.getCreatedAt())
-                .build();
+        comparisonTableRepository.update(existingTable);
 
-        // 5. 비교표 업데이트 저장
-        comparisonTableRepository.update(updatedTable);
-
+        log.info("비교 테이블 수정 완료 - tableId: {}, userId: {}", existingTable.getId(), userId);
         return true;
     }
 
@@ -336,10 +338,11 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     }
 
     /**
-     * 숙소 세부 내용 업데이트
+     * 숙소 세부 내용을 업데이트하는 헬퍼 메서드
+     * 
+     * @param accommodationRequestList 업데이트할 숙소 요청 리스트
      */
-    private void updateAccommodationsContent(
-            List<UpdateAccommodationRequest> accommodationRequestList) {
+    private void updateAccommodationsContent(List<UpdateAccommodationRequest> accommodationRequestList) {
         for (UpdateAccommodationRequest accommodationRequest : accommodationRequestList) {
             if (accommodationRequest.getId() != null) {
                 accommodationService.updateAccommodation(accommodationRequest);

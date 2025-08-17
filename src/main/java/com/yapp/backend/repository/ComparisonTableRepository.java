@@ -15,6 +15,10 @@ public interface ComparisonTableRepository {
 
     ComparisonTable findByIdOrThrow(Long tableId);
 
+    /**
+     * 비교표의 메타 데이터, 숙소 매핑 정보 및 순서 등을 업데이트합니다.
+     * @param comparisonTable
+     */
     void update(ComparisonTable comparisonTable);
 
     /**
