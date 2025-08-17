@@ -36,11 +36,11 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
 
     @Override
     @Transactional
-    public Long save(ComparisonTable comparisonTable) {
+    public ComparisonTable save(ComparisonTable comparisonTable) {
         // 비교표 저장
-        return jpaComparisonTableRepository
-                .save(comparisonTableMapper.domainToEntity(comparisonTable))
-                .getId();
+        ComparisonTableEntity savedComparisonTable = jpaComparisonTableRepository
+                .save(comparisonTableMapper.domainToEntity(comparisonTable));
+        return comparisonTableMapper.entityToDomain(savedComparisonTable);
     }
 
     @Override

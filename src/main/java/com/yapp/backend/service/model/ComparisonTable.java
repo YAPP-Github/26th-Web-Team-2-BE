@@ -33,7 +33,7 @@ public class ComparisonTable {
             List<Accommodation> accommodationList,
             List<ComparisonFactor> factors
     ) {
-        return ComparisonTable.builder()
+        ComparisonTable newTable = ComparisonTable.builder()
                 .tableName(tableName)
                 .createdById(user.getId())
                 .tripBoardId(tripBoard.getId())
@@ -41,6 +41,10 @@ public class ComparisonTable {
                 .factors(factors)
                 .shareCode(ShareCodeGeneratorUtil.generateUniqueShareCode())
                 .build();
+        newTable.createdAt = Instant.now();
+        newTable.updatedAt = Instant.now();
+        return newTable;
+    }
     }
 
 }

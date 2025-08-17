@@ -47,6 +47,7 @@ public class ComparisonAccommodationEntity {
 
     // 숙소 정렬 순서
     @Column(name = "position", nullable = false)
+    @Builder.Default
     private Integer position = 0;
 
     @PrePersist
@@ -60,7 +61,7 @@ public class ComparisonAccommodationEntity {
         this.accommodationEntity = accommodationEntity;
     }
 
-    public void setComparisonTable(ComparisonTableEntity table) {
+    public void updateComparisonTable(ComparisonTableEntity table) {
         this.comparisonTableEntity = table;
     }
 }

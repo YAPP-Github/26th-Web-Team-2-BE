@@ -5,7 +5,13 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 public interface ComparisonTableRepository {
-    Long save(ComparisonTable comparisonTable);
+
+    /**
+     * 비교표를 저장하고, 저장한 비교표 도메인을 반환합니다.
+     * @param comparisonTable
+     * @return
+     */
+    ComparisonTable save(ComparisonTable comparisonTable);
 
     ComparisonTable findByIdOrThrow(Long tableId);
 

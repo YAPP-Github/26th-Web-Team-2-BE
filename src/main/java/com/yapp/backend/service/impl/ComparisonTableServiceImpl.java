@@ -184,9 +184,17 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         List<Accommodation> accommodationList = request.getAccommodationIdList().stream()
                 .map(accommodationRepository::findByIdOrThrow)
                 .toList();
+        
+        // 요청된 숙소들이 해당 여행보드에 속하는지 확인
+        for (Accommodation accommodation : accommodationList) {
+            tripBoardAuthorizationService.validateAccommodationBelongsToTripBoardOrThrow(
+                accommodation, 
+                tripBoard.getId()
+            );
+        }
 
         // 저장하고 생성된 테이블 ID 반환
-        return comparisonTableRepository.save(
+        Long tableId = comparisonTableRepository.save(
                 ComparisonTable.from(
                         request.getTableName(),
                         userRepository.findByIdOrThrow(userId),
@@ -200,6 +208,10 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     @Override
     public ComparisonTable getComparisonTable(Long tableId) {
         return comparisonTableRepository.findByIdOrThrow(tableId);
+        ).getId();
+        
+        log.info("비교 테이블 생성 완료 - tableId: {}, tripBoardId: {}, userId: {}", tableId, request.getTripBoardId(), userId);
+        return tableId;
     }
 
 
