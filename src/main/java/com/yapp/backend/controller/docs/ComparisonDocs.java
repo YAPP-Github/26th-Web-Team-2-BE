@@ -26,14 +26,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "비교표 API", description = "비교표 관련 API")
 public interface ComparisonDocs {
 
-    @Operation(summary = "비교표 기준 항목 Enum 리스트", description = "비교 기준 항목 Enum 리스트를 반환합니다.")
+    @Operation(summary = "비교표 기준 항목 Enum 리스트", description = "비교 기준 항목 Enum 리스트를 반환합니다. (인증 불필요)")
     ResponseEntity<StandardResponse<ComparisonFactorList>> getComparisonFactorList();
 
-    @Operation(summary = "편의 서비스 Enum 리스트", description = "편의 서비스 항목 Enum 리스트를 반환합니다.")
+    @Operation(summary = "편의 서비스 Enum 리스트", description = "편의 서비스 항목 Enum 리스트를 반환합니다. (인증 불필요)")
     ResponseEntity<StandardResponse<AmenityFactorList>> getAmenityFactorList();
 
-    @Operation(summary = "비교표 생성", description = "비교표 이름, 숙소 ID 리스트, 비교 기준 항목을 받아서 비교표 메타 데이터를 생성합니다. (Authorization 헤더에 Bearer 토큰 필요)")
+    @Operation(
+            summary = "비교표 생성",
+            description = "비교표 이름, 숙소 ID 리스트, 비교 기준 항목을 받아서 비교표 메타 데이터를 생성합니다. "
+                    + "(Authorization 헤더에 Bearer 토큰 필요)")
     @SecurityRequirement(name = "JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비교표 생성 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않은 토큰 또는 인증 정보 없음"),
+            @ApiResponse(responseCode = "403", description = "비교표 생성 권한이 없음"),
+            @ApiResponse(responseCode = "404", description = "비교표, 숙소 등 관련 리소스를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 - 비교표 생성 중 오류 발생")
+    })
     ResponseEntity<StandardResponse<CreateComparisonTableResponse>> createComparisonTable(
             @RequestBody CreateComparisonTableRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
@@ -45,7 +55,11 @@ public interface ComparisonDocs {
     )
     @SecurityRequirement(name = "JWT")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "비교표 조회 성공")
+        @ApiResponse(responseCode = "200", description = "비교표 조회 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않은 토큰 또는 인증 정보 없음"),
+        @ApiResponse(responseCode = "403", description = "비교표 조회 권한이 없음"),
+        @ApiResponse(responseCode = "404", description = "비교표, 숙소 등 관련 리소스를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 - 비교표 조회 중 오류 발생")
     })
     ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "숙소가 포함된 테이블의 ID") Long tableId,
@@ -57,7 +71,10 @@ public interface ComparisonDocs {
         description = "shareCode를 사용하여 인증 없이 비교표를 조회합니다. 유효한 shareCode가 필요합니다."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "비교표 조회 성공")
+        @ApiResponse(responseCode = "200", description = "비교표 조회 성공"),
+        @ApiResponse(responseCode = "403", description = "공유 코드가 유효하지 않음"),
+        @ApiResponse(responseCode = "404", description = "비교표, 숙소 등 관련 리소스를 찾을 수 없음"),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류 - 비교표 조회 중 오류 발생")
     })
     ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTableByShareCode(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "숙소가 포함된 테이블의 ID") Long tableId,
@@ -67,6 +84,13 @@ public interface ComparisonDocs {
 
     @Operation(summary = "비교표 수정", description = "비교표 메타 데이터(제목)와 숙소 세부 내용, 비교 기준 정렬 순서, 숙소 정렬 순서를 수정합니다. (Authorization 헤더에 Bearer 토큰 필요)")
     @SecurityRequirement(name = "JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비교표 수정 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않은 토큰 또는 인증 정보 없음"),
+            @ApiResponse(responseCode = "403", description = "비교표 수정 권한이 없음"),
+            @ApiResponse(responseCode = "404", description = "비교표, 숙소, 여행 보드 등 관련 리소스를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 - 비교표 수정 중 오류 발생")
+    })
     ResponseEntity<StandardResponse<Boolean>> updateComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "수정할 테이블의 ID") Long tableId,
             @RequestBody UpdateComparisonTableRequest request,
@@ -75,6 +99,13 @@ public interface ComparisonDocs {
 
     @Operation(summary = "비교표 숙소 추가", description = "비교표에 새로운 숙소를 추가합니다. (Authorization 헤더에 Bearer 토큰 필요)")
     @SecurityRequirement(name = "JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비교표에 숙소 추가 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않은 토큰 또는 인증 정보 없음"),
+            @ApiResponse(responseCode = "403", description = "비교표 수정 권한이 없음"),
+            @ApiResponse(responseCode = "404", description = "비교표, 숙소 등 관련 리소스를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 - 비교표 수정 중 오류 발생")
+    })
     ResponseEntity<StandardResponse<ComparisonTableResponse>> addAccommodationToComparisonTable(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "테이블의 ID") Long tableId,
             @RequestBody AddAccommodationRequest request,
@@ -100,11 +131,16 @@ public interface ComparisonDocs {
     )
     @SecurityRequirement(name = "JWT")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "비교표 리스트 조회 성공")
+            @ApiResponse(responseCode = "200", description = "비교표 리스트 조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않은 토큰 또는 인증 정보 없음"),
+            @ApiResponse(responseCode = "403", description = "권한 없음 - 여행보드 멤버가 아님"),
+            @ApiResponse(responseCode = "404", description = "여행보드 등 관련 리소스를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 - 비교표 리스트 조회 중 오류 발생")
     })
     ResponseEntity<StandardResponse<ComparisonTablePageResponse>> getComparisonTablesByTripBoard(
             @Parameter(in = ParameterIn.PATH, schema = @Schema(type = "integer"), description = "조회할 여행보드의 ID") Long tripBoardId,
             @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 번호 (0부터 시작)") Integer page,
-            @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 크기") Integer size);
+            @Parameter(in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "페이지 크기") Integer size,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails);
 
 }
