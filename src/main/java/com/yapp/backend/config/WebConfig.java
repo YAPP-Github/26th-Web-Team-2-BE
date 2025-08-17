@@ -23,7 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://*.run.app",
                         "https://ssok-*.vercel.app"
                 )
-                .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                .allowedMethods("GET","POST","PUT","DELETE","OPTIONS", "PATCH")
                 .allowCredentials(true);
     }
 }
