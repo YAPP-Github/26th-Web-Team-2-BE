@@ -4,6 +4,7 @@ import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.exception.InvalidComparisonTable;
 import com.yapp.backend.common.util.ShareCodeGeneratorUtil;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -43,8 +44,9 @@ public class ComparisonTable {
                 .factors(factors)
                 .shareCode(ShareCodeGeneratorUtil.generateUniqueShareCode())
                 .build();
-        newTable.createdAt = Instant.now();
-        newTable.updatedAt = Instant.now();
+        Instant now = Instant.now();
+        newTable.createdAt = now;
+        newTable.updatedAt = now;
         return newTable;
     }
 
