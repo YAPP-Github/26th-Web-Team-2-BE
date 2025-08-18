@@ -32,6 +32,11 @@ public class UserServiceImpl implements UserService {
         
         return user;
     }
+
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findByIdOrThrow(userId);
+    }
     
     @Override
     @Transactional
