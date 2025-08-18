@@ -15,6 +15,8 @@ public class UpdateAccommodationRequest {
     @Size(max = 100, message = "100자 이내로 수정 가능합니다.")
     private String memo;
     private Integer lowestPrice;
+
+    @Size(max = 3, message = "KRW, EUR, USD, JPY등과 같이 통화코드만 입력 가능합니다.")
     private String currency;
     private Double reviewScore;
     private Double cleanlinessScore;

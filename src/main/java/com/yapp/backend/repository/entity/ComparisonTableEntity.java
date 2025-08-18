@@ -1,21 +1,18 @@
 package com.yapp.backend.repository.entity;
 
-
 import static jakarta.persistence.CascadeType.ALL;
 
-import com.yapp.backend.service.model.Accommodation;
-import com.yapp.backend.service.model.ComparisonTable;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -43,15 +40,15 @@ public class ComparisonTableEntity {
     @Column(name = "table_name")
     private String tableName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_board")
     private TripBoardEntity tripBoardEntity;
-
-    @ManyToOne
+    
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private UserEntity createdByEntity;
 
-    @Type(JsonType.class)
+    @Type(JsonBinaryType.class)
     @Column(name = "factors", columnDefinition = "jsonb")
     private List<ComparisonFactor> factors;
 
@@ -63,7 +60,7 @@ public class ComparisonTableEntity {
             cascade = ALL,
             orphanRemoval = true
     )
-    @OrderBy("position")
+    @Builder.Default
     private List<ComparisonAccommodationEntity> items = new ArrayList<>();
 
     @CreationTimestamp
@@ -72,10 +69,19 @@ public class ComparisonTableEntity {
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Instant updatedAt;  // UTC 저장
+    private Instant updatedAt;
 
-    public void update(ComparisonTable updatedComparison) {
-        this.tableName = updatedComparison.getTableName();
-        this.factors = updatedComparison.getFactors();
+    // ===== 전용 업데이트 메서드들 (캡슐화 강화) =====
+    /**
+     * 비교 테이블의 기본 정보와 숙소 매핑 리스트를 업데이트합니다.
+     * 기존 매핑을 안전하게 교체합니다.
+     */
+    public void updateComparisonTableEntity(String tableName, List<ComparisonFactor> factors, List<ComparisonAccommodationEntity> newItems) {
+        this.tableName = tableName;
+        this.factors = factors;
+        this.items.clear();
+        this.items.addAll(newItems);
+        this.updatedAt = Instant.now();
     }
+
 }

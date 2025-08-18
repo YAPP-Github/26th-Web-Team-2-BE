@@ -77,14 +77,13 @@ public class ComparisonTableController implements ComparisonDocs {
                         new AmenityFactorList(List.of(AmenityFactor.values()))));
     }
 
-    // TODO: 비교 테이블 관련 권한 검증
     @Override
     @PostMapping("/new")
     public ResponseEntity<StandardResponse<CreateComparisonTableResponse>> createComparisonTable(
             @RequestBody @Valid CreateComparisonTableRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        Long tableId = comparisonTableService.createComparisonTable(request, userId);
+        Long tableId = comparisonTableService.createComparisonTableWithAuthorization(request, userId);
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS,
                         new CreateComparisonTableResponse(tableId)));
@@ -96,7 +95,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @PathVariable("tableId") Long tableId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        ComparisonTable comparisonTable = comparisonTableService.getComparisonTable(tableId);
+        ComparisonTable comparisonTable = comparisonTableService.getComparisonTableWithAuthorization(tableId, userDetails.getUserId());
         User creator = userService.getUserById(comparisonTable.getCreatedById());
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
 
@@ -104,10 +103,10 @@ public class ComparisonTableController implements ComparisonDocs {
     }
 
     /**
-     * shareCode를 통한 비교표 조회 (인증 불필요)
+     * shareCode를 통한 비교표 조회 (인증 불필요, 권한 검증 불필요)
      */
     @Override
-    @PublicApi(description = "공유 코드를 통한 비교표 조회 - 인증 불필요")
+    @PublicApi(description = "공유 코드를 통한 비교표 조회 - 인증 불필요, 권한 검증 불필요")
     @GetMapping("/{tableId}/shared")
     public ResponseEntity<StandardResponse<ComparisonTableResponse>> getComparisonTableByShareCode(
             @PathVariable("tableId") Long tableId,
@@ -141,7 +140,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @RequestBody UpdateComparisonTableRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        Boolean isUpdated = comparisonTableService.updateComparisonTable(tableId, request, userId);
+        Boolean isUpdated = comparisonTableService.updateComparisonTableWithAuthorization(tableId, request, userId);
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, isUpdated));
     }
@@ -154,7 +153,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
 
-        ComparisonTable comparisonTable = comparisonTableService.addAccommodationToComparisonTable(tableId, request, userId);
+        ComparisonTable comparisonTable = comparisonTableService.addAccommodationToComparisonTableWithAuthorization(tableId, request, userId);
         User creator = userService.getUserById(comparisonTable.getCreatedById());
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
 
@@ -167,7 +166,7 @@ public class ComparisonTableController implements ComparisonDocs {
             @PathVariable("tableId") Long tableId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        comparisonTableService.deleteComparisonTable(tableId, userId);
+        comparisonTableService.deleteComparisonTableWithAuthorization(tableId, userId);
 
         ComparisonTableDeleteResponse response = ComparisonTableDeleteResponse.builder()
                 .tableId(tableId)
@@ -183,15 +182,16 @@ public class ComparisonTableController implements ComparisonDocs {
     public ResponseEntity<StandardResponse<ComparisonTablePageResponse>> getComparisonTablesByTripBoard(
             @PathVariable("tripBoardId") Long tripBoardId,
             @RequestParam Integer page,
-            @RequestParam Integer size) {
+            @RequestParam Integer size,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         // 페이징 객체 생성 (최신순 정렬: 수정일 내림차순)
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.DESC, "updatedAt"));
 
-        // Service로부터 페이지네이션된 응답 조회
+        // Service로부터 페이지네이션된 응답 조회 (권한 검증 포함)
         ComparisonTablePageResponse response =
-                comparisonTableService.getComparisonTablesByTripBoardId(tripBoardId, pageable);
+                comparisonTableService.getComparisonTablesByTripBoardIdWithAuthorization(tripBoardId, pageable, userDetails.getUserId());
 
         return ResponseEntity.ok(
                 new StandardResponse<>(ResponseType.SUCCESS, response));

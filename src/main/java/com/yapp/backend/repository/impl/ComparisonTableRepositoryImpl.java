@@ -14,17 +14,18 @@ import com.yapp.backend.repository.mapper.ComparisonTableMapper;
 import com.yapp.backend.service.model.Accommodation;
 import com.yapp.backend.service.model.ComparisonTable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.HashSet;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ComparisonTableRepositoryImpl implements ComparisonTableRepository {
@@ -36,11 +37,11 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
 
     @Override
     @Transactional
-    public Long save(ComparisonTable comparisonTable) {
+    public ComparisonTable save(ComparisonTable comparisonTable) {
         // 비교표 저장
-        return jpaComparisonTableRepository
-                .save(comparisonTableMapper.domainToEntity(comparisonTable))
-                .getId();
+        ComparisonTableEntity savedComparisonTable = jpaComparisonTableRepository
+                .save(comparisonTableMapper.domainToEntity(comparisonTable));
+        return comparisonTableMapper.entityToDomain(savedComparisonTable);
     }
 
     @Override
@@ -53,66 +54,67 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
     @Override
     @Transactional
     public void update(ComparisonTable comparisonTable) {
-        // 기존 엔티티 조회
+        // 도메인 객체 유효성 검증
+        comparisonTable.validateBeforeSave();
+        
+        // 기존 엔티티 조회 (managed 상태 유지)
         ComparisonTableEntity existingEntity = jpaComparisonTableRepository.findById(comparisonTable.getId())
                 .orElseThrow(() -> new ComparisonTableNotFoundException(ErrorCode.TABLE_NOT_FOUND));
+        
+        // 1. 새로운 매핑 정보 리스트
+        List<ComparisonAccommodationEntity> newMappings = updateAccommodationMappings(
+                existingEntity,
+                comparisonTable.getAccommodationList()
+        );
+        // 2. 기존 매핑 정보 삭제
+        existingEntity.getItems().clear();
+        jpaComparisonTableRepository.flush();
 
-        // 기본 정보, 숙소 매핑 정보 업데이트
-        existingEntity.update(comparisonTable);
-        updateAccommodationMappings(existingEntity, comparisonTable.getAccommodationList());
-        jpaComparisonTableRepository.save(existingEntity);
+        // 2. 비교테이블 메타 정보 및 숙소 매핑 정보 업데이트
+        existingEntity.updateComparisonTableEntity(
+                comparisonTable.getTableName(),
+                comparisonTable.getFactors(),
+                newMappings);
+
+        log.debug("비교 테이블 배치 업데이트 완료 - tableId: {}", comparisonTable.getId());
     }
 
-    @Override
-    @Transactional
-    public void deleteById(Long tableId) {
-        jpaComparisonTableRepository.deleteById(tableId);
-    }
 
     /**
-     * 숙소 매핑 정보를 업데이트합니다.
-     * 기존 매핑을 삭제/생성하는 대신 position을 업데이트하고 필요한 경우에만 추가/삭제합니다.
+     * 숙소 매핑 엔티티 리스트를 생성합니다.
      */
-    private void updateAccommodationMappings(
-            ComparisonTableEntity tableEntity,
+    private List<ComparisonAccommodationEntity> updateAccommodationMappings(
+            ComparisonTableEntity existingEntity, 
             List<Accommodation> accommodationList) {
-        // 기존 매핑을 Map으로 변환 (accommodationId -> ComparisonAccommodationEntity)
-        Map<Long, ComparisonAccommodationEntity> existingMappings = new HashMap<>();
-        for (ComparisonAccommodationEntity item : tableEntity.getItems()) {
-            existingMappings.put(item.getAccommodationEntity().getId(), item);
-        }
-
-        // 새로운 매핑 리스트 생성
-        List<ComparisonAccommodationEntity> updatedItems = new ArrayList<>();
+        
+        List<ComparisonAccommodationEntity> newMappings = new ArrayList<>();
+        Set<Long> processedIds = new HashSet<>(); // 중복 방지
+        
         for (int i = 0; i < accommodationList.size(); i++) {
             Long accommodationId = accommodationList.get(i).getId();
-            // 기존 매핑이 있는 경우 position만 업데이트
-            if (existingMappings.containsKey(accommodationId)) {
-                ComparisonAccommodationEntity existingItem = existingMappings.get(accommodationId);
-                ComparisonAccommodationEntity updatedItem = ComparisonAccommodationEntity.builder()
-                        .id(existingItem.getId())
-                        .comparisonTableEntity(tableEntity)
-                        .accommodationEntity(existingItem.getAccommodationEntity())
-                        .position(i)
-                        .build();
-                updatedItems.add(updatedItem);
-                existingMappings.remove(accommodationId); // 처리된 매핑 제거
-            } else {
-                // 새로운 매핑 생성 - AccommodationRepository에서 Entity 조회
-                AccommodationEntity accommodationEntity = jpaAccommodationRepository.getReferenceById(accommodationId);
-                ComparisonAccommodationEntity newItem = ComparisonAccommodationEntity.builder()
-                        .comparisonTableEntity(tableEntity)
-                        .accommodationEntity(accommodationEntity)
-                        .position(i)
-                        .build();
-                updatedItems.add(newItem);
+            
+            // 중복 체크
+            if (processedIds.contains(accommodationId)) {
+                log.warn("중복된 숙소 ID가 감지되어 건너뜁니다: accommodationId={}, position={}", accommodationId, i);
+                continue;
             }
+            processedIds.add(accommodationId);
+            
+            // 새로운 매핑 생성
+            AccommodationEntity accommodationEntity = jpaAccommodationRepository.getReferenceById(accommodationId);
+            ComparisonAccommodationEntity newItem = ComparisonAccommodationEntity.builder()
+                    .comparisonTableEntity(existingEntity)
+                    .accommodationEntity(accommodationEntity)
+                    .position(i)
+                    .build();
+            newMappings.add(newItem);
         }
-
-        // 매핑 리스트 교체
-        // 남은 기존 매핑들은 자동으로 삭제됨 (orphanRemoval = true)
-        tableEntity.getItems().clear();
-        tableEntity.getItems().addAll(updatedItems);
+        
+        log.debug("숙소 매핑 생성 완료 - tableId: {}, 총 매핑 수: {}, 중복 제거된 숙소 수: {}", 
+                existingEntity.getId(), newMappings.size(), 
+                accommodationList.size() - processedIds.size());
+        
+        return newMappings;
     }
 
     @Override
@@ -176,6 +178,12 @@ public class ComparisonTableRepositoryImpl implements ComparisonTableRepository 
     @Transactional
     public void removeAccommodationFromAllTables(Long accommodationId) {
         jpaComparisonTableRepository.deleteComparisonAccommodationsByAccommodationId(accommodationId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long tableId) {
+        jpaComparisonTableRepository.deleteById(tableId);
     }
 
     @Override

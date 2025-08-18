@@ -1,5 +1,7 @@
 package com.yapp.backend.service.authorization.impl;
 
+import com.yapp.backend.common.exception.ErrorCode;
+import com.yapp.backend.common.exception.InvalidRequestException;
 import com.yapp.backend.common.exception.UserAuthorizationException;
 import com.yapp.backend.repository.JpaAccommodationRepository;
 import com.yapp.backend.repository.JpaUserTripBoardRepository;
@@ -11,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.yapp.backend.service.model.Accommodation;
 
 /**
  * 사용자-여행보드 권한 검증 서비스 구현체
@@ -100,6 +104,8 @@ public class UserTripBoardAuthorizationServiceImpl implements UserTripBoardAutho
             throw new UserAuthorizationException(userId, tripBoardId);
         }
     }
+
+
 
     private boolean hasAccessToTripBoard(Long userId, Long tripBoardId) {
         log.info("권한 검증 시작 - 사용자 ID: {}, 보드 ID: {}", userId, tripBoardId);

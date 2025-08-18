@@ -63,6 +63,8 @@ public class ComparisonTableResponseMapper {
                         .collect(Collectors.toList()),
                 comparisonTable.getShareCode(),
                 comparisonTable.getFactors(),
+                comparisonTable.getCreatedAt(),
+                comparisonTable.getUpdatedAt(),
                 comparisonTable.getCreatedById(),
                 creatorName
         );

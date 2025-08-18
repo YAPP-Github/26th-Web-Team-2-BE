@@ -37,14 +37,17 @@ public class ComparisonTableMapper {
                 .items(new ArrayList<>())
                 .factors(comparisonTable.getFactors())
                 .shareCode(comparisonTable.getShareCode())
+                .createdAt(comparisonTable.getCreatedAt())
+                .updatedAt(comparisonTable.getUpdatedAt())
                 .build();
+
         for (int i = 0; i < comparisonTable.getAccommodationList().size(); i++) {
             Accommodation accommodation = comparisonTable.getAccommodationList().get(i);
             AccommodationEntity accEntity = accommodationMapper.domainToEntity(accommodation);
             ComparisonAccommodationEntity itemEntity = ComparisonAccommodationEntity.builder()
                     .accommodationEntity(accEntity)
                     .position(i).build();
-            itemEntity.setComparisonTable(tableEntity);
+            itemEntity.updateComparisonTable(tableEntity);
             tableEntity.getItems().add(itemEntity);
         }
 

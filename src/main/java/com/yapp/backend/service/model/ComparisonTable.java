@@ -1,7 +1,10 @@
 package com.yapp.backend.service.model;
 
+import com.yapp.backend.common.exception.ErrorCode;
+import com.yapp.backend.common.exception.InvalidComparisonTable;
 import com.yapp.backend.common.util.ShareCodeGeneratorUtil;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -33,7 +36,7 @@ public class ComparisonTable {
             List<Accommodation> accommodationList,
             List<ComparisonFactor> factors
     ) {
-        return ComparisonTable.builder()
+        ComparisonTable newTable = ComparisonTable.builder()
                 .tableName(tableName)
                 .createdById(user.getId())
                 .tripBoardId(tripBoard.getId())
@@ -41,6 +44,50 @@ public class ComparisonTable {
                 .factors(factors)
                 .shareCode(ShareCodeGeneratorUtil.generateUniqueShareCode())
                 .build();
+        Instant now = Instant.now();
+        newTable.createdAt = now;
+        newTable.updatedAt = now;
+        return newTable;
+    }
+
+    /**
+     * 비교 테이블의 모든 정보를 업데이트합니다.
+     * shareCode는 보존됩니다.
+     * @param tableName 새로운 테이블명
+     * @param accommodationList 새로운 숙소 리스트
+     * @param factors 새로운 비교 기준
+     */
+    public void updateTable(String tableName, List<Accommodation> accommodationList, List<ComparisonFactor> factors) {
+        this.tableName = tableName;
+        this.accommodationList = accommodationList;
+        this.factors = factors;
+        this.updatedAt = Instant.now();
+        // shareCode는 보존 (생성 시에만 설정)
+    }
+    /**
+     * 도메인 객체를 Entity로 변환하기 전에 유효성을 검증합니다.
+     * @throws InvalidComparisonTable 유효하지 않은 경우
+     */
+    public void validateBeforeSave() {
+        if (!isValid()) {
+            throw new InvalidComparisonTable(ErrorCode.INVALID_COMPARISON_TABLE);
+        }
+    }
+
+    /**
+     * 비교 테이블의 유효성을 검증합니다.
+     * - 테이블 이름
+     * - 숙소 리스트 (1개 이상 존재)
+     * - 공유 코드
+     * @return 유효성 검증 결과
+     */
+    private boolean isValid() {
+        if(tableName == null || tableName.trim().isEmpty()) return false;
+        if(accommodationList == null || accommodationList.isEmpty()) return false;
+        if(createdById == null) return false;
+        if(tripBoardId == null) return false;
+        if(shareCode == null) return false;
+        return true;
     }
 
 }
