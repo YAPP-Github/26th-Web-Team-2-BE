@@ -72,15 +72,20 @@ public class ComparisonTable {
         }
     }
 
-
     /**
      * 비교 테이블의 유효성을 검증합니다.
+     * - 테이블 이름
+     * - 숙소 리스트 (1개 이상 존재)
+     * - 공유 코드
      * @return 유효성 검증 결과
      */
     private boolean isValid() {
-        return tableName != null && !tableName.trim().isEmpty()
-                && accommodationList != null && !accommodationList.isEmpty()
-                && shareCode != null;
+        if(tableName == null || tableName.trim().isEmpty()) return false;
+        if(accommodationList == null || accommodationList.isEmpty()) return false;
+        if(createdById == null) return false;
+        if(tripBoardId == null) return false;
+        if(shareCode == null) return false;
+        return true;
     }
 
 }
