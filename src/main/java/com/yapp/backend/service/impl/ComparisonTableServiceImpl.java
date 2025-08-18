@@ -223,9 +223,10 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         // 요청된 숙소들이 해당 여행보드에 속하는지 확인
         // 숙소가 존재하지 않으면 404
         // 숙소가 여행 보드에 속하지 않으면 400
+        List<Accommodation> accommodationList = null;
         if (request.getAccommodationIdList() != null && !request.getAccommodationIdList().isEmpty()) {
             // 먼저 숙소들을 조회
-            List<Accommodation> accommodationList = request.getAccommodationIdList().stream()
+            accommodationList = request.getAccommodationIdList().stream()
                     .map(accommodationRepository::findByIdOrThrow)
                     .toList();
             
@@ -242,11 +243,8 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         updateAccommodationsContent(request.getAccommodationRequestList());
 
         // 2. 도메인 객체 내부 메서드로 ComparisonFactor 정렬 순서, Accommodation 정렬 순서 업데이트
-        List<Accommodation> updatedAccommodationList = request.getAccommodationIdList().stream()
-                .map(accommodationRepository::findByIdOrThrow)
-                .toList();
         List<ComparisonFactor> updatedFactors = ComparisonFactor.convertToComparisonFactorList(request.getFactorList());
-        existingTable.updateTable(request.getTableName(), updatedAccommodationList, updatedFactors);
+        existingTable.updateTable(request.getTableName(), accommodationList, updatedFactors);
 
         comparisonTableRepository.update(existingTable);
 
