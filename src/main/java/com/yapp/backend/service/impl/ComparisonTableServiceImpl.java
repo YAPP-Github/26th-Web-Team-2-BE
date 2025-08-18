@@ -10,6 +10,7 @@ import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
 import com.yapp.backend.controller.dto.response.ComparisonTablePageResponse;
 import com.yapp.backend.controller.dto.response.ComparisonTableSummaryResponse;
 import com.yapp.backend.controller.mapper.ComparisonTableResponseMapper;
+import com.yapp.backend.service.authorization.UserAccommodationAuthorizationService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import com.yapp.backend.repository.AccommodationRepository;
@@ -52,6 +53,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     private final ComparisonTableResponseMapper responseMapper;
     private final UserComparisonTableAuthorizationService authorizationService;
     private final UserTripBoardAuthorizationService tripBoardAuthorizationService;
+    private final UserAccommodationAuthorizationService accommodationAuthorizationService;
 
     // ==================== Public Methods (Controller에서 호출) ====================
 
@@ -186,7 +188,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         
         // 요청된 숙소들이 해당 여행보드에 속하는지 확인
         for (Accommodation accommodation : accommodationList) {
-            tripBoardAuthorizationService.validateAccommodationBelongsToTripBoardOrThrow(
+            accommodationAuthorizationService.validateAccommodationBelongsToTripBoardOrThrow(
                 accommodation, 
                 tripBoard.getId()
             );
@@ -229,7 +231,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
             
             // 조회된 숙소들을 사용하여 검증 (중복 조회 방지)
             for (Accommodation accommodation : accommodationList) {
-                tripBoardAuthorizationService.validateAccommodationBelongsToTripBoardOrThrow(
+                accommodationAuthorizationService.validateAccommodationBelongsToTripBoardOrThrow(
                     accommodation, 
                     existingTable.getTripBoardId()
                 );
@@ -276,7 +278,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
 
             // 조회된 숙소들을 사용하여 검증
             for (Accommodation accommodation : accommodationList) {
-                tripBoardAuthorizationService.validateAccommodationBelongsToTripBoardOrThrow(
+                accommodationAuthorizationService.validateAccommodationBelongsToTripBoardOrThrow(
                     accommodation,
                     comparisonTable.getTripBoardId()
                 );
