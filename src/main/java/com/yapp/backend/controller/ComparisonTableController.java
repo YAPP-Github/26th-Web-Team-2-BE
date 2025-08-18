@@ -18,6 +18,8 @@ import com.yapp.backend.controller.dto.response.ComparisonTablePageResponse;
 import com.yapp.backend.controller.dto.response.CreateComparisonTableResponse;
 import com.yapp.backend.filter.dto.CustomUserDetails;
 import com.yapp.backend.service.ComparisonTableService;
+import com.yapp.backend.service.UserService;
+import com.yapp.backend.service.model.User;
 import com.yapp.backend.service.model.enums.AmenityFactor;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
 import jakarta.validation.Valid;
@@ -53,6 +55,7 @@ public class ComparisonTableController implements ComparisonDocs {
 
     private final ComparisonTableService comparisonTableService;
     private final ComparisonTableResponseMapper comparisonTableResponseMapper;
+    private final UserService userService;
 
     @Override
     @PublicApi(description = "비교 기준 항목 목록 조회 - 인증 불필요")
@@ -93,7 +96,8 @@ public class ComparisonTableController implements ComparisonDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         ComparisonTable comparisonTable = comparisonTableService.getComparisonTableWithAuthorization(tableId, userDetails.getUserId());
-        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable);
+        User creator = userService.getUserById(comparisonTable.getCreatedById());
+        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
@@ -112,7 +116,9 @@ public class ComparisonTableController implements ComparisonDocs {
 
         // shareCode 검증
         validateShareCodeAccess(tableId, shareCode, comparisonTable);
-        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable);
+
+        User creator = userService.getUserById(comparisonTable.getCreatedById());
+        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }
 
@@ -148,7 +154,8 @@ public class ComparisonTableController implements ComparisonDocs {
         Long userId = userDetails.getUserId();
 
         ComparisonTable comparisonTable = comparisonTableService.addAccommodationToComparisonTableWithAuthorization(tableId, request, userId);
-        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable);
+        User creator = userService.getUserById(comparisonTable.getCreatedById());
+        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
 
         return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
     }

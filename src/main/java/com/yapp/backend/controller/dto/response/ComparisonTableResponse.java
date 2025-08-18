@@ -19,4 +19,5 @@ public class ComparisonTableResponse {
     private Instant createdAt;
     private Instant lastModifiedAt;
     private Long createdBy;
+    private String creatorName;
 }
