@@ -15,7 +15,7 @@ public class ComparisonTableResponse {
     private String tableName;
     private List<AccommodationResponse> accommodationResponsesList;
     private String shareCode;
-    private List<ComparisonFactor> factorsList;
+    private List<ComparisonFactor> factorList;
     private Instant createdAt;
     private Instant lastModifiedAt;
     private Long createdBy;
