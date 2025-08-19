@@ -11,6 +11,7 @@ import com.yapp.backend.service.dto.ScrapingTransportation;
 import com.yapp.backend.service.dto.ScrapingCheckTime;
 import com.yapp.backend.service.model.Amenity;
 import com.yapp.backend.service.model.Attraction;
+import com.yapp.backend.service.model.DistanceInfo;
 import com.yapp.backend.service.model.Transportation;
 import com.yapp.backend.service.model.CheckTime;
 
@@ -152,8 +153,12 @@ public class ScrapingDataMapper {
                 .latitude(scrapingAttraction.getLatitude())
                 .longitude(scrapingAttraction.getLongitude())
                 .distance(scrapingAttraction.getDistance())
+                .byFoot(mapDistanceInfo(scrapingAttraction.getByFoot()))
+                .byCar(mapDistanceInfo(scrapingAttraction.getByCar()))
+
                 .build();
     }
+
 
     /**
      * 스크래핑 교통수단 리스트를 도메인 모델로 매핑합니다.
@@ -178,7 +183,20 @@ public class ScrapingDataMapper {
                 .latitude(scrapingTransportation.getLatitude())
                 .longitude(scrapingTransportation.getLongitude())
                 .distance(scrapingTransportation.getDistance())
+                .byFoot(mapDistanceInfo(scrapingTransportation.getByFoot()))
+                .byCar(mapDistanceInfo(scrapingTransportation.getByCar()))
                 .build();
+    }
+
+    private DistanceInfo mapDistanceInfo(DistanceInfo scrapingDistanceInfo) {
+        if (scrapingDistanceInfo == null) {
+            return null;
+        }
+        return DistanceInfo.builder()
+                .distance(scrapingDistanceInfo.getDistance())
+                .time(scrapingDistanceInfo.getTime())
+                .build();
+
     }
 
     /**
