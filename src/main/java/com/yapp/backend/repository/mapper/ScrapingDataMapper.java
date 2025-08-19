@@ -189,6 +189,9 @@ public class ScrapingDataMapper {
     }
 
     private DistanceInfo mapDistanceInfo(DistanceInfo scrapingDistanceInfo) {
+        if (scrapingDistanceInfo == null) {
+            return null;
+        }
         return DistanceInfo.builder()
                 .distance(scrapingDistanceInfo.getDistance())
                 .time(scrapingDistanceInfo.getTime())
