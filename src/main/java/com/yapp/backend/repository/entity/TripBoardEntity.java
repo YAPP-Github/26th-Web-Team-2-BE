@@ -12,7 +12,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -60,6 +59,10 @@ public class TripBoardEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "next_comparison_table_number", nullable = false)
+    @Builder.Default
+    private Integer nextComparisonTableNumber = 1;
 
     @OneToMany(mappedBy = "tripBoardEntity"
     // cascade = CascadeType.ALL,
