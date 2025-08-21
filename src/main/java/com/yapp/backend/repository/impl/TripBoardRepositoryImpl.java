@@ -163,4 +163,16 @@ public class TripBoardRepositoryImpl implements TripBoardRepository {
                 .map(tripBoardMapper::entityToDomain);
     }
 
+    @Override
+    @Transactional
+    public int getNextComparisonTableNumber(Long tripBoardId) {
+        TripBoardEntity tripBoard = jpaTripBoardRepository.getAndIncrementSequenceNumber(tripBoardId)
+                .orElseThrow(TripBoardNotFoundException::new);
+        
+        int nextNumber = tripBoard.getAndIncrementNumber();
+        jpaTripBoardRepository.save(tripBoard);
+        
+        return nextNumber;
+    }
+
 }

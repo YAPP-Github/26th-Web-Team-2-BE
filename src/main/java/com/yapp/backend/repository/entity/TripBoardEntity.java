@@ -82,4 +82,12 @@ public class TripBoardEntity {
         this.endDate = endDate;
         this.updatedBy = updatedBy;
     }
+
+    /**
+     * 다음 비교표 번호를 가져오고 증가시킵니다.
+     * @return 다음 비교표 번호
+     */
+    public int getAndIncrementNumber() {
+        return nextComparisonTableNumber++;
+    }
 }

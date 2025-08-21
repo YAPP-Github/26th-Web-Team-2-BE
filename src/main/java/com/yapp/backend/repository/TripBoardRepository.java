@@ -66,4 +66,11 @@ public interface TripBoardRepository {
      * 존재하지 않는 경우 Optional.empty() 반환
      */
     Optional<TripBoard> findById(Long id);
+
+    /**
+     * 특정 여행보드의 다음 비교표 번호를 가져옵니다.
+     * @param tripBoardId 여행보드 ID
+     * @return 다음 비교표 번호
+     */
+    int getNextComparisonTableNumber(Long tripBoardId);
 }

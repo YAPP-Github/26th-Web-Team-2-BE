@@ -1,6 +1,5 @@
 package com.yapp.backend.controller.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -11,7 +10,7 @@ public class CreateComparisonTableRequest {
     @NotNull(message = "여행 보드 ID는 필수 입력값입니다.")
     private Long tripBoardId;
 
-    @NotBlank
+    // tableName이 null이거나 빈 문자열이면 자동 생성됩니다
     private String tableName;
 
     @NotEmpty(message = "숙소 정렬 순서대로 ID를 입력해주세요. 1개 이상 필수 입력입니다.")

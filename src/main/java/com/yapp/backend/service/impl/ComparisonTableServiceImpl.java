@@ -3,6 +3,7 @@ package com.yapp.backend.service.impl;
 import com.yapp.backend.common.exception.ComparisonTableDeleteException;
 import com.yapp.backend.common.exception.ErrorCode;
 import com.yapp.backend.common.exception.UserAuthorizationException;
+import com.yapp.backend.common.util.ComparisonTableNameGeneratorUtil;
 import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
 import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
 import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
@@ -26,7 +27,6 @@ import com.yapp.backend.service.model.ComparisonTable;
 import com.yapp.backend.service.model.TripBoard;
 import com.yapp.backend.service.model.enums.ComparisonFactor;
 
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -194,10 +194,19 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
             );
         }
 
+        // 비교표 이름 자동 생성 (tableName이 null이거나 빈 문자열인 경우)
+        String tableName = request.getTableName();
+        if (tableName == null || tableName.trim().isEmpty()) {
+            int nextNumber = tripBoardRepository.getNextComparisonTableNumber(tripBoard.getId());
+            tableName = ComparisonTableNameGeneratorUtil.generateTableName(nextNumber);
+            log.debug("비교표 이름 자동 생성 - tripBoardId: {}, destination: {}, nextNumber: {}, generatedName: {}", 
+                    tripBoard.getId(), tripBoard.getDestination(), nextNumber, tableName);
+        }
+
         // 저장하고 생성된 테이블 ID 반환
         Long tableId = comparisonTableRepository.save(
                 ComparisonTable.from(
-                        request.getTableName(),
+                        tableName,
                         userRepository.findByIdOrThrow(userId),
                         tripBoard,
                         accommodationList,
