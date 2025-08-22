@@ -12,7 +12,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -61,6 +60,10 @@ public class TripBoardEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "next_comparison_table_number", nullable = false)
+    @Builder.Default
+    private Integer nextComparisonTableNumber = 1;
+
     @OneToMany(mappedBy = "tripBoardEntity"
     // cascade = CascadeType.ALL,
     // orphanRemoval = true
@@ -78,5 +81,13 @@ public class TripBoardEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.updatedBy = updatedBy;
+    }
+
+    /**
+     * 다음 비교표 번호를 가져오고 증가시킵니다.
+     * @return 다음 비교표 번호
+     */
+    public int getAndIncrementNumber() {
+        return nextComparisonTableNumber++;
     }
 }
