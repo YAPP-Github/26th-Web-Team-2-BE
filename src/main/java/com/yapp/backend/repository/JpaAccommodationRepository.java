@@ -3,6 +3,7 @@ package com.yapp.backend.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -80,4 +81,11 @@ public interface JpaAccommodationRepository extends JpaRepository<AccommodationE
                         "WHERE a.tripBoardId IN :tripBoards " +
                         "GROUP BY a.tripBoardId")
         List<AccommodationCountPerBoard> countByTripBoardIds(@Param("tripBoards") List<Long> tripBoards);
+
+        /**
+         * 숙소 ID로 메모를 업데이트하고 updatedAt을 현재 시간으로 설정
+         */
+        @Modifying
+        @Query("UPDATE AccommodationEntity a SET a.memo = :memo, a.updatedAt = CURRENT_TIMESTAMP WHERE a.id = :accommodationId")
+        int updateMemoById(@Param("accommodationId") Long accommodationId, @Param("memo") String memo);
 }

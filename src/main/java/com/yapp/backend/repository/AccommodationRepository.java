@@ -50,4 +50,9 @@ public interface AccommodationRepository {
      */
     void deleteById(Long accommodationId);
 
+    /**
+     * 숙소 ID로 메모를 업데이트합니다.
+     */
+    void updateMemoById(Long accommodationId, String memo);
+
 }
