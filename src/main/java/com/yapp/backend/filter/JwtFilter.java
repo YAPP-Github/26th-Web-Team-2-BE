@@ -65,6 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 || uri.startsWith("/swagger-ui")
                 || uri.startsWith("/v3/api-docs")
                 || uri.startsWith("/actuator/metrics")
+                || uri.startsWith("/actuator/prometheus")
                 ;
     }
 

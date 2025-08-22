@@ -31,4 +31,3 @@ oauth:
       - "https://ssok.info"
       - "https://api.ssok.info"
       - "https://dev-api.ssok.info"
-logging.level.org.springframework.security: DEBUG
