@@ -56,7 +56,9 @@ public class SecurityConfig {
                                                 "/swagger-ui/**",
                                                 "/swagger-ui.html",
                                                 "/v3/api-docs",
-                                                "/v3/api-docs/**"
+                                                "/v3/api-docs/**",
+                                                "/actuator/metrics",
+                                                "/actuator/metrics/**"
                                         )
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // WebConfig의 CORS 설정
