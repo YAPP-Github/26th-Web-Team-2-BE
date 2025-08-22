@@ -3,6 +3,7 @@ package com.yapp.backend.service;
 import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
 import com.yapp.backend.controller.dto.response.AccommodationDeleteResponse;
+import com.yapp.backend.controller.dto.response.AccommodationMemoUpdateResponse;
 import com.yapp.backend.controller.dto.response.AccommodationPageResponse;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 
@@ -18,6 +19,8 @@ public interface AccommodationService {
     AccommodationResponse findAccommodationById(Long accommodationId);
 
     void updateAccommodation(UpdateAccommodationRequest request);
+
+    AccommodationMemoUpdateResponse updateAccommodationMemo(Long accommodationId, String memo);
 
     AccommodationDeleteResponse deleteAccommodation(Long accommodationId, Long userId);
 }

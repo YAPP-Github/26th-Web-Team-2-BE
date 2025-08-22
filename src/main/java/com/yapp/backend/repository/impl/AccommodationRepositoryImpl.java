@@ -126,4 +126,9 @@ public class AccommodationRepositoryImpl implements AccommodationRepository {
         jpaAccommodationRepository.deleteById(accommodationId);
     }
 
+    @Override
+    public void updateMemoById(Long accommodationId, String memo) {
+        jpaAccommodationRepository.updateMemoById(accommodationId, memo);
+    }
+
 }

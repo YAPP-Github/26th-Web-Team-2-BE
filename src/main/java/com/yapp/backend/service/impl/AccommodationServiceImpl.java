@@ -6,6 +6,7 @@ import com.yapp.backend.controller.dto.request.AccommodationRegisterRequest;
 import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
 import com.yapp.backend.controller.dto.response.AccommodationRegisterResponse;
 import com.yapp.backend.controller.dto.response.AccommodationDeleteResponse;
+import com.yapp.backend.controller.dto.response.AccommodationMemoUpdateResponse;
 import com.yapp.backend.repository.entity.AccommodationEntity;
 import com.yapp.backend.repository.mapper.ScrapingDataMapper;
 import com.yapp.backend.service.model.Accommodation;
@@ -183,6 +184,44 @@ public class AccommodationServiceImpl implements AccommodationService {
 			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
 		} catch (Exception e) {
 			log.error("Unexpected error while updating accommodation", e);
+			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+		}
+	}
+
+	/**
+	 * 숙소 메모 업데이트
+	 * 특정 숙소의 메모만을 업데이트합니다.
+	 */
+	@Override
+	@Transactional
+	public AccommodationMemoUpdateResponse updateAccommodationMemo(Long accommodationId, String memo) {
+		try {
+			log.info("숙소 메모 업데이트 시작 - 숙소 ID: {}", accommodationId);
+
+			// 숙소 존재 여부 확인
+			Accommodation accommodation = accommodationRepository.findByIdOrThrow(accommodationId);
+
+			// 메모 업데이트
+			accommodationRepository.updateMemoById(accommodationId, memo);
+
+			log.info("숙소 메모 업데이트 완료 - 숙소 ID: {}", accommodationId);
+
+			// 업데이트된 숙소 정보 다시 조회하여 응답 생성
+			Accommodation updatedAccommodation = accommodationRepository.findByIdOrThrow(accommodationId);
+
+			return AccommodationMemoUpdateResponse.of(
+					updatedAccommodation.getId(),
+					updatedAccommodation.getMemo(),
+					updatedAccommodation.getUpdatedAt());
+
+		} catch (CustomException e) {
+			// Re-throw custom exceptions as-is
+			throw e;
+		} catch (DataAccessException e) {
+			log.error("Database error while updating accommodation memo for id: {}", accommodationId, e);
+			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
+		} catch (Exception e) {
+			log.error("Unexpected error while updating accommodation memo for id: {}", accommodationId, e);
 			throw new CustomException(ErrorCode.DATABASE_CONNECTION_ERROR);
 		}
 	}
