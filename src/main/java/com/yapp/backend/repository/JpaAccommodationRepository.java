@@ -85,7 +85,7 @@ public interface JpaAccommodationRepository extends JpaRepository<AccommodationE
         /**
          * 숙소 ID로 메모를 업데이트하고 updatedAt을 현재 시간으로 설정
          */
-        @Modifying
-        @Query("UPDATE AccommodationEntity a SET a.memo = :memo, a.updatedAt = CURRENT_TIMESTAMP WHERE a.id = :accommodationId")
-        int updateMemoById(@Param("accommodationId") Long accommodationId, @Param("memo") String memo);
+        @Modifying(clearAutomatically = true)
+        @Query("UPDATE AccommodationEntity a SET a.memo = :memo WHERE a.id = :accommodationId")
+        void updateMemoById(@Param("accommodationId") Long accommodationId, @Param("memo") String memo);
 }

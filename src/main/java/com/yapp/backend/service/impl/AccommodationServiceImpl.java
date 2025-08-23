@@ -196,23 +196,23 @@ public class AccommodationServiceImpl implements AccommodationService {
 	@Transactional
 	public AccommodationMemoUpdateResponse updateAccommodationMemo(Long accommodationId, String memo) {
 		try {
-			log.info("숙소 메모 업데이트 시작 - 숙소 ID: {}", accommodationId);
+			log.info("숙소 메모 업데이트 시작 - 숙소 ID: {}, 메모: {}", accommodationId, memo);
 
 			// 숙소 존재 여부 확인
 			Accommodation accommodation = accommodationRepository.findByIdOrThrow(accommodationId);
 
-			// 메모 업데이트
-			accommodationRepository.updateMemoById(accommodationId, memo);
+			// 도메인 객체에서 메모 업데이트
+			accommodation.updateMemo(memo);
+
+			// 업데이트된 도메인 객체를 저장
+			accommodationRepository.update(accommodation);
 
 			log.info("숙소 메모 업데이트 완료 - 숙소 ID: {}", accommodationId);
 
-			// 업데이트된 숙소 정보 다시 조회하여 응답 생성
-			Accommodation updatedAccommodation = accommodationRepository.findByIdOrThrow(accommodationId);
-
 			return AccommodationMemoUpdateResponse.of(
-					updatedAccommodation.getId(),
-					updatedAccommodation.getMemo(),
-					updatedAccommodation.getUpdatedAt());
+					accommodation.getId(),
+					accommodation.getMemo(),
+					accommodation.getUpdatedAt());
 
 		} catch (CustomException e) {
 			// Re-throw custom exceptions as-is
