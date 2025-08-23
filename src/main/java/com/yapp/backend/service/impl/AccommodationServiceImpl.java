@@ -201,7 +201,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 			// 숙소 존재 여부 확인
 			Accommodation accommodation = accommodationRepository.findByIdOrThrow(accommodationId);
 
-			// 업데이트된 도메인 객체를 저장
+			// 메모 업데이트
 			accommodationRepository.updateMemoById(accommodationId, memo);
 
 			log.info("숙소 메모 업데이트 완료 - 숙소 ID: {}", accommodationId);

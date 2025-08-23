@@ -5,8 +5,6 @@ import com.yapp.backend.common.exception.ErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.yapp.backend.repository.AccommodationRepository;
@@ -15,7 +13,6 @@ import com.yapp.backend.repository.entity.AccommodationEntity;
 import com.yapp.backend.repository.enums.SortType;
 import com.yapp.backend.repository.mapper.AccommodationMapper;
 import com.yapp.backend.service.model.Accommodation;
-import jakarta.persistence.EntityManager;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +24,6 @@ import java.util.stream.Collectors;
 public class AccommodationRepositoryImpl implements AccommodationRepository {
     private final JpaAccommodationRepository jpaAccommodationRepository;
     private final AccommodationMapper accommodationMapper;
-    private final EntityManager entityManager;
 
     /**
      * 여행보드 ID로 숙소 목록을 페이징하여 조회하는 쿼리
