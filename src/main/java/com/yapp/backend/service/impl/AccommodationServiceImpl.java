@@ -196,7 +196,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 	@Transactional
 	public AccommodationMemoUpdateResponse updateAccommodationMemo(Long accommodationId, String memo) {
 		try {
-			log.info("숙소 메모 업데이트 시작 - 숙소 ID: {}", accommodationId);
+			log.info("숙소 메모 업데이트 시작 - 숙소 ID: {}, 메모: {}", accommodationId, memo);
 
 			// 숙소 존재 여부 확인
 			Accommodation accommodation = accommodationRepository.findByIdOrThrow(accommodationId);
