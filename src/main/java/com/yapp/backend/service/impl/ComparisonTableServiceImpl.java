@@ -57,12 +57,10 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     private final UserRepository userRepository;
     private final AccommodationRepository accommodationRepository;
     private final AccommodationService accommodationService;
-    private final ComparisonTableResponseMapper responseMapper;
+    private final ComparisonTableResponseMapper comparisonTableResponseMapper;
     private final UserComparisonTableAuthorizationService authorizationService;
     private final UserTripBoardAuthorizationService tripBoardAuthorizationService;
     private final UserAccommodationAuthorizationService accommodationAuthorizationService;
-
-    private final ComparisonTableResponseMapper comparisonTableResponseMapper;
     private final UserService userService;
 
     // ==================== Public Methods (Controller에서 호출) ====================
@@ -105,7 +103,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
 
         // 권한 검증 (엔티티 객체 전달)
         authorizationService.validateReadPermission(comparisonTable, userId);
-        User creator = userService.getUserById(comparisonTable.getCreatedById());
+        User creator = userRepository.findByIdOrThrow(userId);
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
 
 
@@ -367,7 +365,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         }
         
         // 매퍼를 사용하여 Response DTO로 변환
-        List<ComparisonTableSummaryResponse> responseList = responseMapper.toResponseList(comparisonTables);
+        List<ComparisonTableSummaryResponse> responseList = comparisonTableResponseMapper.toResponseList(comparisonTables);
         
         // 페이지 응답 객체로 감싸서 반환
         ComparisonTablePageResponse response = ComparisonTablePageResponse.of(responseList, hasNext);
@@ -396,9 +394,9 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
      */
     private void validateShareCodeAccess(Long tableId, String shareCode, ComparisonTable comparisonTable) {
         if (!shareCode.equals(comparisonTable.getShareCode())) {
-            log.warn("유효하지 않은 shareCode로 비교표 조회 시도 - tableId: {}, shareCode: {}", tableId, shareCode);
+            log.warn("유효하지 않은 shareCode로 비교표 조회 시도 - tableId: {}", tableId);
             throw new ShareCodeException(INVALID_SHARE_CODE);
         }
-        log.info("shareCode를 통한 비교표 조회 성공 - tableId: {}, shareCode: {}", tableId, shareCode);
+        log.info("shareCode를 통한 비교표 조회 성공 - tableId: {}", tableId);
     }
 }
