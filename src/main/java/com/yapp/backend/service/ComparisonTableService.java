@@ -4,6 +4,7 @@ import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
 import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
 import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
 import com.yapp.backend.controller.dto.response.ComparisonTablePageResponse;
+import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import org.springframework.data.domain.Pageable;
 import com.yapp.backend.service.model.ComparisonTable;
 
@@ -22,7 +23,7 @@ public interface ComparisonTableService {
      * @param tableId 비교 테이블 ID
      * @return 비교 테이블 정보
      */
-    ComparisonTable getComparisonTable(Long tableId);
+    ComparisonTableResponse getComparisonTable(Long tableId, String shareCode);
 
     /**
      * 사용자 권한을 검증하고 비교 테이블의 상세 정보를 조회합니다.
@@ -30,7 +31,7 @@ public interface ComparisonTableService {
      * @param userId 사용자 ID
      * @return 비교 테이블 정보
      */
-    ComparisonTable getComparisonTableWithAuthorization(Long tableId, Long userId);
+    ComparisonTableResponse getComparisonTableWithAuthorization(Long tableId, Long userId);
 
     /**
      * 사용자 권한을 검증하고 비교테이블의 상세 정보를 수정합니다.
@@ -48,7 +49,7 @@ public interface ComparisonTableService {
      * @param userId 사용자 ID
      * @return 업데이트된 비교 테이블
      */
-    ComparisonTable addAccommodationToComparisonTableWithAuthorization(Long tableId, AddAccommodationRequest request, Long userId);
+    ComparisonTableResponse addAccommodationToComparisonTableWithAuthorization(Long tableId, AddAccommodationRequest request, Long userId);
 
     /**
      * 사용자 권한을 검증하고 특정 비교 테이블을 삭제합니다.
