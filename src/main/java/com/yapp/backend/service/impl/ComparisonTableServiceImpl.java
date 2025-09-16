@@ -87,7 +87,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         // shareCode 검증
         validateShareCodeAccess(tableId, shareCode, comparisonTable);
 
-        User creator = userService.getUserById(comparisonTable.getCreatedById());
+        User creator = userRepository.findByIdOrThrow(comparisonTable.getCreatedById());
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
 
         log.debug("비교 테이블 조회 완료 - tableId: {}", tableId);
@@ -103,7 +103,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
 
         // 권한 검증 (엔티티 객체 전달)
         authorizationService.validateReadPermission(comparisonTable, userId);
-        User creator = userRepository.findByIdOrThrow(userId);
+        User creator = userRepository.findByIdOrThrow(comparisonTable.getCreatedById());
         ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
 
 
