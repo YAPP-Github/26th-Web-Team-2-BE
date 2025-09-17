@@ -1,7 +1,10 @@
 package com.yapp.backend.service.impl;
 
+import static com.yapp.backend.common.exception.ErrorCode.INVALID_SHARE_CODE;
+
 import com.yapp.backend.common.exception.ComparisonTableDeleteException;
 import com.yapp.backend.common.exception.ErrorCode;
+import com.yapp.backend.common.exception.ShareCodeException;
 import com.yapp.backend.common.exception.UserAuthorizationException;
 import com.yapp.backend.common.util.ComparisonTableNameGeneratorUtil;
 import com.yapp.backend.controller.dto.request.AddAccommodationRequest;
@@ -9,9 +12,12 @@ import com.yapp.backend.controller.dto.request.CreateComparisonTableRequest;
 import com.yapp.backend.controller.dto.request.UpdateAccommodationRequest;
 import com.yapp.backend.controller.dto.request.UpdateComparisonTableRequest;
 import com.yapp.backend.controller.dto.response.ComparisonTablePageResponse;
+import com.yapp.backend.controller.dto.response.ComparisonTableResponse;
 import com.yapp.backend.controller.dto.response.ComparisonTableSummaryResponse;
 import com.yapp.backend.controller.mapper.ComparisonTableResponseMapper;
+import com.yapp.backend.service.UserService;
 import com.yapp.backend.service.authorization.UserAccommodationAuthorizationService;
+import com.yapp.backend.service.model.User;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import com.yapp.backend.repository.AccommodationRepository;
@@ -42,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ComparisonTableServiceImpl implements ComparisonTableService {
 
@@ -50,10 +57,11 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     private final UserRepository userRepository;
     private final AccommodationRepository accommodationRepository;
     private final AccommodationService accommodationService;
-    private final ComparisonTableResponseMapper responseMapper;
+    private final ComparisonTableResponseMapper comparisonTableResponseMapper;
     private final UserComparisonTableAuthorizationService authorizationService;
     private final UserTripBoardAuthorizationService tripBoardAuthorizationService;
     private final UserAccommodationAuthorizationService accommodationAuthorizationService;
+    private final UserService userService;
 
     // ==================== Public Methods (Controller에서 호출) ====================
 
@@ -70,17 +78,24 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
     }
 
     @Override
-    public ComparisonTable getComparisonTable(Long tableId) {
+    public ComparisonTableResponse getComparisonTable(Long tableId, String shareCode) {
         log.debug("비교 테이블 조회 시작 - tableId: {}", tableId);
         
         // 리소스를 한 번만 조회
         ComparisonTable comparisonTable = comparisonTableRepository.findByIdOrThrow(tableId);
+
+        // shareCode 검증
+        validateShareCodeAccess(tableId, shareCode, comparisonTable);
+
+        User creator = userRepository.findByIdOrThrow(comparisonTable.getCreatedById());
+        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
+
         log.debug("비교 테이블 조회 완료 - tableId: {}", tableId);
-        return comparisonTable;
+        return response;
     }
 
     @Override
-    public ComparisonTable getComparisonTableWithAuthorization(Long tableId, Long userId) {
+    public ComparisonTableResponse getComparisonTableWithAuthorization(Long tableId, Long userId) {
         log.debug("비교 테이블 조회 시작 (권한 검증 포함) - tableId: {}, userId: {}", tableId, userId);
 
         // 리소스를 한 번만 조회
@@ -88,9 +103,12 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
 
         // 권한 검증 (엔티티 객체 전달)
         authorizationService.validateReadPermission(comparisonTable, userId);
+        User creator = userRepository.findByIdOrThrow(comparisonTable.getCreatedById());
+        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
+
 
         log.debug("비교 테이블 조회 완료 (권한 검증 포함) - tableId: {}, userId: {}", tableId, userId);
-        return comparisonTable;
+        return response;
     }
 
     @Override
@@ -110,7 +128,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
 
     @Override
     @Transactional
-    public ComparisonTable addAccommodationToComparisonTableWithAuthorization(Long tableId, AddAccommodationRequest request, Long userId) {
+    public ComparisonTableResponse addAccommodationToComparisonTableWithAuthorization(Long tableId, AddAccommodationRequest request, Long userId) {
         log.debug("비교 테이블에 숙소 추가 시작 (권한 검증 포함) - tableId: {}, userId: {}", tableId, userId);
         
         // 리소스를 한 번만 조회
@@ -120,7 +138,10 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         authorizationService.validateUpdatePermission(existingTable, userId);
         
         // 순수 비즈니스 로직 실행
-        return addAccommodationToComparisonTableInternal(tableId, request, userId);
+        ComparisonTable comparisonTable = addAccommodationToComparisonTableInternal(tableId, request, userId);
+        User creator = userService.getUserById(comparisonTable.getCreatedById());
+        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
+        return response;
     }
 
     @Override
@@ -344,7 +365,7 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
         }
         
         // 매퍼를 사용하여 Response DTO로 변환
-        List<ComparisonTableSummaryResponse> responseList = responseMapper.toResponseList(comparisonTables);
+        List<ComparisonTableSummaryResponse> responseList = comparisonTableResponseMapper.toResponseList(comparisonTables);
         
         // 페이지 응답 객체로 감싸서 반환
         ComparisonTablePageResponse response = ComparisonTablePageResponse.of(responseList, hasNext);
@@ -365,5 +386,17 @@ public class ComparisonTableServiceImpl implements ComparisonTableService {
                 accommodationService.updateAccommodation(accommodationRequest);
             }
         }
+    }
+
+
+    /**
+     * shareCode를 통한 접근 권한 검증
+     */
+    private void validateShareCodeAccess(Long tableId, String shareCode, ComparisonTable comparisonTable) {
+        if (!shareCode.equals(comparisonTable.getShareCode())) {
+            log.warn("유효하지 않은 shareCode로 비교표 조회 시도 - tableId: {}", tableId);
+            throw new ShareCodeException(INVALID_SHARE_CODE);
+        }
+        log.info("shareCode를 통한 비교표 조회 성공 - tableId: {}", tableId);
     }
 }

@@ -1,8 +1,5 @@
 package com.yapp.backend.controller;
 
-import static com.yapp.backend.common.exception.ErrorCode.*;
-
-import com.yapp.backend.common.exception.ShareCodeException;
 import com.yapp.backend.common.annotation.PublicApi;
 import com.yapp.backend.common.response.ResponseType;
 import com.yapp.backend.common.response.StandardResponse;
@@ -54,8 +51,7 @@ import com.yapp.backend.controller.mapper.ComparisonTableResponseMapper;
 public class ComparisonTableController implements ComparisonDocs {
 
     private final ComparisonTableService comparisonTableService;
-    private final ComparisonTableResponseMapper comparisonTableResponseMapper;
-    private final UserService userService;
+
 
     @Override
     @PublicApi(description = "비교 기준 항목 목록 조회 - 인증 불필요")
@@ -95,11 +91,9 @@ public class ComparisonTableController implements ComparisonDocs {
             @PathVariable("tableId") Long tableId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        ComparisonTable comparisonTable = comparisonTableService.getComparisonTableWithAuthorization(tableId, userDetails.getUserId());
-        User creator = userService.getUserById(comparisonTable.getCreatedById());
-        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
+        ComparisonTableResponse comparisonTableResponse = comparisonTableService.getComparisonTableWithAuthorization(tableId, userDetails.getUserId());
 
-        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
+        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, comparisonTableResponse));
     }
 
     /**
@@ -112,26 +106,11 @@ public class ComparisonTableController implements ComparisonDocs {
             @PathVariable("tableId") Long tableId,
             @RequestParam("shareCode") String shareCode) {
 
-        ComparisonTable comparisonTable = comparisonTableService.getComparisonTable(tableId);
+        ComparisonTableResponse comparisonTableResponse = comparisonTableService.getComparisonTable(tableId, shareCode);
 
-        // shareCode 검증
-        validateShareCodeAccess(tableId, shareCode, comparisonTable);
-
-        User creator = userService.getUserById(comparisonTable.getCreatedById());
-        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
-        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
+        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, comparisonTableResponse));
     }
 
-    /**
-     * shareCode를 통한 접근 권한 검증
-     */
-    private void validateShareCodeAccess(Long tableId, String shareCode, ComparisonTable comparisonTable) {
-        if (!shareCode.equals(comparisonTable.getShareCode())) {
-            log.warn("유효하지 않은 shareCode로 비교표 조회 시도 - tableId: {}, shareCode: {}", tableId, shareCode);
-            throw new ShareCodeException(INVALID_SHARE_CODE);
-        }
-        log.info("shareCode를 통한 비교표 조회 성공 - tableId: {}, shareCode: {}", tableId, shareCode);
-    }
 
     @Override
     @PutMapping("/{tableId}")
@@ -153,11 +132,9 @@ public class ComparisonTableController implements ComparisonDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
 
-        ComparisonTable comparisonTable = comparisonTableService.addAccommodationToComparisonTableWithAuthorization(tableId, request, userId);
-        User creator = userService.getUserById(comparisonTable.getCreatedById());
-        ComparisonTableResponse response = comparisonTableResponseMapper.toResponse(comparisonTable, creator.getNickname());
+        ComparisonTableResponse comparisonTableResponse = comparisonTableService.addAccommodationToComparisonTableWithAuthorization(tableId, request, userId);
 
-        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, response));
+        return ResponseEntity.ok(new StandardResponse<>(ResponseType.SUCCESS, comparisonTableResponse));
     }
 
     @Override
