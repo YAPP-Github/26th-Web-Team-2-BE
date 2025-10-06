@@ -1,15 +1,13 @@
 package com.yapp.backend.service.model;
 
 import com.yapp.backend.controller.dto.request.update.AttractionUpdate;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class Attraction {
     private String name;
     private String type;

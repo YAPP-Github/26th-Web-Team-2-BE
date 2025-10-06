@@ -20,6 +20,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccommodationResponse {
+    private static final int MAX_AMENITIES_COUNT = 6;
+
 	private Long id;
 	private String url;
 	private String siteName;
@@ -72,7 +74,7 @@ public class AccommodationResponse {
 				.hotelId(accommodation.getHotelId())
 				.nearbyAttractions(accommodation.getNearbyAttractions())
 				.nearbyTransportation(accommodation.getNearbyTransportation())
-				.amenities(accommodation.getAmenities())
+				.amenities(accommodation.getAmenities().subList(0, Math.min(accommodation.getAmenities().size(), MAX_AMENITIES_COUNT))) // 최대 6개까지
 				.checkInTime(accommodation.getCheckInTime())
 				.checkOutTime(accommodation.getCheckOutTime())
 				.build();
