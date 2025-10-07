@@ -8,7 +8,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.3'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id "io.sentry.jvm.gradle" version "5.7.0"
+	id "io.sentry.jvm.gradle" version "5.12.1"
 }
 
 group = 'com.yapp'
@@ -44,7 +44,7 @@ dependencies {
     implementation 'com.google.cloud:spring-cloud-gcp-starter-secretmanager'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
 
-	implementation 'io.sentry:sentry-spring-boot-starter:8.12.0'
+	implementation 'io.sentry:sentry-spring-boot-starter-jakarta:8.23.0'
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
@@ -104,6 +104,6 @@ sentry {
 	projectName = "26th-web-team-2-be-web"
 	authToken = System.getenv("SENTRY_AUTH_TOKEN") ?: ""
 
-	// 명시적으로 Sentry 버전을 8.12.0으로 통일
-	autoInstallation.sentryVersion.set("8.12.0")
+	// 명시적으로 Sentry 버전을 8.23.0으로 통일
+	autoInstallation.sentryVersion.set("8.23.0")
 }
