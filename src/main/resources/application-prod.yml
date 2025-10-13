@@ -25,6 +25,16 @@ management:
     web:
       exposure:
         include: health,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    readinessState:
+      enabled: true
+    livenessState:
+      enabled: true
   otlp:
     tracing:
       endpoint: https://tempo-prod-20-prod-ap-northeast-0.grafana.net/otlp/v1/traces
