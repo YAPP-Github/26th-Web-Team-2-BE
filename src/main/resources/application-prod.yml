@@ -24,7 +24,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: metrics,prometheus
+        include: health,metrics,prometheus
   otlp:
     tracing:
       endpoint: https://tempo-prod-20-prod-ap-northeast-0.grafana.net/otlp/v1/traces
