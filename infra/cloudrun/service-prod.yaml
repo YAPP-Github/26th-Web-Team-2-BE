@@ -12,6 +12,7 @@ spec:
         run.googleapis.com/container-dependencies: '{"${IMAGE_NAME}":["collector"]}'
         run.googleapis.com/execution-environment: gen2
     spec:
+      serviceAccountName: ${SERVICE_ACCOUNT_EMAIL}
       containers:
       - name: ${IMAGE_NAME}
         image: ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:${IMAGE_SHA}

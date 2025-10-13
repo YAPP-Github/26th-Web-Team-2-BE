@@ -9,6 +9,7 @@ IMAGE_NAME=$5
 CLOUD_SQL_INSTANCE=$6
 PROFILE=$7
 IMAGE_SHA=$8
+SERVICE_ACCOUNT_EMAIL=${9:-"${PROJECT_ID}@appspot.gserviceaccount.com"}
 
 echo "============================================"
 echo "Cloud Run YAML-based Deployment Starting..."
@@ -48,6 +49,7 @@ export IMAGE_NAME
 export CLOUD_SQL_INSTANCE
 export PROFILE
 export IMAGE_SHA
+export SERVICE_ACCOUNT_EMAIL
 export SECRETS_ENV
 
 # Generate the final service YAML from template
