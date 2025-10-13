@@ -27,6 +27,14 @@ ${SECRETS_ENV}
           limits:
             cpu: "2"
             memory: 1Gi
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 0
+          periodSeconds: 3
+          failureThreshold: 60
+          timeoutSeconds: 3
       - name: collector
         image: us-docker.pkg.dev/cloud-ops-agents-artifacts/cloud-run-gmp-sidecar/cloud-run-gmp-sidecar:1.2.0
         startupProbe:
