@@ -26,7 +26,9 @@ spring:
   cloud:
     gcp:
       sql:
-        enabled: false  # Private IP 직접 연결 방식 사용
+        enabled: true
+        instance-connection-name: ${CLOUD_SQL_INSTANCE}
+        database-name: ${PROD_DB_NAME}
   flyway:
     enabled: true
     url: jdbc:postgresql://${DB_PRIVATE_IP}:5432/${PROD_DB_NAME}?options=-c%20TimeZone=UTC
