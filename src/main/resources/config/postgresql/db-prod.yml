@@ -38,6 +38,6 @@ spring:
 
 logging:
   level:
-    root: DEBUG
-    com.your.package: TRACE
-    com.zaxxer.hikari: DEBUG
+    root: INFO
+    com.yapp.backend: INFO
+    com.zaxxer.hikari: INFO
