@@ -28,3 +28,10 @@ ${SECRETS_ENV}
             memory: 1Gi
       - name: collector
         image: us-docker.pkg.dev/cloud-ops-agents-artifacts/cloud-run-gmp-sidecar/cloud-run-gmp-sidecar:1.2.0
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: 8888
+          initialDelaySeconds: 0
+          periodSeconds: 1
+          failureThreshold: 30
