@@ -9,7 +9,6 @@ spec:
     metadata:
       annotations:
         run.googleapis.com/cloudsql-instances: ${PROJECT_ID}:${REGION}:${CLOUD_SQL_INSTANCE}
-        run.googleapis.com/container-dependencies: '{"${IMAGE_NAME}":["collector"]}'
         run.googleapis.com/execution-environment: gen2
     spec:
       serviceAccountName: ${SERVICE_ACCOUNT_EMAIL}
@@ -37,10 +36,3 @@ ${SECRETS_ENV}
           timeoutSeconds: 3
       - name: collector
         image: us-docker.pkg.dev/cloud-ops-agents-artifacts/cloud-run-gmp-sidecar/cloud-run-gmp-sidecar:1.2.0
-        startupProbe:
-          httpGet:
-            path: /healthz
-            port: 8888
-          initialDelaySeconds: 0
-          periodSeconds: 1
-          failureThreshold: 30
