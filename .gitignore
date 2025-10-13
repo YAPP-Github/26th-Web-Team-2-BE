@@ -42,3 +42,9 @@ out/
 
 ### kiro ###
 .kiro
+
+### claude ###
+CLAUDE.md
+
+### copilot ###
+.github/git-commit-instructions.md
