@@ -6,10 +6,15 @@ REGION=$2
 CLOUD_RUN_REGION=$3
 REPO_NAME=$4
 IMAGE_NAME=$5
-CLOUD_SQL_INSTANCE=$6
+CLOUD_SQL_INSTANCE_FROM_ARGS=$6
 PROFILE=$7
 IMAGE_SHA=$8
 SERVICE_ACCOUNT_EMAIL=${9:-"${PROJECT_ID}@appspot.gserviceaccount.com"}
+
+# Fetch CLOUD_SQL_INSTANCE from Secret Manager (needs full connection string for annotation)
+echo "Fetching CLOUD_SQL_INSTANCE from Secret Manager..."
+CLOUD_SQL_INSTANCE=$(gcloud secrets versions access latest --secret="CLOUD_SQL_INSTANCE" --project="${PROJECT_ID}" | tr -d '\n\r')
+echo "Cloud SQL Instance: ${CLOUD_SQL_INSTANCE}"
 
 echo "============================================"
 echo "Cloud Run YAML-based Deployment Starting..."
