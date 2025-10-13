@@ -40,6 +40,15 @@ out/
 .env
 /continual*
 
+### Local Development ###
+# 로컬 개발 환경 설정 파일은 추적하지만, 개인별 오버라이드는 제외
+.env.local.override
+docker-compose.override.yml
+
+# 로컬 개발 환경 데이터
+/logs/local/
+/data/local/
+
 ### kiro ###
 .kiro
 
