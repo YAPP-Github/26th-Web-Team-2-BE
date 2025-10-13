@@ -30,8 +30,8 @@ ${SECRETS_ENV}
           tcpSocket:
             port: 8080
           initialDelaySeconds: 0
-          periodSeconds: 240
-          failureThreshold: 1
-          timeoutSeconds: 240
+          periodSeconds: 10
+          failureThreshold: 24
+          timeoutSeconds: 10
       - name: collector
         image: us-docker.pkg.dev/cloud-ops-agents-artifacts/cloud-run-gmp-sidecar/cloud-run-gmp-sidecar:1.2.0
