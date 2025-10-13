@@ -8,7 +8,7 @@ spring:
     hikari:
       maximum-pool-size: 10        # 현재와 동일(증설 필요 시만 조정)
       minimum-idle: 2              # 유휴 최소 커넥션 줄여 초기/유휴 부담 감소
-      connection-timeout: 10000    # 못 빌리면 10초 내 실패
+      connection-timeout: 30000    # 30초로 증가 (Cloud SQL 초기 연결 고려)
       idle-timeout: 600000
       max-lifetime: 1800000
       leak-detection-threshold: 20000  # 20초 넘게 쥐고있으면 누수 로그
@@ -26,9 +26,7 @@ spring:
   cloud:
     gcp:
       sql:
-        enabled: true
-        instance-connection-name: ${CLOUD_SQL_INSTANCE}
-        database-name: ${PROD_DB_NAME}
+        enabled: false  # Private IP 직접 연결 방식 사용
   flyway:
     enabled: true
     url: jdbc:postgresql://${DB_PRIVATE_IP}:5432/${PROD_DB_NAME}?options=-c%20TimeZone=UTC
