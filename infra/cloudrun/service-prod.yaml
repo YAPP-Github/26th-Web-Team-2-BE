@@ -9,7 +9,7 @@ spec:
     metadata:
       annotations:
         run.googleapis.com/cloudsql-instances: ${PROJECT_ID}:${REGION}:${CLOUD_SQL_INSTANCE}
-        run.googleapis.com/container-dependencies: '{"collector":["${IMAGE_NAME}"]}'
+        run.googleapis.com/container-dependencies: '{"${IMAGE_NAME}":["collector"]}'
         run.googleapis.com/execution-environment: gen2
     spec:
       containers:
