@@ -9,11 +9,11 @@ env:
   SA_KEY: ${{ secrets.GCP_SA_KEY }}
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: ${{ secrets.GCP_REGION }}
-  CLOUD_RUN_REGION: ${{ secrets.CLOUD_RUN_REGION }}
-  REPO_NAME:  ${{ secrets.GCP_ARTIFACT_REGISTRY_REPO_NAME }}
-  CLOUD_SQL_INSTANCE: ${{ secrets.CLOUD_SQL_INSTANCE_PROD }}
+  REPO_NAME: ${{ secrets.GCP_ARTIFACT_REGISTRY_REPO_NAME }}
   PROFILE: prod
   IMAGE_NAME: ssok-prod
+  VM_INSTANCE: ${{ secrets.GCP_VM_INSTANCE }}
+  VM_ZONE: asia-northeast3-a
 
 jobs:
   build-and-deploy:
@@ -42,6 +42,7 @@ jobs:
           docker build \
           --build-arg SPRING_PROFILES_ACTIVE=${PROFILE} \
           -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:$GITHUB_SHA \
+          -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:latest \
           -f Dockerfile \
           .
 
@@ -49,17 +50,39 @@ jobs:
         run: |
           docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:$GITHUB_SHA
 
-      - name: Make deploy script executable
-        run: chmod +x script/deploy-to-cloud-run.sh
-
-      - name: Deploy to Cloud Run
+      - name: Deploy to VM
         run: |
-          ./script/deploy-to-cloud-run.sh \
-            ${{ env.PROJECT_ID }} \
-            ${{ env.REGION }} \
-            ${{ env.CLOUD_RUN_REGION }} \
-            ${{ env.REPO_NAME }} \
-            ${{ env.IMAGE_NAME }} \
-            ${{ env.CLOUD_SQL_INSTANCE }} \
-            ${{ env.PROFILE }} \
-            $GITHUB_SHA
+          gcloud compute ssh ${VM_INSTANCE} \
+            --zone=${VM_ZONE} \
+            --project=${PROJECT_ID} \
+            --command="sudo GCP_PROJECT_ID=${PROJECT_ID} bash /opt/app/scripts/docker/deploy-app.sh ${IMAGE_NAME} $GITHUB_SHA"
+
+      - name: Verify deployment
+        run: |
+          # VM의 외부 IP 가져오기
+          EXTERNAL_IP=$(gcloud compute instances describe ${VM_INSTANCE} \
+            --zone=${VM_ZONE} \
+            --project=${PROJECT_ID} \
+            --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+
+          echo "Verifying deployment at ${EXTERNAL_IP}..."
+
+          # 헬스체크 (최대 60초 대기)
+          MAX_ATTEMPTS=12
+          ATTEMPT=0
+
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            if curl -f -s "https://${EXTERNAL_IP}/actuator/health" > /dev/null 2>&1 || \
+               curl -f -s "http://${EXTERNAL_IP}/actuator/health" > /dev/null 2>&1; then
+              echo "✓ Deployment verified successfully!"
+              curl -s "http://${EXTERNAL_IP}/actuator/health" | jq .
+              exit 0
+            fi
+
+            echo "Waiting for service to be ready... ($ATTEMPT/$MAX_ATTEMPTS)"
+            sleep 5
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+
+          echo "WARNING: Health check timed out, but deployment may still be in progress"
+          echo "Check VM logs: gcloud compute ssh ${VM_INSTANCE} --zone=${VM_ZONE} --command='sudo docker logs ssok-prod-blue --tail=50'"
