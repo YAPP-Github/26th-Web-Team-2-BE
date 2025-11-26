@@ -1,0 +1,72 @@
+name: Automatic Versioning
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref != 'develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git checkout ${{ github.event.pull_request.base.ref }}
+
+      - name: Get current version from build.gradle
+        id: get_version
+        run: |
+          version=$(grep "^version = " build.gradle | sed "s/version = '//' | sed "s/'//")
+          echo "Current version: $version"
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Increment version based on branch name
+        id: increment_version
+        run: |
+          version=${{ steps.get_version.outputs.version }}
+          major=$(echo $version | cut -d. -f1)
+          minor=$(echo $version | cut -d. -f2)
+
+          if [[ "${{ github.event.pull_request.head.ref }}" == feature/* ]]; then
+            major=$((major + 1))
+            minor=0
+          elif [[ "${{ github.event.pull_request.head.ref }}" == hotfix/* ]]; then
+            minor=$((minor + 1))
+          fi
+
+          new_version="$major.$minor"
+          echo "New version: $new_version"
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Update build.gradle
+        run: |
+          old_version=${{ steps.get_version.outputs.version }}
+          new_version=${{ steps.increment_version.outputs.new_version }}
+          sed -i "s/version = '$old_version'/version = '$new_version'/" build.gradle
+
+      - name: Update SwaggerConfig.java
+        run: |
+          new_version=${{ steps.increment_version.outputs.new_version }}
+          sed -i "s/version     = ".*"/version     = "v$new_version"/" src/main/java/com/yapp/backend/config/SwaggerConfig.java
+
+      - name: Commit and push changes
+        run: |
+          git add build.gradle src/main/java/com/yapp/backend/config/SwaggerConfig.java
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: Bump version to ${{ steps.increment_version.outputs.new_version }}"
+            git push origin ${{ github.event.pull_request.base.ref }}
+          fi
