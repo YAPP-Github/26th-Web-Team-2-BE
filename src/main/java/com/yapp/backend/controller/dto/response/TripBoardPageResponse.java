@@ -17,4 +17,5 @@ import java.util.List;
 public class TripBoardPageResponse {
     private List<TripBoardSummaryResponse> tripBoards;
     private boolean hasNext;
+    private long totalCnt;
 }

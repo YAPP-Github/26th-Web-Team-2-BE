@@ -214,6 +214,7 @@ public class TripBoardServiceImpl implements TripBoardService {
             TripBoardPageResponse response = TripBoardPageResponse.builder()
                     .tripBoards(content)
                     .hasNext(tripBoardPage.hasNext())
+                    .totalCnt(tripBoardPage.getTotalElements())
                     .build();
 
             log.info("여행 보드 목록 조회 완료 - 사용자 ID: {}, 조회된 개수: {}, 전체 개수: {}",
