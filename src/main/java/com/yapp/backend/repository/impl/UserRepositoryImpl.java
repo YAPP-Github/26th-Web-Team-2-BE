@@ -8,6 +8,7 @@ import com.yapp.backend.service.model.User;
 import com.yapp.backend.repository.JpaUserRepository;
 import com.yapp.backend.repository.entity.UserEntity;
 import com.yapp.backend.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,18 +27,17 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User getUserBySocialUserInfoOrCreateUser(User socialUserInfo) {
+    public Optional<User> getUserBySocialUserInfo(User socialUserInfo) {
         return jpaUserRepository
                 .findByProviderAndSocialIdAndDeletedAtIsNull(socialUserInfo.getProvider(), socialUserInfo.getSocialId())
-                .orElseGet(() -> jpaUserRepository.save(UserEntity.from(socialUserInfo)))
-                .toModel();
+                .map(UserEntity::toModel);
     }
 
 
     @Override
     public User save(User user) {
-        jpaUserRepository.save(userMapper.domainToEntity(user));
-        return user;
+        return jpaUserRepository.save(userMapper.domainToEntity(user))
+                .toModel();
     }
 
 }
