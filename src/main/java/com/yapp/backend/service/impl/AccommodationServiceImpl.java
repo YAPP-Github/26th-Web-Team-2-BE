@@ -121,6 +121,7 @@ public class AccommodationServiceImpl implements AccommodationService {
 			// 응답 객체 생성
 			return AccommodationRegisterResponse.builder()
 					.accommodationId(savedAccommodation.getId())
+					.accommodationName(savedAccommodation.getAccommodationName())
 					.build();
 		} catch (CustomException e) {
 			// Re-throw custom exceptions (validation errors) as-is
