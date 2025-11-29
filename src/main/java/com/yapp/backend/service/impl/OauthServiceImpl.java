@@ -8,6 +8,7 @@ import com.yapp.backend.filter.dto.SocialUserInfo;
 import com.yapp.backend.filter.service.RefreshTokenService;
 import com.yapp.backend.service.OauthService;
 import com.yapp.backend.service.UserLoginService;
+import com.yapp.backend.service.dto.OAuthLoginResult;
 import com.yapp.backend.service.model.User;
 import com.yapp.backend.service.oauth.OAuthCodeUserInfoProvider;
 import com.yapp.backend.common.exception.oauth.InvalidBaseUrlException;
@@ -68,7 +69,8 @@ public class OauthServiceImpl implements OauthService {
         User socialUser = socialUserInfo.toModel();
 
         // 3. 사용자 저장 또는 조회
-        User user = userLoginService.handleOAuthLogin(socialUser);
+        OAuthLoginResult loginResult = userLoginService.handleOAuthLogin(socialUser);
+        User user = loginResult.getUser();
 
         // 4. 토큰 생성
         String accessToken = jwtTokenProvider.createAccessToken(user.getId());
@@ -81,7 +83,8 @@ public class OauthServiceImpl implements OauthService {
         OauthLoginResponse response = new OauthLoginResponse(
                 user.getId(),
                 user.getNickname(),
-                user.getEmail()
+                user.getEmail(),
+                loginResult.isNewUser()
         );
         response.deliverToken(accessToken, refreshToken);
         

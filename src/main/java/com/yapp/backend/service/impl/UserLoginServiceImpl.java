@@ -1,5 +1,6 @@
 package com.yapp.backend.service.impl;
 
+import com.yapp.backend.service.dto.OAuthLoginResult;
 import com.yapp.backend.service.model.User;
 import com.yapp.backend.repository.UserRepository;
 import com.yapp.backend.service.UserLoginService;
@@ -21,7 +22,12 @@ public class UserLoginServiceImpl implements UserLoginService {
      */
     @Override
     @Transactional
-    public User handleOAuthLogin(User userSocialInfo) {
-        return userRepository.getUserBySocialUserInfoOrCreateUser(userSocialInfo);
+    public OAuthLoginResult handleOAuthLogin(User userSocialInfo) {
+        return userRepository.getUserBySocialUserInfo(userSocialInfo)
+                .map(user -> new OAuthLoginResult(user, false)) // 기존 유저
+                .orElseGet(() -> {
+                    User created = userRepository.save(userSocialInfo);
+                    return new OAuthLoginResult(created, true); // 신규 유저
+                });
     }
 }

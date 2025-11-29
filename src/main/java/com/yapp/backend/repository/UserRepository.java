@@ -1,6 +1,7 @@
 package com.yapp.backend.repository;
 
 import com.yapp.backend.service.model.User;
+import java.util.Optional;
 
 public interface UserRepository {
     /**
@@ -12,11 +13,11 @@ public interface UserRepository {
 
     /**
      * 소셜 로그인 정보를 통해
-     * 탈퇴하지 않은 활성 유저만 조회, 없으면 새로운 사용자 생성
+     * 탈퇴하지 않은 활성 유저만 조회
      * @param socialUserInfo
      * @return
      */
-    User getUserBySocialUserInfoOrCreateUser(User socialUserInfo);
+    Optional<User> getUserBySocialUserInfo(User socialUserInfo);
 
     /**
      * 유저 정보 저장
