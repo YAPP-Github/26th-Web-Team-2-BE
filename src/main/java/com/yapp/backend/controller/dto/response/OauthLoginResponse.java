@@ -21,10 +21,14 @@ public class OauthLoginResponse {
         @Schema(description = "토큰 정보")
         private TokenSuccessResponse token;
 
-        public OauthLoginResponse(Long userId, String nickname, String email) {
+        @Schema(description = "신규 유저 여부")
+        private boolean isNewUser;
+
+        public OauthLoginResponse(Long userId, String nickname, String email, boolean isNewUser) {
                 this.userId = userId;
                 this.nickname = nickname;
                 this.email = email;
+                this.isNewUser = isNewUser;
         }
 
         public void deliverToken(String accessToken, String refreshToken) {
