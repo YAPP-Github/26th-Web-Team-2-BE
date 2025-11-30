@@ -75,7 +75,7 @@ jobs:
             if curl -f -s "https://${EXTERNAL_IP}/actuator/health" > /dev/null 2>&1 || \
                curl -f -s "http://${EXTERNAL_IP}/actuator/health" > /dev/null 2>&1; then
               echo "✓ Deployment verified successfully!"
-              curl -s "http://${EXTERNAL_IP}/actuator/health" | jq .
+              curl -L -k -s "https://$EXTERNAL_IP/actuator/health" || echo "Service is running (health check returned non-200)"
               exit 0
             fi
 
